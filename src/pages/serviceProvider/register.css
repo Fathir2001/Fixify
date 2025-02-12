@@ -1,0 +1,131 @@
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #121212;
+  padding: 2rem;
+}
+
+.register-card {
+  background: rgba(32, 32, 32, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.register-icon {
+  font-size: 3rem;
+  color: #FFD700;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+.register-header h2 {
+  color: #ffffff;
+  font-size: 1.8rem;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #FFD700;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.8rem;
+  border: 2px solid #333333;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.form-group textarea {
+  padding: 0.8rem 1rem;
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #FFD700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #808080;
+}
+
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFD700'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+}
+
+.form-group select option {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.register-button {
+  background: #1a1a1a;
+  color: #FFD700;
+  padding: 1rem;
+  border: 2px solid #FFD700;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.register-button:hover {
+  background: #FFD700;
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+  .register-card {
+    padding: 1.5rem;
+  }
+
+  .register-header h2 {
+    font-size: 1.5rem;
+  }
+}
