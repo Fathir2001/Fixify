@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import './FirstPage.css';
 
 const services = [
@@ -31,10 +32,15 @@ const services = [
 
 const FirstPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const handleEstimateClick = () => {
+    navigate('/user-type');
+  };
 
   return (
     <div className="container">
@@ -57,6 +63,7 @@ const FirstPage: React.FC = () => {
             className="cta-button"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleEstimateClick}
           >
             Get Free Estimate
           </motion.button>
