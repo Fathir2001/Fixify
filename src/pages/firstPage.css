@@ -81,12 +81,15 @@
 }
 
 .hero-subtitle {
-  font-size: 1.8rem;
-  margin-bottom: 2.5rem;
-  max-width: 800px;
-  line-height: 1.6;
-  color: var(--text-light);
-}
+    font-size: 1.8rem;
+    margin-bottom: 2.5rem;
+    max-width: 800px;
+    line-height: 1.6;
+    color: var(--text-light);
+    margin-left: auto;  /* Add this */
+    margin-right: auto; /* Add this */
+    text-align: center; /* Add this */
+  }
 
 .cta-button {
   padding: 1.2rem 3rem;
