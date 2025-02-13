@@ -5,6 +5,8 @@
   align-items: center;
   background: #121212;
   padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .register-card {
@@ -197,10 +199,14 @@
 @media (max-width: 768px) {
   .register-container {
     padding: 1rem;
+    min-height: 100dvh; /* dynamic viewport height for mobile */
+    align-items: flex-start; /* start from top on mobile */
+    overflow-y: auto; /* enable scrolling */
   }
 
   .register-card {
     padding: 1.5rem;
+    margin: 1rem auto;
   }
 
   .register-header h2 {
@@ -232,8 +238,13 @@
 }
 
 @media (max-width: 480px) {
+    .register-container {
+        padding: 0.5rem;
+      }
   .register-card {
     padding: 1rem;
+    margin: 0.5rem auto;
+    border-radius: 8px;
   }
 
   .days-grid {
