@@ -1,5 +1,5 @@
-const RequestedServiceProvider = require('../models/RequestedServiceProvider.js');
-const bcrypt = require('bcryptjs');
+const RequestedServiceProvider = require("../models/RequestedServiceProvider.js");
+const bcrypt = require("bcryptjs");
 
 const registerServiceProvider = async (req, res) => {
   try {
@@ -13,13 +13,24 @@ const registerServiceProvider = async (req, res) => {
       availableDays,
       timeFrom,
       timeTo,
-      experience
+      experience,
     } = req.body;
 
     // Check if email already exists
     const existingProvider = await RequestedServiceProvider.findOne({ email });
     if (existingProvider) {
-      return res.status(400).json({ message: 'Email already registered' });
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
+    // Validate service types
+    if (
+      !serviceType ||
+      !Array.isArray(serviceType) ||
+      serviceType.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Please select at least one service type" });
     }
 
     // Hash password
@@ -36,19 +47,21 @@ const registerServiceProvider = async (req, res) => {
       availableDays,
       timeFrom,
       timeTo,
-      experience
+      experience,
     });
 
     // Save to database
     await newServiceProvider.save();
 
-    res.status(201).json({ message: 'Registration request submitted successfully' });
+    res
+      .status(201)
+      .json({ message: "Registration request submitted successfully" });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Server error during registration" });
   }
 };
 
 module.exports = {
-  registerServiceProvider
+  registerServiceProvider,
 };

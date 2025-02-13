@@ -15,7 +15,7 @@ const ServiceProviderRegister: React.FC = () => {
     fullName: "",
     email: "",
     password: "",
-    serviceType: "",
+    serviceType: [] as string[],
     phoneNumber: "",
     serviceArea: "",
     experience: "",
@@ -72,6 +72,13 @@ const ServiceProviderRegister: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Add validation for service types
+    if (formData.serviceType.length === 0) {
+      alert("Please select at least one service type");
+      return;
+    }
+
     try {
       const response = await fetch(
         "http://localhost:5000/api/service-providers/register",
@@ -88,7 +95,19 @@ const ServiceProviderRegister: React.FC = () => {
 
       if (response.ok) {
         alert("Registration request submitted successfully!");
-        // Reset form or redirect user
+        // Reset form after successful submission
+        setFormData({
+          fullName: "",
+          email: "",
+          password: "",
+          serviceType: [],
+          phoneNumber: "",
+          serviceArea: "",
+          experience: "",
+          availableDays: [],
+          timeFrom: "",
+          timeTo: "",
+        });
       } else {
         alert(data.message || "Registration failed");
       }
@@ -143,21 +162,36 @@ const ServiceProviderRegister: React.FC = () => {
             />
           </div>
 
-          <div className="form-group">
-            <FaTools className="input-icon" />
-            <select
-              name="serviceType"
-              value={formData.serviceType}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Service Type</option>
+          <div className="form-group service-type-selection">
+            <label className="service-type-label">
+              Service Types <span className="required">*</span>
+              {formData.serviceType.length === 0 && (
+                <span className="error-text">
+                  Please select at least one service type
+                </span>
+              )}
+            </label>
+            <div className="service-type-grid">
               {serviceTypes.map((service, index) => (
-                <option key={index} value={service}>
-                  {service}
-                </option>
+                <label key={index} className="service-checkbox">
+                  <input
+                    type="checkbox"
+                    name={`service-${service}`}
+                    checked={formData.serviceType.includes(service)}
+                    onChange={(e) => {
+                      const service = e.target.name.replace("service-", "");
+                      setFormData((prev) => ({
+                        ...prev,
+                        serviceType: e.target.checked
+                          ? [...prev.serviceType, service]
+                          : prev.serviceType.filter((s) => s !== service),
+                      }));
+                    }}
+                  />
+                  <span className="checkbox-text">{service}</span>
+                </label>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="form-group">
