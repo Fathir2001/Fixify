@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import {
-  FaTools,
+  FaClock,
   FaEnvelope,
   FaLock,
-  FaUserCircle,
-  FaPhone,
   FaMapMarkerAlt,
-  FaClock,
+  FaPhone,
+  FaTools,
+  FaUserCircle,
 } from "react-icons/fa";
 import "./register.css";
 
@@ -70,10 +70,32 @@ const ServiceProviderRegister: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Add your registration logic here
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/service-providers/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Registration request submitted successfully!");
+        // Reset form or redirect user
+      } else {
+        alert(data.message || "Registration failed");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("Registration failed. Please try again.");
+    }
   };
 
   return (
