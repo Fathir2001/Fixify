@@ -22,7 +22,7 @@ const UserType: React.FC = () => {
           onClick={() => handleUserTypeSelection("service-needer")}
         >
           <img
-            src="/images/customer-service.jpg"
+            src="/serviceNeeder.webp"
             alt="Service Needer Background"
             className="card-background"
           />
@@ -59,7 +59,7 @@ const UserType: React.FC = () => {
           onClick={() => handleUserTypeSelection("admin")}
         >
           <img
-            src="/admin.webp"
+            src="/admin.jpg"
             alt="Admin Background"
             className="card-background"
           />
