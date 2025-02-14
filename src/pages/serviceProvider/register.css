@@ -303,6 +303,70 @@ body::before {
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.modal-icon {
+  color: #FFD700;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+.modal-title {
+  color: #FFD700;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.modal-message {
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.modal-button {
+  background: #1a1a1a;
+  color: #FFD700;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid #FFD700;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.modal-button:hover {
+  background: #FFD700;
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
 @media (max-width: 768px) {
   .register-container {
     padding: 1rem;
@@ -372,5 +436,10 @@ body::before {
 
   .time-range .time-inputs {
     gap: 0.5rem;
+  }
+
+  .modal-content {
+    width: 85%;
+    padding: 1.5rem;
   }
 }

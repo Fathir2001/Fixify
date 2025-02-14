@@ -7,6 +7,7 @@ import {
   FaPhone,
   FaTools,
   FaUserCircle,
+  FaCheckCircle,
 } from "react-icons/fa";
 import "./register.css";
 
@@ -45,6 +46,8 @@ const ServiceProviderRegister: React.FC = () => {
     "Saturday",
     "Sunday",
   ];
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -94,7 +97,7 @@ const ServiceProviderRegister: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Registration request submitted successfully!");
+        setShowSuccessModal(true);
         // Reset form after successful submission
         setFormData({
           fullName: "",
@@ -272,6 +275,24 @@ const ServiceProviderRegister: React.FC = () => {
           </button>
         </form>
       </div>
+      {showSuccessModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <FaCheckCircle className="modal-icon" />
+            <h3 className="modal-title">Registration Successful!</h3>
+            <p className="modal-message">
+              Your profile is being sent to the admin. After the admin review,
+              you can login to the system. This process may take some time.
+            </p>
+            <button
+              className="modal-button"
+              onClick={() => setShowSuccessModal(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
