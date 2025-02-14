@@ -1,34 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { FaBolt, FaWrench, FaHammer, FaCar, FaTools, 
+         FaBroom, FaPaintRoller, FaTree, FaHome } from 'react-icons/fa';
 import './FirstPage.css';
 
 const services = [
     {
       id: 1,
-      title: 'Emergency Repairs',
-      description: '24/7 available for urgent home repairs',
-      icon: '🔧'
+      title: 'Electrician Services',
+      description: 'Professional electrical installation and repair services',
+      icon: FaBolt
     },
     {
       id: 2,
-      title: 'Home Renovation',
-      description: 'Complete home makeover services',
-      icon: '🏠'
+      title: 'Plumbing Services',
+      description: 'Expert plumbing solutions for your home',
+      icon: FaWrench
     },
     {
       id: 3,
-      title: 'Plumbing Services',
-      description: 'Expert plumbing solutions',
-      icon: '🚰'
+      title: 'Carpentry Services',
+      description: 'Custom woodwork and furniture repairs',
+      icon: FaHammer
     },
     {
       id: 4,
-      title: 'Electrical Work',
-      description: 'Professional electrical repairs and installations',
-      icon: '⚡'
+      title: 'Vehicle Breakdown',
+      description: '24/7 roadside assistance services',
+      icon: FaCar
+    },
+    {
+      id: 5,
+      title: 'Appliance Repair',
+      description: 'Fixing all types of home appliances',
+      icon: FaTools
+    },
+    {
+      id: 6,
+      title: 'House Cleaning',
+      description: 'Professional cleaning services',
+      icon: FaBroom
+    },
+    {
+      id: 7,
+      title: 'Painting Services',
+      description: 'Interior and exterior painting solutions',
+      icon: FaPaintRoller
+    },
+    {
+      id: 8,
+      title: 'Gardening & Landscaping',
+      description: 'Transform your outdoor spaces',
+      icon: FaTree
+    },
+    {
+      id: 9,
+      title: 'Roof Repair',
+      description: 'Waterproofing and roof maintenance',
+      icon: FaHome
     }
-  ];
+];
+
 
 const FirstPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -87,7 +120,7 @@ const FirstPage: React.FC = () => {
                 animate={{ y: [-5, 5, -5] }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
-                {service.icon}
+                <service.icon />
               </motion.div>
               <h3 className="service-title">{service.title}</h3>
               <p className="service-description">{service.description}</p>
