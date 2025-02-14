@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const requestedServiceProviderRoutes = require('./routes/requestedServiceProvider.js');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/service-providers', requestedServiceProviderRoutes);
+app.use('/api/admin', adminRoutes);
+
 
 // Connect to MongoDB
 mongoose
