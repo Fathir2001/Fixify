@@ -8,11 +8,9 @@ import {
   FaFileInvoiceDollar,
   FaChartLine,
   FaCalendarAlt,
-  FaBell,
   FaUserCircle,
   FaSignOutAlt,
   FaBars,
-  FaSearch,
 } from "react-icons/fa";
 import "./dashboard.css";
 
@@ -73,12 +71,7 @@ const AdminDashboard: React.FC = () => {
       <nav className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <FaTools className="logo-icon" />
-          <span className="logo-text">Fixify Admin</span>
-        </div>
-
-        <div className="search-box">
-          <FaSearch className="search-icon" />
-          <input type="text" placeholder="Search..." />
+          <span className="logo-text">~ Fixify ~</span>
         </div>
 
         <div className="sidebar-menu">
@@ -131,15 +124,11 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="header-right">
-            <button className="notification-btn">
-              <FaBell />
-              <span className="notification-badge">3</span>
-            </button>
+            
             <div className="user-profile">
               <FaUserCircle className="avatar" />
               <div className="user-info">
-                <span className="user-name">John Doe</span>
-                <span className="user-role">Administrator</span>
+                <span className="user-name">Administrator</span>
               </div>
             </div>
             <button
