@@ -1,34 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaCheck, FaTimes, FaSpinner } from "react-icons/fa";
+import axios from "axios";
 import "./serviceProviders.css";
 
 interface ProviderRequest {
-  id: string;
-  name: string;
+  _id: string;
+  fullName: string;
   email: string;
-  phone: string;
-  services: string[];
+  phoneNumber: string;
+  serviceType: string[];
   experience: string;
   status: "pending" | "approved" | "rejected";
-  date: string;
+  createdAt: string;
+  serviceArea: string;
+  availableDays: string[];
+  timeFrom: string;
+  timeTo: string;
 }
 
 const ServiceProviders: React.FC = () => {
-  const [requests, setRequests] = useState<ProviderRequest[]>([
-    {
-      id: "1",
-      name: "John Smith",
-      email: "john.smith@example.com",
-      phone: "+1 234-567-8900",
-      services: ["Plumbing", "Electrical"],
-      experience: "5 years",
-      status: "pending",
-      date: "2025-02-15",
-    },
-    // Add more sample data as needed
-  ]);
-
+  const [requests, setRequests] = useState<ProviderRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("pending");
+
+  useEffect(() => {
+    const fetchServiceProviders = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/service-providers/all"
+        );
+        // Add type for the response data
+        const providers = response.data.map(
+          (provider: Omit<ProviderRequest, "status">) => ({
+            ...provider,
+            status: "pending" as const,
+          })
+        );
+        setRequests(providers);
+        setLoading(false);
+      } catch (err: unknown) {
+        // Type guard for error handling
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Failed to fetch service providers";
+        setError(errorMessage);
+        setLoading(false);
+      }
+    };
+
+    fetchServiceProviders();
+  }, []);
 
   const handleStatusChange = (
     requestId: string,
@@ -36,12 +59,15 @@ const ServiceProviders: React.FC = () => {
   ) => {
     setRequests(
       requests.map((req) =>
-        req.id === requestId ? { ...req, status: newStatus } : req
+        req._id === requestId ? { ...req, status: newStatus } : req
       )
     );
   };
 
   const filteredRequests = requests.filter((req) => req.status === filter);
+
+  if (loading) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="provider-reqs-container">
@@ -70,9 +96,9 @@ const ServiceProviders: React.FC = () => {
 
       <div className="requests-grid">
         {filteredRequests.map((request) => (
-          <div key={request.id} className="request-card">
+          <div key={request._id} className="request-card">
             <div className="request-header">
-              <h3>{request.name}</h3>
+              <h3>{request.fullName}</h3>
               <span className={`status-badge ${request.status}`}>
                 {request.status === "pending" && (
                   <FaSpinner className="spinning" />
@@ -86,29 +112,40 @@ const ServiceProviders: React.FC = () => {
                 <strong>Email:</strong> {request.email}
               </p>
               <p>
-                <strong>Phone:</strong> {request.phone}
+                <strong>Phone:</strong> {request.phoneNumber}
               </p>
               <p>
-                <strong>Services:</strong> {request.services.join(", ")}
+                <strong>Services:</strong> {request.serviceType.join(", ")}
               </p>
               <p>
                 <strong>Experience:</strong> {request.experience}
               </p>
               <p>
-                <strong>Date:</strong> {request.date}
+                <strong>Service Area:</strong> {request.serviceArea}
+              </p>
+              <p>
+                <strong>Available Days:</strong>{" "}
+                {request.availableDays.join(", ")}
+              </p>
+              <p>
+                <strong>Hours:</strong> {request.timeFrom} - {request.timeTo}
+              </p>
+              <p>
+                <strong>Date Applied:</strong>{" "}
+                {new Date(request.createdAt).toLocaleDateString()}
               </p>
             </div>
             {request.status === "pending" && (
               <div className="action-buttons">
                 <button
                   className="approve-btn"
-                  onClick={() => handleStatusChange(request.id, "approved")}
+                  onClick={() => handleStatusChange(request._id, "approved")}
                 >
                   <FaCheck /> Approve
                 </button>
                 <button
                   className="reject-btn"
-                  onClick={() => handleStatusChange(request.id, "rejected")}
+                  onClick={() => handleStatusChange(request._id, "rejected")}
                 >
                   <FaTimes /> Reject
                 </button>
