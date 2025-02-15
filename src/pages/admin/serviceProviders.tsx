@@ -16,31 +16,44 @@ interface ProviderRequest {
   availableDays: string[];
   timeFrom: string;
   timeTo: string;
+  approvedAt?: string;
+  rejectedAt?: string;
 }
 
 const ServiceProviders: React.FC = () => {
-  const [requests, setRequests] = useState<ProviderRequest[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<ProviderRequest[]>([]);
+  const [approvedProviders, setApprovedProviders] = useState<ProviderRequest[]>([]);
+  const [rejectedProviders, setRejectedProviders] = useState<ProviderRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("pending");
 
   useEffect(() => {
-    const fetchServiceProviders = async () => {
+    const fetchProviders = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/service-providers/all"
-        );
-        // Add type for the response data
-        const providers = response.data.map(
-          (provider: Omit<ProviderRequest, "status">) => ({
-            ...provider,
-            status: "pending" as const,
-          })
-        );
-        setRequests(providers);
+        const [pendingResponse, approvedResponse, rejectedResponse] = await Promise.all([
+          axios.get("http://localhost:5000/api/service-providers/all"),
+          axios.get("http://localhost:5000/api/service-providers/approved"),
+          axios.get("http://localhost:5000/api/service-providers/rejected")
+        ]);
+
+        setPendingRequests(pendingResponse.data.map((provider: any) => ({
+          ...provider,
+          status: "pending" as const,
+        })));
+
+        setApprovedProviders(approvedResponse.data.map((provider: any) => ({
+          ...provider,
+          status: "approved" as const,
+        })));
+
+        setRejectedProviders(rejectedResponse.data.map((provider: any) => ({
+          ...provider,
+          status: "rejected" as const,
+        })));
+
         setLoading(false);
       } catch (err: unknown) {
-        // Type guard for error handling
         const errorMessage =
           err instanceof Error
             ? err.message
@@ -50,7 +63,7 @@ const ServiceProviders: React.FC = () => {
       }
     };
 
-    fetchServiceProviders();
+    fetchProviders();
   }, []);
 
   const handleStatusChange = async (
@@ -63,26 +76,63 @@ const ServiceProviders: React.FC = () => {
           `http://localhost:5000/api/service-providers/approve/${requestId}`
         );
 
-        // Update local state
-        setRequests(requests.filter((req) => req._id !== requestId));
+        const approvedProvider = pendingRequests.find(req => req._id === requestId);
+        if (approvedProvider) {
+          setPendingRequests(requests => 
+            requests.filter(req => req._id !== requestId)
+          );
+          setApprovedProviders(providers => [
+            {
+              ...approvedProvider,
+              status: "approved",
+              approvedAt: new Date().toISOString()
+            },
+            ...providers
+          ]);
+        }
 
-        // Show success message
         alert("Service provider approved successfully!");
       } else {
-        // Handle rejection (you can implement similar logic for rejection)
-        setRequests(
-          requests.map((req) =>
-            req._id === requestId ? { ...req, status: newStatus } : req
-          )
+        await axios.put(
+          `http://localhost:5000/api/service-providers/reject/${requestId}`
         );
+
+        const rejectedProvider = pendingRequests.find(req => req._id === requestId);
+        if (rejectedProvider) {
+          setPendingRequests(requests => 
+            requests.filter(req => req._id !== requestId)
+          );
+          setRejectedProviders(providers => [
+            {
+              ...rejectedProvider,
+              status: "rejected",
+              rejectedAt: new Date().toISOString()
+            },
+            ...providers
+          ]);
+        }
+
+        alert("Service provider rejected successfully!");
       }
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Failed to update service provider status");
+      alert(error instanceof Error ? error.message : "Failed to update service provider status");
     }
   };
 
-  const filteredRequests = requests.filter((req) => req.status === filter);
+  const getFilteredRequests = () => {
+    switch (filter) {
+      case "approved":
+        return approvedProviders;
+      case "rejected":
+        return rejectedProviders;
+      case "pending":
+      default:
+        return pendingRequests;
+    }
+  };
+
+  const filteredRequests = getFilteredRequests();
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -121,8 +171,7 @@ const ServiceProviders: React.FC = () => {
                 {request.status === "pending" && (
                   <FaSpinner className="spinning" />
                 )}
-                {request.status.charAt(0).toUpperCase() +
-                  request.status.slice(1)}
+                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
               </span>
             </div>
             <div className="request-details">
@@ -152,6 +201,18 @@ const ServiceProviders: React.FC = () => {
                 <strong>Date Applied:</strong>{" "}
                 {new Date(request.createdAt).toLocaleDateString()}
               </p>
+              {request.approvedAt && (
+                <p>
+                  <strong>Date Approved:</strong>{" "}
+                  {new Date(request.approvedAt).toLocaleDateString()}
+                </p>
+              )}
+              {request.rejectedAt && (
+                <p>
+                  <strong>Date Rejected:</strong>{" "}
+                  {new Date(request.rejectedAt).toLocaleDateString()}
+                </p>
+              )}
             </div>
             {request.status === "pending" && (
               <div className="action-buttons">

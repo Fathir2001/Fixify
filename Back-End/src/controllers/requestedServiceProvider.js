@@ -1,6 +1,7 @@
 const RequestedServiceProvider = require("../models/RequestedServiceProvider.js");
 const ApprovedServiceProvider = require("../models/ApprovedServiceProvider.js");
 const bcrypt = require("bcryptjs");
+const RejectedServiceProvider = require("../models/RejectedServiceProvider.js");
 
 const registerServiceProvider = async (req, res) => {
   try {
@@ -115,8 +116,75 @@ const approveServiceProvider = async (req, res) => {
   }
 };
 
+const getApprovedServiceProviders = async (req, res) => {
+  try {
+    const approvedProviders = await ApprovedServiceProvider.find({})
+      .select("-password")
+      .sort({ approvedAt: -1 });
+
+    res.status(200).json(approvedProviders);
+  } catch (error) {
+    console.error("Error fetching approved providers:", error);
+    res.status(500).json({ message: "Server error while fetching approved providers" });
+  }
+};
+
+
+// Add this new function in the controller
+const rejectServiceProvider = async (req, res) => {
+  try {
+    const { providerId } = req.params;
+
+    // Find the requested service provider
+    const provider = await RequestedServiceProvider.findById(providerId);
+    if (!provider) {
+      return res.status(404).json({ message: "Service provider not found" });
+    }
+
+    // Create new rejected service provider
+    const rejectedProvider = new RejectedServiceProvider({
+      fullName: provider.fullName,
+      email: provider.email,
+      serviceType: provider.serviceType,
+      phoneNumber: provider.phoneNumber,
+      serviceArea: provider.serviceArea,
+      availableDays: provider.availableDays,
+      timeFrom: provider.timeFrom,
+      timeTo: provider.timeTo,
+      experience: provider.experience
+    });
+
+    // Save to rejected collection
+    await rejectedProvider.save();
+
+    // Remove from requested collection
+    await RequestedServiceProvider.findByIdAndDelete(providerId);
+
+    res.status(200).json({ message: "Service provider rejected successfully" });
+  } catch (error) {
+    console.error("Error rejecting service provider:", error);
+    res.status(500).json({ message: "Server error while rejecting provider" });
+  }
+};
+
+const getRejectedServiceProviders = async (req, res) => {
+  try {
+    const rejectedProviders = await RejectedServiceProvider.find({})
+      .sort({ rejectedAt: -1 });
+
+    res.status(200).json(rejectedProviders);
+  } catch (error) {
+    console.error("Error fetching rejected providers:", error);
+    res.status(500).json({ message: "Server error while fetching rejected providers" });
+  }
+};
+
+
 module.exports = {
   registerServiceProvider,
   getAllServiceProviders,
-  approveServiceProvider
+  approveServiceProvider,
+  getApprovedServiceProviders,
+  rejectServiceProvider,
+  getRejectedServiceProviders
 };
