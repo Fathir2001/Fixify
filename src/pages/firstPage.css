@@ -253,3 +253,10 @@
     font-size: 1.1rem;
   }
 }
+
+@media (hover: none) {
+  .service-card:hover {
+      transform: none;
+      box-shadow: none;
+  }
+}
