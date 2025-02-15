@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaCheck, FaTimes, FaSpinner } from "react-icons/fa";
-import "./providerReqs.css";
+import "./serviceProviders.css";
 
 interface ProviderRequest {
   id: string;
@@ -13,7 +13,7 @@ interface ProviderRequest {
   date: string;
 }
 
-const ProviderRequests: React.FC = () => {
+const ServiceProviders: React.FC = () => {
   const [requests, setRequests] = useState<ProviderRequest[]>([
     {
       id: "1",
@@ -28,7 +28,7 @@ const ProviderRequests: React.FC = () => {
     // Add more sample data as needed
   ]);
 
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("pending");
 
   const handleStatusChange = (
     requestId: string,
@@ -121,4 +121,4 @@ const ProviderRequests: React.FC = () => {
   );
 };
 
-export default ProviderRequests;
+export default ServiceProviders;

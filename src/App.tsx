@@ -5,7 +5,7 @@ import ServiceProviderRegister from './pages/serviceProvider/register';
 import AdminLogin from './pages/admin/login';
 import AdminDashboard from './pages/admin/dashboard';
 import './App.css';
-import ProviderRequests from './pages/admin/providerReqs';
+import ProviderRequests from './pages/admin/serviceProviders';
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
         <Route path="/service-provider/register" element={<ServiceProviderRegister />} />
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/provider-requests" element={<ProviderRequests />} />
+        <Route path="/admin/service-provider" element={<ProviderRequests />} />
       </Routes>
     </Router>
   );

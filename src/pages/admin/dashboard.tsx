@@ -37,9 +37,9 @@ const AdminDashboard: React.FC = () => {
       category: "main",
     },
     {
-      id: "providerReqs",
+      id: "ServiceProviders",
       icon: FaUserPlus,
-      label: "Provider Reqs",
+      label: "Service Providers",
       category: "main",
     },
     {
@@ -69,8 +69,8 @@ const AdminDashboard: React.FC = () => {
 
   const handleMenuClick = (itemId: string) => {
     setSelectedSection(itemId);
-    if (itemId === "providerReqs") {
-      navigate("/admin/provider-requests");
+    if (itemId === "ServiceProviders") {
+      navigate("/admin/service-provider");
     }
   };
 
