@@ -53,15 +53,33 @@ const ServiceProviders: React.FC = () => {
     fetchServiceProviders();
   }, []);
 
-  const handleStatusChange = (
+  const handleStatusChange = async (
     requestId: string,
     newStatus: "approved" | "rejected"
   ) => {
-    setRequests(
-      requests.map((req) =>
-        req._id === requestId ? { ...req, status: newStatus } : req
-      )
-    );
+    try {
+      if (newStatus === "approved") {
+        await axios.put(
+          `http://localhost:5000/api/service-providers/approve/${requestId}`
+        );
+
+        // Update local state
+        setRequests(requests.filter((req) => req._id !== requestId));
+
+        // Show success message
+        alert("Service provider approved successfully!");
+      } else {
+        // Handle rejection (you can implement similar logic for rejection)
+        setRequests(
+          requests.map((req) =>
+            req._id === requestId ? { ...req, status: newStatus } : req
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update service provider status");
+    }
   };
 
   const filteredRequests = requests.filter((req) => req.status === filter);
