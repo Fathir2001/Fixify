@@ -67,6 +67,13 @@ const AdminDashboard: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleMenuClick = (itemId: string) => {
+    setSelectedSection(itemId);
+    if (itemId === "providerReqs") {
+      navigate("/admin/provider-requests");
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <nav className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
@@ -86,7 +93,7 @@ const AdminDashboard: React.FC = () => {
                   className={`menu-item ${
                     selectedSection === item.id ? "active" : ""
                   }`}
-                  onClick={() => setSelectedSection(item.id)}
+                  onClick={() => handleMenuClick(item.id)}
                 >
                   <item.icon /> <span>{item.label}</span>
                 </button>
@@ -103,7 +110,7 @@ const AdminDashboard: React.FC = () => {
                   className={`menu-item ${
                     selectedSection === item.id ? "active" : ""
                   }`}
-                  onClick={() => setSelectedSection(item.id)}
+                  onClick={() => handleMenuClick(item.id)}
                 >
                   <item.icon /> <span>{item.label}</span>
                 </button>
@@ -119,24 +126,18 @@ const AdminDashboard: React.FC = () => {
               <FaBars />
             </button>
             <h1 className="page-title">
-              {selectedSection.charAt(0).toUpperCase() +
-                selectedSection.slice(1)}
+              {selectedSection.charAt(0).toUpperCase() + selectedSection.slice(1)}
             </h1>
           </div>
 
           <div className="header-right">
-            
             <div className="user-profile">
               <FaUserCircle className="avatar" />
               <div className="user-info">
                 <span className="user-name">Administrator</span>
               </div>
             </div>
-            <button
-              className="logout-btn"
-              onClick={handleLogout}
-              title="Logout"
-            >
+            <button className="logout-btn" onClick={handleLogout} title="Logout">
               <FaSignOutAlt />
             </button>
           </div>
