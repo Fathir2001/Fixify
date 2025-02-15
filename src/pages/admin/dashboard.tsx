@@ -11,6 +11,7 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaBars,
+  FaUserPlus,
 } from "react-icons/fa";
 import "./dashboard.css";
 
@@ -36,9 +37,9 @@ const AdminDashboard: React.FC = () => {
       category: "main",
     },
     {
-      id: "invoices",
-      icon: FaFileInvoiceDollar,
-      label: "Invoices",
+      id: "providerReqs",
+      icon: FaUserPlus,
+      label: "Provider Reqs",
       category: "main",
     },
     {
