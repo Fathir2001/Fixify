@@ -15,4 +15,42 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+const loginServiceProvider = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const serviceProvider = await ApprovedServiceProvider.findOne({ email });
+    if (!serviceProvider) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, serviceProvider.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { 
+        id: serviceProvider._id,
+        email: serviceProvider.email,
+        fullName: serviceProvider.fullName
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.status(200).json({
+      token,
+      provider: {
+        id: serviceProvider._id,
+        fullName: serviceProvider.fullName,
+        email: serviceProvider.email
+      }
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error during login" });
+  }
+};
+
+module.exports = authMiddleware, loginServiceProvider;

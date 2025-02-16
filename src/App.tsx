@@ -7,6 +7,7 @@ import AdminDashboard from './pages/admin/dashboard';
 import './App.css';
 import ProviderRequests from './pages/admin/serviceProviders';
 import ServiceProviderLogin from './pages/serviceProvider/login';
+import ServiceProviderHomePage from './pages/serviceProvider/homePage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/service-provider" element={<ProviderRequests />} />
         <Route path="/service-provider/login" element={<ServiceProviderLogin />} />
+        <Route path="/service-provider/dashboard" element={<ServiceProviderHomePage />} />
       </Routes>
     </Router>
   );

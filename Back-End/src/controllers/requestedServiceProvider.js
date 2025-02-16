@@ -225,6 +225,30 @@ const loginServiceProvider = async (req, res) => {
   }
 };
 
+const getServiceProviderProfile = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    const provider = await ApprovedServiceProvider.findOne({ _id: decoded.id });
+    if (!provider) {
+      return res.status(404).json({ message: "Provider not found" });
+    }
+
+    res.status(200).json({
+      fullName: provider.fullName,
+      email: provider.email,
+      serviceType: provider.serviceType,
+      phoneNumber: provider.phoneNumber,
+      serviceArea: provider.serviceArea
+    });
+  } catch (error) {
+    console.error("Profile fetch error:", error);
+    res.status(401).json({ message: "Authentication failed" });
+  }
+};
+
+
 
 module.exports = {
   registerServiceProvider,
@@ -233,5 +257,6 @@ module.exports = {
   getApprovedServiceProviders,
   rejectServiceProvider,
   getRejectedServiceProviders,
-  loginServiceProvider
+  loginServiceProvider,
+  getServiceProviderProfile
 };

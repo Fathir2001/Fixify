@@ -8,7 +8,9 @@ const {
   rejectServiceProvider,
   getRejectedServiceProviders,
   loginServiceProvider,
+  getServiceProviderProfile,
 } = require("../controllers/requestedServiceProvider.js");
+const authMiddleware = require('../middleware/auth');
 
 router.post("/register", registerServiceProvider);
 router.get("/all", getAllServiceProviders);
@@ -17,5 +19,6 @@ router.get("/approved", getApprovedServiceProviders);
 router.put("/reject/:providerId", rejectServiceProvider);
 router.get("/rejected", getRejectedServiceProviders);
 router.post("/login", loginServiceProvider);
+router.get('/profile', authMiddleware, getServiceProviderProfile);
 
 module.exports = router;
