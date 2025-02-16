@@ -22,6 +22,31 @@ body::before {
   z-index: -1;
 }
 
+.login-button-container {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.login-button {
+  background: transparent;
+  color: #FFD700;
+  padding: 0.5rem 1rem;
+  border: 1px solid #FFD700;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.login-button:hover {
+  background: #FFD700;
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
 
 
 .register-container {
@@ -35,6 +60,7 @@ body::before {
 }
 
 .register-card {
+  position: relative;
   background: rgba(18, 18, 18, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -418,6 +444,16 @@ body::before {
 }
 
 @media (max-width: 480px) {
+  .login-button-container {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .login-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
   .register-container {
     padding: 0.5rem;
   }

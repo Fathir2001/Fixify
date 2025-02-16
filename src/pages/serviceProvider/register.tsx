@@ -123,10 +123,17 @@ const ServiceProviderRegister: React.FC = () => {
   return (
     <div className="register-container">
       <div className="register-card">
+      <div className="login-button-container">
+    <button onClick={() => window.location.href = '/service-provider/login'} className="login-button">
+      Login
+    </button>
+  </div>
         <div className="register-header">
           <FaTools className="register-icon" />
           <h2>Service Provider Registration</h2>
         </div>
+        
+
 
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-group">

@@ -6,6 +6,7 @@ import AdminLogin from './pages/admin/login';
 import AdminDashboard from './pages/admin/dashboard';
 import './App.css';
 import ProviderRequests from './pages/admin/serviceProviders';
+import ServiceProviderLogin from './pages/serviceProvider/login';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/service-provider" element={<ProviderRequests />} />
+        <Route path="/service-provider/login" element={<ServiceProviderLogin />} />
       </Routes>
     </Router>
   );
