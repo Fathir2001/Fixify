@@ -179,6 +179,52 @@ const getRejectedServiceProviders = async (req, res) => {
   }
 };
 
+// Add these imports at the top
+const jwt = require('jsonwebtoken');
+
+// Add this new function in the controller
+const loginServiceProvider = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find the service provider in the approved collection
+    const serviceProvider = await ApprovedServiceProvider.findOne({ email });
+    if (!serviceProvider) {
+      return res.status(401).json({ message: "Invalid credentials or account not approved" });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, serviceProvider.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        id: serviceProvider._id,
+        email: serviceProvider.email,
+        fullName: serviceProvider.fullName
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    // Send response
+    res.status(200).json({
+      token,
+      serviceProvider: {
+        id: serviceProvider._id,
+        fullName: serviceProvider.fullName,
+        email: serviceProvider.email
+      }
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error during login" });
+  }
+};
+
 
 module.exports = {
   registerServiceProvider,
@@ -186,5 +232,6 @@ module.exports = {
   approveServiceProvider,
   getApprovedServiceProviders,
   rejectServiceProvider,
-  getRejectedServiceProviders
+  getRejectedServiceProviders,
+  loginServiceProvider
 };
