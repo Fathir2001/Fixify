@@ -7,25 +7,39 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0.5rem 2rem;
   background-color: #1a1a1a;
-  color: #FFD700;
+  height: 60px;
+  box-sizing: border-box;
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  letter-spacing: 1px;
+  font-size: 2rem; 
+  font-weight: 800;
+  letter-spacing: 2px;
+  /* Remove the transparent fill */
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  background-clip: text;
+  color: transparent;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
 }
 
 .logout-button {
   background: transparent;
   color: #FFD700;
   border: 1px solid #FFD700;
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 0.8rem;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
+  transform: scale(1.05);
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
 }
 
 .logout-button:hover {

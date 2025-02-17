@@ -59,7 +59,7 @@ const ServiceProviderHomePage: React.FC = () => {
   return (
     <div className="home-container">
       <nav className="navbar">
-        <div className="logo">Fixify</div>
+        <h1 className="logo">Fixify</h1>
         <button onClick={handleLogout} className="logout-button">Logout</button>
       </nav>
 
