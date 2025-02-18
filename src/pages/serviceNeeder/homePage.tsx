@@ -155,7 +155,7 @@ const ServiceNeederHomePage: React.FC = () => {
             </div>
             {/* Add more contact details */}
           </div>
-          <form className="contact-form">{/* Add form fields */}</form>
+          {/* <form className="contact-form">Add form fields</form> */}
         </div>
       </section>
     </div>
