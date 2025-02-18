@@ -12,6 +12,8 @@ import {
   FaPaintRoller,
   FaTree,
   FaHome,
+  FaEnvelope,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import "./homePage.css";
 
@@ -91,6 +93,10 @@ const ServiceNeederHomePage: React.FC = () => {
     },
   ];
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+
   return (
     <div className="home-page">
       {/* Hero Section */}
@@ -101,7 +107,6 @@ const ServiceNeederHomePage: React.FC = () => {
           <button className="cta-button">Book a Service</button>
         </div>
       </section>
-
       {/* Services Section */}
       <section className="services">
         <h2>Our Services</h2>
@@ -117,7 +122,6 @@ const ServiceNeederHomePage: React.FC = () => {
           ))}
         </div>
       </section>
-
       {/* How It Works */}
       <section className="how-it-works">
         <h2>How It Works</h2>
@@ -131,7 +135,6 @@ const ServiceNeederHomePage: React.FC = () => {
           ))}
         </div>
       </section>
-
       {/* Why Choose Us */}
       <section className="why-us">
         <h2>Why Choose Fixify</h2>
@@ -143,7 +146,6 @@ const ServiceNeederHomePage: React.FC = () => {
           {/* Add more benefits */}
         </div>
       </section>
-
       {/* Contact Section */}
       <section className="contact">
         <h2>Get In Touch</h2>
@@ -153,9 +155,52 @@ const ServiceNeederHomePage: React.FC = () => {
               <FaPhoneAlt />
               <span>1-800-FIXIFY</span>
             </div>
-            {/* Add more contact details */}
+            <div className="contact-item">
+              <FaEnvelope />
+              <span>support@fixify.com</span>
+            </div>
+            <div className="contact-item">
+              <FaMapMarkerAlt />
+              <span>123 Repair Street, Fix City</span>
+            </div>
           </div>
-          {/* <form className="contact-form">Add form fields</form> */}
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <div className="input-wrapper">
+              <input type="text" id="name" placeholder="Your Name" required />
+            </div>
+            <div className="input-wrapper">
+              <input
+                type="email"
+                id="email"
+                placeholder="Your Email"
+                required
+              />
+            </div>
+            <div className="input-wrapper">
+              <input type="tel" id="phone" placeholder="Your Phone" required />
+            </div>
+            <div className="input-wrapper">
+              <select id="service" required>
+                <option value="">Select Service</option>
+                {services.map((service) => (
+                  <option key={service.id} value={service.title}>
+                    {service.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="input-wrapper">
+              <textarea
+                id="message"
+                placeholder="Your Message"
+                rows={4}
+                required
+              ></textarea>
+            </div>
+            <button type="submit" className="submit-button">
+              Send Message
+            </button>
+          </form>
         </div>
       </section>
     </div>
