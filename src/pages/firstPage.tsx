@@ -1,66 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { FaBolt, FaWrench, FaHammer, FaCar, FaTools, 
-         FaBroom, FaPaintRoller, FaTree, FaHome } from 'react-icons/fa';
+// import { FaBolt, FaWrench, FaHammer, FaCar, FaTools, 
+//          FaBroom, FaPaintRoller, FaTree, FaHome } from 'react-icons/fa';
 import './FirstPage.css';
 
-const services = [
-    {
-      id: 1,
-      title: 'Electrician Services',
-      description: 'Professional electrical installation and repair services',
-      icon: FaBolt
-    },
-    {
-      id: 2,
-      title: 'Plumbing Services',
-      description: 'Expert plumbing solutions for your home',
-      icon: FaWrench
-    },
-    {
-      id: 3,
-      title: 'Carpentry Services',
-      description: 'Custom woodwork and furniture repairs',
-      icon: FaHammer
-    },
-    {
-      id: 4,
-      title: 'Vehicle Breakdown',
-      description: '24/7 roadside assistance services',
-      icon: FaCar
-    },
-    {
-      id: 5,
-      title: 'Appliance Repair',
-      description: 'Fixing all types of home appliances',
-      icon: FaTools
-    },
-    {
-      id: 6,
-      title: 'House Cleaning',
-      description: 'Professional cleaning services',
-      icon: FaBroom
-    },
-    {
-      id: 7,
-      title: 'Painting Services',
-      description: 'Interior and exterior painting solutions',
-      icon: FaPaintRoller
-    },
-    {
-      id: 8,
-      title: 'Gardening & Landscaping',
-      description: 'Transform your outdoor spaces',
-      icon: FaTree
-    },
-    {
-      id: 9,
-      title: 'Roof Repair',
-      description: 'Waterproofing and roof maintenance',
-      icon: FaHome
-    }
-];
+// const services = [
+//     {
+//       id: 1,
+//       title: 'Electrician Services',
+//       description: 'Professional electrical installation and repair services',
+//       icon: FaBolt
+//     },
+//     {
+//       id: 2,
+//       title: 'Plumbing Services',
+//       description: 'Expert plumbing solutions for your home',
+//       icon: FaWrench
+//     },
+//     {
+//       id: 3,
+//       title: 'Carpentry Services',
+//       description: 'Custom woodwork and furniture repairs',
+//       icon: FaHammer
+//     },
+//     {
+//       id: 4,
+//       title: 'Vehicle Breakdown',
+//       description: '24/7 roadside assistance services',
+//       icon: FaCar
+//     },
+//     {
+//       id: 5,
+//       title: 'Appliance Repair',
+//       description: 'Fixing all types of home appliances',
+//       icon: FaTools
+//     },
+//     {
+//       id: 6,
+//       title: 'House Cleaning',
+//       description: 'Professional cleaning services',
+//       icon: FaBroom
+//     },
+//     {
+//       id: 7,
+//       title: 'Painting Services',
+//       description: 'Interior and exterior painting solutions',
+//       icon: FaPaintRoller
+//     },
+//     {
+//       id: 8,
+//       title: 'Gardening & Landscaping',
+//       description: 'Transform your outdoor spaces',
+//       icon: FaTree
+//     },
+//     {
+//       id: 9,
+//       title: 'Roof Repair',
+//       description: 'Waterproofing and roof maintenance',
+//       icon: FaHome
+//     }
+// ];
 
 
 const FirstPage: React.FC = () => {
@@ -103,7 +103,7 @@ const FirstPage: React.FC = () => {
         </motion.div>
       </section>
 
-      <section className="services-section">
+      {/* <section className="services-section">
         <h2 className="section-title">Our Services</h2>
         <div className="service-grid">
           {services.map((service, index) => (
@@ -127,7 +127,7 @@ const FirstPage: React.FC = () => {
             </motion.div>
           ))}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };
