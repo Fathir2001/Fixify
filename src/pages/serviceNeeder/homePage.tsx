@@ -19,6 +19,7 @@ import {
   FaMoneyBillWave,
   FaHeadset,
   FaThumbsUp,
+  FaChevronDown,
 } from "react-icons/fa";
 import "./homePage.css";
 
@@ -143,6 +144,15 @@ const ServiceNeederHomePage: React.FC = () => {
           <h1>Expert Repairs at Your Fingertips</h1>
           <p>Find trusted professionals for all your repair needs</p>
           <button className="cta-button">Book a Service</button>
+        </div>
+        <div
+          className="scroll-indicator"
+          onClick={() =>
+            window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
+          }
+        >
+          <span>Scroll Down</span>
+          <FaChevronDown className="scroll-icon" />
         </div>
       </section>
       {/* Services Section */}
