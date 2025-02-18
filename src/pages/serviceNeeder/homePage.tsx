@@ -1,38 +1,94 @@
-import React from 'react';
-import { FaTools, FaCheckCircle, FaClock, FaPhoneAlt, FaQuestionCircle } from 'react-icons/fa';
-import './homePage.css';
+import React from "react";
+import {
+  FaTools,
+  FaCheckCircle,
+  FaClock,
+  FaPhoneAlt,
+  FaBolt,
+  FaWrench,
+  FaHammer,
+  FaCar,
+  FaBroom,
+  FaPaintRoller,
+  FaTree,
+  FaHome,
+} from "react-icons/fa";
+import "./homePage.css";
 
 const ServiceNeederHomePage: React.FC = () => {
   const services = [
     {
-      title: "Electrical Services",
-      description: "Expert electrical repairs and installations",
-      icon: "🔌"
+      id: 1,
+      title: "Electrician Services",
+      description: "Professional electrical installation and repair services",
+      icon: FaBolt,
     },
     {
+      id: 2,
       title: "Plumbing Services",
-      description: "Professional plumbing solutions",
-      icon: "🚰"
+      description: "Expert plumbing solutions for your home",
+      icon: FaWrench,
     },
-    // Add more services...
+    {
+      id: 3,
+      title: "Carpentry Services",
+      description: "Custom woodwork and furniture repairs",
+      icon: FaHammer,
+    },
+    {
+      id: 4,
+      title: "Vehicle Breakdown",
+      description: "24/7 roadside assistance services",
+      icon: FaCar,
+    },
+    {
+      id: 5,
+      title: "Appliance Repair",
+      description: "Fixing all types of home appliances",
+      icon: FaTools,
+    },
+    {
+      id: 6,
+      title: "House Cleaning",
+      description: "Professional cleaning services",
+      icon: FaBroom,
+    },
+    {
+      id: 7,
+      title: "Painting Services",
+      description: "Interior and exterior painting solutions",
+      icon: FaPaintRoller,
+    },
+    {
+      id: 8,
+      title: "Gardening & Landscaping",
+      description: "Transform your outdoor spaces",
+      icon: FaTree,
+    },
+    {
+      id: 9,
+      title: "Roof Repair",
+      description: "Waterproofing and roof maintenance",
+      icon: FaHome,
+    },
   ];
 
   const steps = [
     {
       title: "Book Service",
       description: "Choose the service you need and book online",
-      icon: <FaTools />
+      icon: <FaTools />,
     },
     {
       title: "Get Matched",
       description: "We'll connect you with an expert technician",
-      icon: <FaCheckCircle />
+      icon: <FaCheckCircle />,
     },
     {
       title: "Quick Service",
       description: "Get your repair done efficiently",
-      icon: <FaClock />
-    }
+      icon: <FaClock />,
+    },
   ];
 
   return (
@@ -52,7 +108,9 @@ const ServiceNeederHomePage: React.FC = () => {
         <div className="services-grid">
           {services.map((service, index) => (
             <div key={index} className="service-card">
-              <span className="service-icon">{service.icon}</span>
+              <span className="service-icon">
+                <service.icon />
+              </span>
               <h3>{service.title}</h3>
               <p>{service.description}</p>
             </div>
@@ -97,29 +155,8 @@ const ServiceNeederHomePage: React.FC = () => {
             </div>
             {/* Add more contact details */}
           </div>
-          <form className="contact-form">
-            {/* Add form fields */}
-          </form>
+          <form className="contact-form">{/* Add form fields */}</form>
         </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="faq">
-        <h2>Frequently Asked Questions</h2>
-        <div className="faq-grid">
-          <div className="faq-item">
-            <FaQuestionCircle />
-            <h3>How quickly can I get service?</h3>
-            <p>Most services can be scheduled within 24 hours.</p>
-          </div>
-          {/* Add more FAQs */}
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="final-cta">
-        <h2>Ready to Get Started?</h2>
-        <button className="cta-button">Schedule a Repair</button>
       </section>
     </div>
   );
