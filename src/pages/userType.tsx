@@ -7,8 +7,8 @@ const UserType: React.FC = () => {
   const navigate = useNavigate();
 
   const handleUserTypeSelection = (type: string) => {
-    if (type === "service-provider") {
-      navigate("/service-provider/register");
+    if (type === "service-needer") {
+      navigate("/service-needer/home");
     } else {
       navigate(`/${type}`);
     }

@@ -1,0 +1,118 @@
+:root {
+  --primary-color: #FFD700;
+  --secondary-color: #1a1a1a;
+  --text-color: #ffffff;
+  --accent-color: rgba(255, 215, 0, 0.2);
+  --shadow-color: rgba(255, 215, 0, 0.4);
+}
+
+.home-page {
+  min-height: 100vh;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+/* Hero Section */
+.hero {
+  min-height: 80vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url('/background2.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  padding: 2rem;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.cta-button {
+  background: transparent;
+  color: var(--primary-color);
+  padding: 1rem 2rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cta-button:hover {
+  background: var(--primary-color);
+  color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px var(--shadow-color);
+}
+
+/* Services Section */
+.services {
+  padding: 4rem 2rem;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.service-card {
+  background: rgba(26, 26, 26, 0.8);
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  border: 1px solid var(--accent-color);
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+/* How It Works */
+.how-it-works {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 4rem 2rem;
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.step-card {
+  text-align: center;
+  padding: 2rem;
+}
+
+.step-icon {
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .services-grid,
+  .steps-container {
+    grid-template-columns: 1fr;
+  }
+}

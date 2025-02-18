@@ -8,6 +8,7 @@ import './App.css';
 import ProviderRequests from './pages/admin/serviceProviders';
 import ServiceProviderLogin from './pages/serviceProvider/login';
 import ServiceProviderHomePage from './pages/serviceProvider/homePage';
+import ServiceNeederHomePage from './pages/serviceNeeder/homePage';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/admin/service-provider" element={<ProviderRequests />} />
         <Route path="/service-provider/login" element={<ServiceProviderLogin />} />
         <Route path="/service-provider/dashboard" element={<ServiceProviderHomePage />} />
+        <Route path="/service-needer/home" element={<ServiceNeederHomePage />} />
       </Routes>
     </Router>
   );
