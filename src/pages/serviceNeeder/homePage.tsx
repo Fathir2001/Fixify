@@ -153,15 +153,15 @@ const ServiceNeederHomePage: React.FC = () => {
           <div className="contact-info">
             <div className="contact-item">
               <FaPhoneAlt />
-              <span>1-800-FIXIFY</span>
+              <span>+94-778353336</span>
             </div>
             <div className="contact-item">
               <FaEnvelope />
-              <span>support@fixify.com</span>
+              <span>fixify2001@gmail.com</span>
             </div>
             <div className="contact-item">
               <FaMapMarkerAlt />
-              <span>123 Repair Street, Fix City</span>
+              <span>121/E, Kalpitiya road, Kurinchipity</span>
             </div>
           </div>
           <form className="contact-form" onSubmit={handleSubmit}>
@@ -179,7 +179,7 @@ const ServiceNeederHomePage: React.FC = () => {
             <div className="input-wrapper">
               <input type="tel" id="phone" placeholder="Your Phone" required />
             </div>
-            <div className="input-wrapper">
+            {/* <div className="input-wrapper">
               <select id="service" required>
                 <option value="">Select Service</option>
                 {services.map((service) => (
@@ -188,7 +188,7 @@ const ServiceNeederHomePage: React.FC = () => {
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
             <div className="input-wrapper">
               <textarea
                 id="message"
