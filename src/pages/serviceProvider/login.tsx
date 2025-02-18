@@ -18,6 +18,7 @@ const ServiceProviderLogin: React.FC = () => {
     }));
   };
 
+   // Update the handleSubmit function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -31,15 +32,28 @@ const ServiceProviderLogin: React.FC = () => {
           body: JSON.stringify(formData),
         }
       );
-
+  
       const data = await response.json();
-
-      if (response.ok) {
-        // Handle successful login
+  
+      if (response.ok && data.status === "approved") {
+        // Handle successful login for approved providers
         localStorage.setItem("token", data.token);
         navigate("/service-provider/dashboard");
       } else {
-        alert(data.message || "Login failed");
+        // Handle different status messages
+        switch (data.status) {
+          case "pending":
+            alert("Your profile is pending approval from admin. Please wait for approval.");
+            break;
+          case "not_found":
+            alert("Account not found. Please register first.");
+            break;
+          case "invalid":
+            alert("Invalid credentials. Please check your email and password.");
+            break;
+          default:
+            alert(data.message || "Login failed");
+        }
       }
     } catch (error) {
       console.error("Login error:", error);

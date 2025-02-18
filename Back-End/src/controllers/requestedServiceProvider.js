@@ -2,6 +2,8 @@ const RequestedServiceProvider = require("../models/RequestedServiceProvider.js"
 const ApprovedServiceProvider = require("../models/ApprovedServiceProvider.js");
 const bcrypt = require("bcryptjs");
 const RejectedServiceProvider = require("../models/RejectedServiceProvider.js");
+const jwt = require('jsonwebtoken');
+
 
 const registerServiceProvider = async (req, res) => {
   try {
@@ -130,7 +132,7 @@ const getApprovedServiceProviders = async (req, res) => {
 };
 
 
-// Add this new function in the controller
+
 const rejectServiceProvider = async (req, res) => {
   try {
     const { providerId } = req.params;
@@ -179,32 +181,52 @@ const getRejectedServiceProviders = async (req, res) => {
   }
 };
 
-// Add these imports at the top
-const jwt = require('jsonwebtoken');
-
-// Add this new function in the controller
 const loginServiceProvider = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find the service provider in the approved collection
-    const serviceProvider = await ApprovedServiceProvider.findOne({ email });
-    if (!serviceProvider) {
-      return res.status(401).json({ message: "Invalid credentials or account not approved" });
+    // First check if the provider exists in the rejected collection
+    const rejectedProvider = await RejectedServiceProvider.findOne({ email });
+    if (rejectedProvider) {
+      return res.status(403).json({ 
+        message: "Your application was rejected. Please register again with appropriate information.",
+        status: "rejected"
+      });
+    }
+
+    // Then check if the provider exists in the requested collection
+    const requestedProvider = await RequestedServiceProvider.findOne({ email });
+    if (requestedProvider) {
+      return res.status(403).json({ 
+        message: "Your profile is pending approval from admin. Please wait for approval.",
+        status: "pending"
+      });
+    }
+
+    // Finally check in the approved collection
+    const approvedProvider = await ApprovedServiceProvider.findOne({ email });
+    if (!approvedProvider) {
+      return res.status(401).json({ 
+        message: "Invalid credentials or account not found",
+        status: "not_found"
+      });
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, serviceProvider.password);
+    const isValidPassword = await bcrypt.compare(password, approvedProvider.password);
     if (!isValidPassword) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ 
+        message: "Invalid credentials",
+        status: "invalid"
+      });
     }
 
     // Generate JWT token
     const token = jwt.sign(
       { 
-        id: serviceProvider._id,
-        email: serviceProvider.email,
-        fullName: serviceProvider.fullName
+        id: approvedProvider._id,
+        email: approvedProvider.email,
+        fullName: approvedProvider.fullName
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
@@ -212,16 +234,20 @@ const loginServiceProvider = async (req, res) => {
 
     // Send response
     res.status(200).json({
+      status: "approved",
       token,
       serviceProvider: {
-        id: serviceProvider._id,
-        fullName: serviceProvider.fullName,
-        email: serviceProvider.email
+        id: approvedProvider._id,
+        fullName: approvedProvider.fullName,
+        email: approvedProvider.email
       }
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Server error during login" });
+    res.status(500).json({ 
+      message: "Server error during login",
+      status: "error"
+    });
   }
 };
 
