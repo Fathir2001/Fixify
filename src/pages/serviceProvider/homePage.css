@@ -171,19 +171,19 @@
   padding: 1rem 0;
 }
 
-.form-group {
+.form-group-2 {
   margin-bottom: 1rem;
 }
 
-.form-group label {
+.form-group-2 label {
   display: block;
   margin-bottom: 0.5rem;
   color: #666;
   font-weight: 500;
 }
 
-.form-group input,
-.form-group select {
+.form-group-2 input,
+.form-group-2 select {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #ddd;
@@ -232,8 +232,8 @@
   background: #d32f2f;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-group-2 input:focus,
+.form-group-2 select:focus {
   outline: none;
   border-color: #4CAF50;
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);

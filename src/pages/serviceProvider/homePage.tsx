@@ -156,7 +156,7 @@ const ServiceProviderHomePage: React.FC = () => {
             <h3>Profile Information</h3>
             {isEditing ? (
               <div className="edit-form">
-                <div className="form-group">
+                <div className="form-group-2">
                   <label>Name:</label>
                   <input
                     type="text"
@@ -165,7 +165,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-2">
                   <label>Phone:</label>
                   <input
                     type="text"
@@ -174,7 +174,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-2">
                   <label>Service Area:</label>
                   <input
                     type="text"
@@ -183,7 +183,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-2">
                   <label>Experience:</label>
                   <input
                     type="text"
@@ -208,7 +208,7 @@ const ServiceProviderHomePage: React.FC = () => {
           <div className="card">
             <h3>Services</h3>
             {isEditing ? (
-              <div className="form-group">
+              <div className="form-group-2">
                 <label>Select Services:</label>
                 <select
                   multiple
@@ -235,7 +235,7 @@ const ServiceProviderHomePage: React.FC = () => {
             <h3>Availability</h3>
             {isEditing ? (
               <>
-                <div className="form-group">
+                <div className="form-group-2">
                   <label>Available Days:</label>
                   <select
                     multiple
@@ -249,7 +249,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="form-group">
+                <div className="form-group-2">
                   <label>Time From:</label>
                   <input
                     type="time"
@@ -258,7 +258,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-2">
                   <label>Time To:</label>
                   <input
                     type="time"
