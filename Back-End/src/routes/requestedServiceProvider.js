@@ -9,6 +9,7 @@ const {
   getRejectedServiceProviders,
   loginServiceProvider,
   getServiceProviderProfile,
+  updateServiceProviderProfile,
 } = require("../controllers/requestedServiceProvider.js");
 const authMiddleware = require('../middleware/auth');
 
@@ -20,5 +21,6 @@ router.put("/reject/:providerId", rejectServiceProvider);
 router.get("/rejected", getRejectedServiceProviders);
 router.post("/login", loginServiceProvider);
 router.get('/profile', authMiddleware, getServiceProviderProfile);
+router.put('/profile/update', authMiddleware, updateServiceProviderProfile);
 
 module.exports = router;

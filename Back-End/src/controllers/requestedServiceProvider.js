@@ -266,7 +266,12 @@ const getServiceProviderProfile = async (req, res) => {
       email: provider.email,
       serviceType: provider.serviceType,
       phoneNumber: provider.phoneNumber,
-      serviceArea: provider.serviceArea
+      serviceArea: provider.serviceArea,
+      availableDays: provider.availableDays,
+      timeFrom: provider.timeFrom,
+      timeTo: provider.timeTo,
+      experience: provider.experience,
+      approvedAt: provider.approvedAt
     });
   } catch (error) {
     console.error("Profile fetch error:", error);
@@ -274,7 +279,27 @@ const getServiceProviderProfile = async (req, res) => {
   }
 };
 
+const updateServiceProviderProfile = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    const updatedProvider = await ApprovedServiceProvider.findByIdAndUpdate(
+      decoded.id,
+      req.body,
+      { new: true }
+    );
 
+    if (!updatedProvider) {
+      return res.status(404).json({ message: "Provider not found" });
+    }
+
+    res.status(200).json(updatedProvider);
+  } catch (error) {
+    console.error("Profile update error:", error);
+    res.status(500).json({ message: "Failed to update profile" });
+  }
+};
 
 module.exports = {
   registerServiceProvider,
@@ -284,5 +309,6 @@ module.exports = {
   rejectServiceProvider,
   getRejectedServiceProviders,
   loginServiceProvider,
-  getServiceProviderProfile
+  getServiceProviderProfile,
+  updateServiceProviderProfile
 };
