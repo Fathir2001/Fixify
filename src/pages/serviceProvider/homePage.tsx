@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './homePage.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./homePage.css";
 
 interface ServiceProvider {
   fullName: string;
@@ -34,7 +34,7 @@ const ServiceProviderHomePage: React.FC = () => {
     "HVAC",
     "Cleaning",
     "Landscaping",
-    "Moving"
+    "Moving",
   ];
 
   const daysOfWeek = [
@@ -44,33 +44,36 @@ const ServiceProviderHomePage: React.FC = () => {
     "Thursday",
     "Friday",
     "Saturday",
-    "Sunday"
+    "Sunday",
   ];
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      navigate('/service-provider/login');
+      navigate("/service-provider/login");
       return;
     }
 
     const fetchProviderData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/service-providers/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        const response = await fetch(
+          "http://localhost:5000/api/service-providers/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
+        );
 
         if (response.ok) {
           const data = await response.json();
           setProvider(data);
         } else {
-          throw new Error('Failed to fetch provider data');
+          throw new Error("Failed to fetch provider data");
         }
       } catch (error) {
-        console.error('Error:', error);
-        navigate('/service-provider/login');
+        console.error("Error:", error);
+        navigate("/service-provider/login");
       } finally {
         setLoading(false);
       }
@@ -80,54 +83,57 @@ const ServiceProviderHomePage: React.FC = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/service-provider/login');
+    localStorage.removeItem("token");
+    navigate("/service-provider/login");
   };
 
   const handleEdit = () => {
     setEditableData(provider);
     setIsEditing(true);
   };
-  
+
   const handleCancel = () => {
     setEditableData(null);
     setIsEditing(false);
   };
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditableData(prev => prev ? { ...prev, [name]: value } : null);
+    setEditableData((prev) => (prev ? { ...prev, [name]: value } : null));
   };
-  
+
   const handleArrayChange = (name: string, value: string[]) => {
-    setEditableData(prev => prev ? { ...prev, [name]: value } : null);
+    setEditableData((prev) => (prev ? { ...prev, [name]: value } : null));
   };
-  
+
   const handleSave = async () => {
     if (!editableData) return;
-  
+
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/service-providers/profile/update', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editableData),
-      });
-  
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:5000/api/service-providers/profile/update",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editableData),
+        }
+      );
+
       if (response.ok) {
         setProvider(editableData);
         setIsEditing(false);
         setEditableData(null);
-        alert('Profile updated successfully!');
+        alert("Profile updated successfully!");
       } else {
-        throw new Error('Failed to update profile');
+        throw new Error("Failed to update profile");
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update profile');
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile");
     }
   };
 
@@ -140,8 +146,14 @@ const ServiceProviderHomePage: React.FC = () => {
       <nav className="navbar">
         <h1 className="logo">Fixify</h1>
         <div className="nav-buttons">
-          {!isEditing && <button onClick={handleEdit} className="edit-button">Edit Profile</button>}
-          <button onClick={handleLogout} className="logout-button">Logout</button>
+          {!isEditing && (
+            <button onClick={handleEdit} className="edit-button">
+              Edit Profile
+            </button>
+          )}
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
         </div>
       </nav>
 
@@ -161,7 +173,7 @@ const ServiceProviderHomePage: React.FC = () => {
                   <input
                     type="text"
                     name="fullName"
-                    value={editableData?.fullName || ''}
+                    value={editableData?.fullName || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -170,7 +182,7 @@ const ServiceProviderHomePage: React.FC = () => {
                   <input
                     type="text"
                     name="phoneNumber"
-                    value={editableData?.phoneNumber || ''}
+                    value={editableData?.phoneNumber || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -179,7 +191,7 @@ const ServiceProviderHomePage: React.FC = () => {
                   <input
                     type="text"
                     name="serviceArea"
-                    value={editableData?.serviceArea || ''}
+                    value={editableData?.serviceArea || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -188,19 +200,33 @@ const ServiceProviderHomePage: React.FC = () => {
                   <input
                     type="text"
                     name="experience"
-                    value={editableData?.experience || ''}
+                    value={editableData?.experience || ""}
                     onChange={handleChange}
                   />
                 </div>
               </div>
             ) : (
               <>
-                <p><strong>Name:</strong> {provider?.fullName}</p>
-                <p><strong>Email:</strong> {provider?.email}</p>
-                <p><strong>Phone:</strong> {provider?.phoneNumber}</p>
-                <p><strong>Service Area:</strong> {provider?.serviceArea}</p>
-                <p><strong>Experience:</strong> {provider?.experience}</p>
-                <p><strong>Approved Date:</strong> {provider?.approvedAt && new Date(provider.approvedAt).toLocaleDateString()}</p>
+                <p>
+                  <strong>Name:</strong> {provider?.fullName}
+                </p>
+                <p>
+                  <strong>Email:</strong> {provider?.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {provider?.phoneNumber}
+                </p>
+                <p>
+                  <strong>Service Area:</strong> {provider?.serviceArea}
+                </p>
+                <p>
+                  <strong>Experience:</strong> {provider?.experience}
+                </p>
+                <p>
+                  <strong>Approved Date:</strong>{" "}
+                  {provider?.approvedAt &&
+                    new Date(provider.approvedAt).toLocaleDateString()}
+                </p>
               </>
             )}
           </div>
@@ -210,22 +236,32 @@ const ServiceProviderHomePage: React.FC = () => {
             {isEditing ? (
               <div className="form-group-2">
                 <label>Select Services:</label>
-                <select
-                  multiple
-                  className="service-select"
-                  value={editableData?.serviceType || []}
-                  onChange={(e) => handleArrayChange('serviceType', 
-                    Array.from(e.target.selectedOptions, option => option.value))}
-                >
-                  {availableServices.map(service => (
-                    <option key={service} value={service}>{service}</option>
+                <div className="checkbox-group">
+                  {availableServices.map((service) => (
+                    <div key={service} className="checkbox-item">
+                      <input
+                        type="checkbox"
+                        id={`service-${service}`}
+                        checked={editableData?.serviceType.includes(service)}
+                        onChange={(e) => {
+                          const currentServices = editableData?.serviceType || [];
+                          const updatedServices = e.target.checked
+                            ? [...currentServices, service]
+                            : currentServices.filter((s) => s !== service);
+                          handleArrayChange("serviceType", updatedServices);
+                        }}
+                      />
+                      <label htmlFor={`service-${service}`}>{service}</label>
+                    </div>
                   ))}
-                </select>
+                </div>
               </div>
             ) : (
               <div className="services-list">
                 {provider?.serviceType.map((service, index) => (
-                  <span key={index} className="service-tag">{service}</span>
+                  <span key={index} className="service-tag">
+                    {service}
+                  </span>
                 ))}
               </div>
             )}
@@ -237,24 +273,32 @@ const ServiceProviderHomePage: React.FC = () => {
               <>
                 <div className="form-group-2">
                   <label>Available Days:</label>
-                  <select
-                    multiple
-                    className="days-select"
-                    value={editableData?.availableDays || []}
-                    onChange={(e) => handleArrayChange('availableDays', 
-                      Array.from(e.target.selectedOptions, option => option.value))}
-                  >
-                    {daysOfWeek.map(day => (
-                      <option key={day} value={day}>{day}</option>
+                  <div className="checkbox-group">
+                    {daysOfWeek.map((day) => (
+                      <div key={day} className="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id={`day-${day}`}
+                          checked={editableData?.availableDays.includes(day)}
+                          onChange={(e) => {
+                            const currentDays = editableData?.availableDays || [];
+                            const updatedDays = e.target.checked
+                              ? [...currentDays, day]
+                              : currentDays.filter((d) => d !== day);
+                            handleArrayChange("availableDays", updatedDays);
+                          }}
+                        />
+                        <label htmlFor={`day-${day}`}>{day}</label>
+                      </div>
                     ))}
-                  </select>
+                  </div>
                 </div>
                 <div className="form-group-2">
                   <label>Time From:</label>
                   <input
                     type="time"
                     name="timeFrom"
-                    value={editableData?.timeFrom || ''}
+                    value={editableData?.timeFrom || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -263,20 +307,27 @@ const ServiceProviderHomePage: React.FC = () => {
                   <input
                     type="time"
                     name="timeTo"
-                    value={editableData?.timeTo || ''}
+                    value={editableData?.timeTo || ""}
                     onChange={handleChange}
                   />
                 </div>
               </>
             ) : (
               <>
-                <p><strong>Available Days:</strong></p>
+                <p>
+                  <strong>Available Days:</strong>
+                </p>
                 <div className="services-list">
                   {provider?.availableDays.map((day, index) => (
-                    <span key={index} className="service-tag">{day}</span>
+                    <span key={index} className="service-tag">
+                      {day}
+                    </span>
                   ))}
                 </div>
-                <p><strong>Working Hours:</strong> {provider?.timeFrom} - {provider?.timeTo}</p>
+                <p>
+                  <strong>Working Hours:</strong> {provider?.timeFrom} -{" "}
+                  {provider?.timeTo}
+                </p>
               </>
             )}
           </div>
@@ -284,8 +335,12 @@ const ServiceProviderHomePage: React.FC = () => {
 
         {isEditing && (
           <div className="edit-buttons">
-            <button onClick={handleSave} className="save-button">Save Changes</button>
-            <button onClick={handleCancel} className="cancel-button">Cancel</button>
+            <button onClick={handleSave} className="save-button">
+              Save Changes
+            </button>
+            <button onClick={handleCancel} className="cancel-button">
+              Cancel
+            </button>
           </div>
         )}
       </div>
