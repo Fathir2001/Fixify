@@ -98,7 +98,7 @@ const FirstPage: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             onClick={handleEstimateClick}
           >
-            Get Free Estimate
+            Get Started
           </motion.button>
         </motion.div>
       </section>
