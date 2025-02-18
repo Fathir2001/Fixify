@@ -14,6 +14,11 @@ import {
   FaHome,
   FaEnvelope,
   FaMapMarkerAlt,
+  FaUserTie,
+  FaShieldAlt,
+  FaMoneyBillWave,
+  FaHeadset,
+  FaThumbsUp,
 } from "react-icons/fa";
 import "./homePage.css";
 
@@ -93,6 +98,39 @@ const ServiceNeederHomePage: React.FC = () => {
     },
   ];
 
+  const benefits = [
+    {
+      icon: <FaUserTie />,
+      title: "Expert Technicians",
+      description: "Qualified and experienced professionals at your service",
+    },
+    {
+      icon: <FaShieldAlt />,
+      title: "Guaranteed Safety",
+      description: "All services backed by our satisfaction guarantee",
+    },
+    {
+      icon: <FaClock />,
+      title: "24/7 Availability",
+      description: "Round-the-clock service for emergencies",
+    },
+    {
+      icon: <FaMoneyBillWave />,
+      title: "Competitive Pricing",
+      description: "Transparent pricing with no hidden charges",
+    },
+    {
+      icon: <FaHeadset />,
+      title: "Dedicated Support",
+      description: "Customer service team always ready to help",
+    },
+    {
+      icon: <FaThumbsUp />,
+      title: "Quality Assured",
+      description: "Top-notch service quality guaranteed",
+    },
+  ];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
@@ -139,13 +177,16 @@ const ServiceNeederHomePage: React.FC = () => {
       <section className="why-us">
         <h2>Why Choose Fixify</h2>
         <div className="benefits-grid">
-          <div className="benefit-card">
-            <h3>Expert Technicians</h3>
-            <p>Qualified and experienced professionals</p>
-          </div>
-          {/* Add more benefits */}
+          {benefits.map((benefit, index) => (
+            <div key={index} className="benefit-card">
+              <div className="benefit-icon">{benefit.icon}</div>
+              <h3>{benefit.title}</h3>
+              <p>{benefit.description}</p>
+            </div>
+          ))}
         </div>
       </section>
+
       {/* Contact Section */}
       <section className="contact">
         <h2>Get In Touch</h2>
