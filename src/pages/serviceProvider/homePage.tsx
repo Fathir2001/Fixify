@@ -27,14 +27,15 @@ const ServiceProviderHomePage: React.FC = () => {
   const [editableData, setEditableData] = useState<EditableData | null>(null);
 
   const availableServices = [
-    "Plumbing",
-    "Electrical",
-    "Carpentry",
-    "Painting",
-    "HVAC",
-    "Cleaning",
-    "Landscaping",
-    "Moving",
+    "Electrician Services",
+    "Plumbing Services",
+    "Carpentry Services",
+    "Vehicle Breakdown Assistance",
+    "Home Appliance Repair",
+    "House Cleaning Services",
+    "Painting Services",
+    "Gardening & Landscaping",
+    "Roof Repair & Waterproofing",
   ];
 
   const daysOfWeek = [
@@ -242,9 +243,14 @@ const ServiceProviderHomePage: React.FC = () => {
                       <input
                         type="checkbox"
                         id={`service-${service}`}
-                        checked={editableData?.serviceType.includes(service)}
+                        // Check if the service exists in editableData.serviceType array
+                        checked={
+                          editableData?.serviceType?.includes(service) || false
+                        }
                         onChange={(e) => {
-                          const currentServices = editableData?.serviceType || [];
+                          const currentServices = [
+                            ...(editableData?.serviceType || []),
+                          ];
                           const updatedServices = e.target.checked
                             ? [...currentServices, service]
                             : currentServices.filter((s) => s !== service);
@@ -281,7 +287,8 @@ const ServiceProviderHomePage: React.FC = () => {
                           id={`day-${day}`}
                           checked={editableData?.availableDays.includes(day)}
                           onChange={(e) => {
-                            const currentDays = editableData?.availableDays || [];
+                            const currentDays =
+                              editableData?.availableDays || [];
                             const updatedDays = e.target.checked
                               ? [...currentDays, day]
                               : currentDays.filter((d) => d !== day);
