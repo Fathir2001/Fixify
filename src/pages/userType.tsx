@@ -7,10 +7,23 @@ const UserType: React.FC = () => {
   const navigate = useNavigate();
 
   const handleUserTypeSelection = (type: string) => {
-    if (type === "service-needer") {
-      navigate("/service-needer/home");
-    } else {
-      navigate(`/${type}`);
+    try {
+      console.log("Selected user type:", type);
+      switch (type) {
+        case "service-needer":
+          navigate("/service-needer/home");
+          break;
+        case "service-provider":
+          navigate("/service-provider/register");
+          break;
+        case "admin":
+          navigate("/admin");
+          break;
+        default:
+          console.error("Unknown user type:", type);
+      }
+    } catch (error) {
+      console.error("Navigation error:", error);
     }
   };
 
