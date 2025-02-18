@@ -151,17 +151,20 @@
 }
 
 .edit-button {
-  background: #4CAF50;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
+  background: transparent;
+  color: #FFD700;
+  border: 1px solid #FFD700;
+  padding: 0.3rem 0.8rem;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
+  transform: scale(1.05);
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
 }
 
 .edit-button:hover {
-  background: #45a049;
+  background: #FFD700;
+  color: #1a1a1a;
 }
 
 .edit-form {
