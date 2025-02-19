@@ -20,15 +20,33 @@ const ServiceNeederRegister: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // Add your registration API call here
-      console.log('Form submitted:', formData);
-      navigate('/service-needer/home');
-    } catch (error) {
-      console.error('Registration failed:', error);
+  e.preventDefault();
+  try {
+    const response = await fetch('http://localhost:5000/api/service-needers/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Registration failed');
     }
-  };
+
+    // Store the token in localStorage
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    console.log('Registration successful:', data);
+    navigate('/service-needer/login');
+  } catch (error) {
+    console.error('Registration failed:', error);
+    // You might want to add error handling UI here
+  }
+};
 
   return (
     <div className="register-container">
