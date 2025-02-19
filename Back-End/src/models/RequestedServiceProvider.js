@@ -41,7 +41,11 @@ const requestedServiceProviderSchema = new mongoose.Schema({
   experience: {
     type: String,
     required: true
-  }
+  },
+  serviceFee: {
+    type: Number,
+    required: true
+  },
 }, {
   timestamps: true
 });

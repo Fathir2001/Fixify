@@ -11,7 +11,11 @@ const approvedServiceProviderSchema = new mongoose.Schema({
   timeFrom: { type: String, required: true },
   timeTo: { type: String, required: true },
   experience: { type: String, required: true },
-  approvedAt: { type: Date, default: Date.now }
+  approvedAt: { type: Date, default: Date.now },
+  serviceFee: {
+    type: Number,
+    required: true
+  },
 }, {
   timestamps: true
 });

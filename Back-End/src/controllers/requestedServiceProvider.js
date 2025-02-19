@@ -18,6 +18,7 @@ const registerServiceProvider = async (req, res) => {
       timeFrom,
       timeTo,
       experience,
+      serviceFee,
     } = req.body;
 
     // Check if email already exists
@@ -37,6 +38,11 @@ const registerServiceProvider = async (req, res) => {
         .json({ message: "Please select at least one service type" });
     }
 
+    // Validate service fee
+    if (!serviceFee || serviceFee <= 0) {
+      return res.status(400).json({ message: "Please enter a valid service fee" });
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -52,19 +58,18 @@ const registerServiceProvider = async (req, res) => {
       timeFrom,
       timeTo,
       experience,
+      serviceFee,
     });
 
-    // Save to database
-    await newServiceProvider.save();
+     // Save to database
+     await newServiceProvider.save();
 
-    res
-      .status(201)
-      .json({ message: "Registration request submitted successfully" });
-  } catch (error) {
-    console.error("Registration error:", error);
-    res.status(500).json({ message: "Server error during registration" });
-  }
-};
+     res.status(201).json({ message: "Registration request submitted successfully" });
+   } catch (error) {
+     console.error("Registration error:", error);
+     res.status(500).json({ message: "Server error during registration" });
+   }
+ };
 
 const getAllServiceProviders = async (req, res) => {
   try {
@@ -103,6 +108,7 @@ const approveServiceProvider = async (req, res) => {
       timeFrom: provider.timeFrom,
       timeTo: provider.timeTo,
       experience: provider.experience,
+      serviceFee: provider.serviceFee, // Add this line
     });
 
     // Save to approved collection
@@ -132,7 +138,6 @@ const getApprovedServiceProviders = async (req, res) => {
 };
 
 
-
 const rejectServiceProvider = async (req, res) => {
   try {
     const { providerId } = req.params;
@@ -153,7 +158,8 @@ const rejectServiceProvider = async (req, res) => {
       availableDays: provider.availableDays,
       timeFrom: provider.timeFrom,
       timeTo: provider.timeTo,
-      experience: provider.experience
+      experience: provider.experience,
+      serviceFee: provider.serviceFee, // Add this line
     });
 
     // Save to rejected collection

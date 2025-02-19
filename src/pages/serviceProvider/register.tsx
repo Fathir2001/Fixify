@@ -8,6 +8,7 @@ import {
   FaTools,
   FaUserCircle,
   FaCheckCircle,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import "./register.css";
 
@@ -23,6 +24,7 @@ const ServiceProviderRegister: React.FC = () => {
     availableDays: [] as string[],
     timeFrom: "",
     timeTo: "",
+    serviceFee: "",
   });
 
   const serviceTypes = [
@@ -82,7 +84,19 @@ const ServiceProviderRegister: React.FC = () => {
       return;
     }
 
+    // Add validation for service fee
+    if (!formData.serviceFee || Number(formData.serviceFee) <= 0) {
+      alert("Please enter a valid service fee");
+      return;
+    }
+
     try {
+      // Create a new object with serviceFee converted to number
+      const submitData = {
+        ...formData,
+        serviceFee: Number(formData.serviceFee),
+      };
+
       const response = await fetch(
         "http://localhost:5000/api/service-providers/register",
         {
@@ -90,7 +104,7 @@ const ServiceProviderRegister: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(submitData),
         }
       );
 
@@ -110,6 +124,7 @@ const ServiceProviderRegister: React.FC = () => {
           availableDays: [],
           timeFrom: "",
           timeTo: "",
+          serviceFee: "",
         });
       } else {
         alert(data.message || "Registration failed");
@@ -119,21 +134,21 @@ const ServiceProviderRegister: React.FC = () => {
       alert("Registration failed. Please try again.");
     }
   };
-
   return (
     <div className="register-container">
       <div className="register-card">
-      <div className="login-button-container">
-    <button onClick={() => window.location.href = '/service-provider/login'} className="login-button">
-      Login
-    </button>
-  </div>
+        <div className="login-button-container">
+          <button
+            onClick={() => (window.location.href = "/service-provider/login")}
+            className="login-button"
+          >
+            Login
+          </button>
+        </div>
         <div className="register-header">
           <FaTools className="register-icon" />
           <h2>Service Provider Registration</h2>
         </div>
-        
-
 
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-group">
@@ -274,6 +289,20 @@ const ServiceProviderRegister: React.FC = () => {
               placeholder="Brief description of your experience"
               rows={4}
               required
+            />
+          </div>
+          <div className="form-group">
+            <FaMoneyBillWave className="input-icon" />
+            <input
+              type="number"
+              name="serviceFee"
+              value={formData.serviceFee}
+              onChange={handleChange}
+              placeholder="Service Fee per Hour (LKR)"
+              min="0"
+              step="0.01"
+              required
+              onWheel={(e) => e.currentTarget.blur()} // Prevents mouse wheel from changing the value
             />
           </div>
 
