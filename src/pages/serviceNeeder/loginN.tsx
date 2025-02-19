@@ -9,22 +9,42 @@ const ServiceNeederLogin: React.FC = () => {
     email: '',
     password: ''
   });
+  const [error, setError] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+    setError(''); // Clear error when user types
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Add your login API call here
-      console.log('Login attempt:', formData);
-      navigate('/service-needer/home');
+      const response = await fetch('http://localhost:5000/api/service-needers/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store the token and user data in localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      console.log('Login successful:', data);
+      navigate('/book-service');
     } catch (error) {
       console.error('Login failed:', error);
+      setError(error instanceof Error ? error.message : 'Login failed');
     }
   };
 
@@ -33,6 +53,8 @@ const ServiceNeederLogin: React.FC = () => {
       <div className="login-card">
         <h1>Welcome Back</h1>
         <p>Login to access your Fixify account</p>
+        
+        {error && <div className="error-message">{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
