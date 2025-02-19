@@ -142,15 +142,29 @@ const BookService: React.FC = () => {
               <FaCalendar />
               <input type="date" required />
             </div>
-            <div className="form-group-3">
-              <FaClock />
-              <input
-                type="time"
-                required
-                min="08:00"
-                max="20:00"
-                step="1800" // 30-minute intervals
-              />
+            <div className="time-range-group">
+              <div className="form-group-3">
+                <FaClock />
+                <input
+                  type="time"
+                  required
+                  min="08:00"
+                  max="20:00"
+                  step="1800"
+                  placeholder="From"
+                />
+              </div>
+              <div className="form-group-3">
+                <FaClock />
+                <input
+                  type="time"
+                  required
+                  min="08:00"
+                  max="20:00"
+                  step="1800"
+                  placeholder="To"
+                />
+              </div>
             </div>
             <button type="submit" className="next-button">
               Next

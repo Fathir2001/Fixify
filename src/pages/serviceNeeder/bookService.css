@@ -134,7 +134,17 @@
     border-radius: 4px;
 }
 
+.time-range-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
 
+.form-group-3 svg {
+    font-size: 1.2rem;
+    margin-right: 10px;
+}
 
 .next-button,
 .confirm-button {
