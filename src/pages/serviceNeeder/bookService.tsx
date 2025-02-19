@@ -83,6 +83,7 @@ const BookService: React.FC = () => {
   return (
     <div className="book-service">
       <h1>Book a Service</h1>
+      <h2>Steps</h2>
 
       <div className="booking-progress">
         <div className={`progress-step ${step >= 1 ? "active" : ""}`}>
