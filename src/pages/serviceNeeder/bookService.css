@@ -164,9 +164,109 @@
     text-align: center;
 }
 
+.error-message {
+    background-color: #ffe6e6;
+    color: #d63031;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    text-align: center;
+    border: 1px solid #ff9999;
+  }
+
 .booking-summary {
-    margin: 2rem 0;
-    padding: 2rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.summary-details {
+  margin-top: 1rem;
+}
+
+.summary-details p {
+  margin: 0.5rem 0;
+}
+
+.providers-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.provider-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.provider-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.provider-details {
+  margin: 1rem 0;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.star-filled {
+  color: #FFD700;
+}
+
+.star-empty {
+  color: #ddd;
+}
+
+.new-provider {
+  color: #666;
+  font-style: italic;
+}
+
+.select-provider-button {
+  width: 100%;
+  padding: 0.8rem;
+  background: #FFD700;
+  color: black;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.select-provider-button:hover {
+  background: #F4C430;
+}
+
+.no-providers {
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.back-button {
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: #666;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background: #555;
 }

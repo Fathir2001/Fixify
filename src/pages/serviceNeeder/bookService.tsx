@@ -15,10 +15,32 @@ import {
   FaHome,
   FaBell,
   FaUser,
+  FaStar,
 } from "react-icons/fa";
+
+interface ServiceProvider {
+  _id: string;
+  fullName: string;
+  experience: string;
+  serviceFee: number;
+  rating?: number;
+  phoneNumber: string;
+  email: string;
+}
 
 const BookService: React.FC = () => {
   const [step, setStep] = useState(1);
+  const [selectedService, setSelectedService] = useState("");
+  const [matchedProviders, setMatchedProviders] = useState<ServiceProvider[]>(
+    []
+  );
+  const [bookingData, setBookingData] = useState({
+    serviceType: "",
+    location: "",
+    date: "",
+    timeFrom: "",
+    timeTo: "",
+  });
 
   const services = [
     {
@@ -77,9 +99,95 @@ const BookService: React.FC = () => {
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleServiceSelect = (serviceName: string) => {
+    setSelectedService(serviceName);
+    setBookingData((prev) => ({ ...prev, serviceType: serviceName }));
+    setStep(2);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBookingData({
+      ...bookingData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const [error, setError] = useState<string>("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStep(step + 1);
+    setError(""); // Clear any previous errors
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Please login to continue");
+        return;
+      }
+
+      console.log("Sending booking data:", bookingData); // Debug log
+
+      const response = await fetch(
+        "http://localhost:5000/api/service-needers/find-providers",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(bookingData),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Received response:", data); // Debug log
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to find service providers");
+      }
+
+      if (!data.providers || !Array.isArray(data.providers)) {
+        throw new Error("Invalid response format from server");
+      }
+
+      setMatchedProviders(data.providers);
+      setStep(3);
+    } catch (error) {
+      console.error("Error finding providers:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to find service providers"
+      );
+    }
+  };
+
+  const handleBookingConfirm = async (providerId: string) => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/service-needers/book-service",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            ...bookingData,
+            providerId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      // Handle successful booking (e.g., redirect to booking confirmation page)
+      console.log("Booking confirmed:", data);
+    } catch (error) {
+      console.error("Error confirming booking:", error);
+    }
   };
 
   return (
@@ -118,7 +226,7 @@ const BookService: React.FC = () => {
                 <div
                   key={service.id}
                   className="service-card"
-                  onClick={() => setStep(2)}
+                  onClick={() => handleServiceSelect(service.name)}
                 >
                   <span className="service-icon">
                     <service.icon />
@@ -134,52 +242,138 @@ const BookService: React.FC = () => {
         {step === 2 && (
           <form className="booking-form" onSubmit={handleSubmit}>
             <h2>Schedule Your Service</h2>
+            {error && <div className="error-message">{error}</div>}
             <div className="form-group-3">
               <FaMapMarkerAlt />
-              <input type="text" placeholder="Service Location" required />
+              <input
+                type="text"
+                name="location"
+                placeholder="Service Location"
+                value={bookingData.location}
+                onChange={handleInputChange}
+                required
+              />
             </div>
             <div className="form-group-3">
               <FaCalendar />
-              <input type="date" required />
+              <input
+                type="date"
+                name="date"
+                value={bookingData.date}
+                onChange={handleInputChange}
+                required
+              />
             </div>
             <div className="time-range-group">
               <div className="form-group-3">
                 <FaClock />
                 <input
                   type="time"
+                  name="timeFrom"
+                  value={bookingData.timeFrom}
+                  onChange={handleInputChange}
                   required
                   min="08:00"
                   max="20:00"
                   step="1800"
-                  placeholder="From"
                 />
               </div>
               <div className="form-group-3">
                 <FaClock />
                 <input
                   type="time"
+                  name="timeTo"
+                  value={bookingData.timeTo}
+                  onChange={handleInputChange}
                   required
                   min="08:00"
                   max="20:00"
                   step="1800"
-                  placeholder="To"
                 />
               </div>
             </div>
             <button type="submit" className="next-button">
-              Next
+              Find Service Providers
             </button>
           </form>
         )}
 
         {step === 3 && (
           <div className="booking-confirmation">
-            <h2>Confirm Your Booking</h2>
+            <h2>Available Service Providers</h2>
             <div className="booking-summary">
-              <h3>Booking Summary</h3>
-              {/* Add booking summary details */}
+              <h3>Booking Details</h3>
+              <div className="summary-details">
+                <p>
+                  <strong>Service:</strong> {selectedService}
+                </p>
+                <p>
+                  <strong>Location:</strong> {bookingData.location}
+                </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {new Date(bookingData.date).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Time:</strong> {bookingData.timeFrom} -{" "}
+                  {bookingData.timeTo}
+                </p>
+              </div>
             </div>
-            <button className="confirm-button">Confirm Booking</button>
+
+            <div className="providers-list">
+              {matchedProviders.length > 0 ? (
+                matchedProviders.map((provider) => (
+                  <div key={provider._id} className="provider-card">
+                    <h3>{provider.fullName}</h3>
+                    <div className="provider-details">
+                      <p>
+                        <strong>Experience:</strong> {provider.experience}
+                      </p>
+                      <p>
+                        <strong>Service Fee:</strong> ${provider.serviceFee}
+                      </p>
+                      <div className="rating">
+                        <strong>Rating:</strong>
+                        {provider.rating ? (
+                          <span>
+                            {Array(5)
+                              .fill(0)
+                              .map((_, index) => (
+                                <FaStar
+                                  key={index}
+                                  className={
+                                    index < provider.rating!
+                                      ? "star-filled"
+                                      : "star-empty"
+                                  }
+                                />
+                              ))}
+                          </span>
+                        ) : (
+                          <span className="new-provider">New Provider</span>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      className="select-provider-button"
+                      onClick={() => handleBookingConfirm(provider._id)}
+                    >
+                      Book Now
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="no-providers">
+                  <p>
+                    No service providers available for the selected criteria.
+                  </p>
+                  <button className="back-button" onClick={() => setStep(2)}>
+                    Modify Search
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
