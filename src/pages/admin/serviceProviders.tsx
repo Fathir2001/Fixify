@@ -18,12 +18,17 @@ interface ProviderRequest {
   timeTo: string;
   approvedAt?: string;
   rejectedAt?: string;
+  serviceFee: number;
 }
 
 const ServiceProviders: React.FC = () => {
   const [pendingRequests, setPendingRequests] = useState<ProviderRequest[]>([]);
-  const [approvedProviders, setApprovedProviders] = useState<ProviderRequest[]>([]);
-  const [rejectedProviders, setRejectedProviders] = useState<ProviderRequest[]>([]);
+  const [approvedProviders, setApprovedProviders] = useState<ProviderRequest[]>(
+    []
+  );
+  const [rejectedProviders, setRejectedProviders] = useState<ProviderRequest[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("pending");
@@ -31,26 +36,33 @@ const ServiceProviders: React.FC = () => {
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const [pendingResponse, approvedResponse, rejectedResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/service-providers/all"),
-          axios.get("http://localhost:5000/api/service-providers/approved"),
-          axios.get("http://localhost:5000/api/service-providers/rejected")
-        ]);
+        const [pendingResponse, approvedResponse, rejectedResponse] =
+          await Promise.all([
+            axios.get("http://localhost:5000/api/service-providers/all"),
+            axios.get("http://localhost:5000/api/service-providers/approved"),
+            axios.get("http://localhost:5000/api/service-providers/rejected"),
+          ]);
 
-        setPendingRequests(pendingResponse.data.map((provider: any) => ({
-          ...provider,
-          status: "pending" as const,
-        })));
+        setPendingRequests(
+          pendingResponse.data.map((provider: any) => ({
+            ...provider,
+            status: "pending" as const,
+          }))
+        );
 
-        setApprovedProviders(approvedResponse.data.map((provider: any) => ({
-          ...provider,
-          status: "approved" as const,
-        })));
+        setApprovedProviders(
+          approvedResponse.data.map((provider: any) => ({
+            ...provider,
+            status: "approved" as const,
+          }))
+        );
 
-        setRejectedProviders(rejectedResponse.data.map((provider: any) => ({
-          ...provider,
-          status: "rejected" as const,
-        })));
+        setRejectedProviders(
+          rejectedResponse.data.map((provider: any) => ({
+            ...provider,
+            status: "rejected" as const,
+          }))
+        );
 
         setLoading(false);
       } catch (err: unknown) {
@@ -76,18 +88,20 @@ const ServiceProviders: React.FC = () => {
           `http://localhost:5000/api/service-providers/approve/${requestId}`
         );
 
-        const approvedProvider = pendingRequests.find(req => req._id === requestId);
+        const approvedProvider = pendingRequests.find(
+          (req) => req._id === requestId
+        );
         if (approvedProvider) {
-          setPendingRequests(requests => 
-            requests.filter(req => req._id !== requestId)
+          setPendingRequests((requests) =>
+            requests.filter((req) => req._id !== requestId)
           );
-          setApprovedProviders(providers => [
+          setApprovedProviders((providers) => [
             {
               ...approvedProvider,
               status: "approved",
-              approvedAt: new Date().toISOString()
+              approvedAt: new Date().toISOString(),
             },
-            ...providers
+            ...providers,
           ]);
         }
 
@@ -97,18 +111,20 @@ const ServiceProviders: React.FC = () => {
           `http://localhost:5000/api/service-providers/reject/${requestId}`
         );
 
-        const rejectedProvider = pendingRequests.find(req => req._id === requestId);
+        const rejectedProvider = pendingRequests.find(
+          (req) => req._id === requestId
+        );
         if (rejectedProvider) {
-          setPendingRequests(requests => 
-            requests.filter(req => req._id !== requestId)
+          setPendingRequests((requests) =>
+            requests.filter((req) => req._id !== requestId)
           );
-          setRejectedProviders(providers => [
+          setRejectedProviders((providers) => [
             {
               ...rejectedProvider,
               status: "rejected",
-              rejectedAt: new Date().toISOString()
+              rejectedAt: new Date().toISOString(),
             },
-            ...providers
+            ...providers,
           ]);
         }
 
@@ -116,7 +132,11 @@ const ServiceProviders: React.FC = () => {
       }
     } catch (error) {
       console.error("Error updating status:", error);
-      alert(error instanceof Error ? error.message : "Failed to update service provider status");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to update service provider status"
+      );
     }
   };
 
@@ -171,7 +191,8 @@ const ServiceProviders: React.FC = () => {
                 {request.status === "pending" && (
                   <FaSpinner className="spinning" />
                 )}
-                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                {request.status.charAt(0).toUpperCase() +
+                  request.status.slice(1)}
               </span>
             </div>
             <div className="request-details">
@@ -183,6 +204,9 @@ const ServiceProviders: React.FC = () => {
               </p>
               <p>
                 <strong>Services:</strong> {request.serviceType.join(", ")}
+              </p>
+              <p>
+                <strong>Service Fee:</strong> LKR {request.serviceFee}/hr
               </p>
               <p>
                 <strong>Experience:</strong> {request.experience}
