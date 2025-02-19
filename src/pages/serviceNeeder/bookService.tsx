@@ -121,15 +121,15 @@ const BookService: React.FC = () => {
       {step === 2 && (
         <form className="booking-form" onSubmit={handleSubmit}>
           <h2>Schedule Your Service</h2>
-          <div className="form-group">
+          <div className="form-group-3">
             <FaMapMarkerAlt />
             <input type="text" placeholder="Service Location" required />
           </div>
-          <div className="form-group">
+          <div className="form-group-3">
             <FaCalendar />
             <input type="date" required />
           </div>
-          <div className="form-group">
+          <div className="form-group-3">
             <FaClock />
             <select required>
               <option value="">Select Time</option>
