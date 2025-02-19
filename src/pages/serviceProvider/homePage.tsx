@@ -13,6 +13,7 @@ interface ServiceProvider {
   timeTo: string;
   experience: string;
   approvedAt: string;
+  serviceFee: number;
 }
 
 interface EditableData extends ServiceProvider {
@@ -99,8 +100,14 @@ const ServiceProviderHomePage: React.FC = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditableData((prev) => (prev ? { ...prev, [name]: value } : null));
+    const { name, value, type } = e.target;
+    setEditableData((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        [name]: type === "number" ? Number(value) : value,
+      };
+    });
   };
 
   const handleArrayChange = (name: string, value: string[]) => {
@@ -205,6 +212,17 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
+                <div className="form-group-2">
+                  <label>Service Fee per Hour (LKR):</label>
+                  <input
+                    type="number"
+                    name="serviceFee"
+                    value={editableData?.serviceFee || ""}
+                    onChange={handleChange}
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
               </div>
             ) : (
               <>
@@ -227,6 +245,9 @@ const ServiceProviderHomePage: React.FC = () => {
                   <strong>Approved Date:</strong>{" "}
                   {provider?.approvedAt &&
                     new Date(provider.approvedAt).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Service Fee:</strong> LKR {provider?.serviceFee}/hr
                 </p>
               </>
             )}

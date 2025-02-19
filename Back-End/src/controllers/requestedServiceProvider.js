@@ -2,8 +2,7 @@ const RequestedServiceProvider = require("../models/RequestedServiceProvider.js"
 const ApprovedServiceProvider = require("../models/ApprovedServiceProvider.js");
 const bcrypt = require("bcryptjs");
 const RejectedServiceProvider = require("../models/RejectedServiceProvider.js");
-const jwt = require('jsonwebtoken');
-
+const jwt = require("jsonwebtoken");
 
 const registerServiceProvider = async (req, res) => {
   try {
@@ -40,7 +39,9 @@ const registerServiceProvider = async (req, res) => {
 
     // Validate service fee
     if (!serviceFee || serviceFee <= 0) {
-      return res.status(400).json({ message: "Please enter a valid service fee" });
+      return res
+        .status(400)
+        .json({ message: "Please enter a valid service fee" });
     }
 
     // Hash password
@@ -61,15 +62,17 @@ const registerServiceProvider = async (req, res) => {
       serviceFee,
     });
 
-     // Save to database
-     await newServiceProvider.save();
+    // Save to database
+    await newServiceProvider.save();
 
-     res.status(201).json({ message: "Registration request submitted successfully" });
-   } catch (error) {
-     console.error("Registration error:", error);
-     res.status(500).json({ message: "Server error during registration" });
-   }
- };
+    res
+      .status(201)
+      .json({ message: "Registration request submitted successfully" });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Server error during registration" });
+  }
+};
 
 const getAllServiceProviders = async (req, res) => {
   try {
@@ -133,10 +136,11 @@ const getApprovedServiceProviders = async (req, res) => {
     res.status(200).json(approvedProviders);
   } catch (error) {
     console.error("Error fetching approved providers:", error);
-    res.status(500).json({ message: "Server error while fetching approved providers" });
+    res
+      .status(500)
+      .json({ message: "Server error while fetching approved providers" });
   }
 };
-
 
 const rejectServiceProvider = async (req, res) => {
   try {
@@ -177,13 +181,16 @@ const rejectServiceProvider = async (req, res) => {
 
 const getRejectedServiceProviders = async (req, res) => {
   try {
-    const rejectedProviders = await RejectedServiceProvider.find({})
-      .sort({ rejectedAt: -1 });
+    const rejectedProviders = await RejectedServiceProvider.find({}).sort({
+      rejectedAt: -1,
+    });
 
     res.status(200).json(rejectedProviders);
   } catch (error) {
     console.error("Error fetching rejected providers:", error);
-    res.status(500).json({ message: "Server error while fetching rejected providers" });
+    res
+      .status(500)
+      .json({ message: "Server error while fetching rejected providers" });
   }
 };
 
@@ -194,48 +201,53 @@ const loginServiceProvider = async (req, res) => {
     // First check if the provider exists in the rejected collection
     const rejectedProvider = await RejectedServiceProvider.findOne({ email });
     if (rejectedProvider) {
-      return res.status(403).json({ 
-        message: "Your application was rejected. Please register again with appropriate information.",
-        status: "rejected"
+      return res.status(403).json({
+        message:
+          "Your application was rejected. Please register again with appropriate information.",
+        status: "rejected",
       });
     }
 
     // Then check if the provider exists in the requested collection
     const requestedProvider = await RequestedServiceProvider.findOne({ email });
     if (requestedProvider) {
-      return res.status(403).json({ 
-        message: "Your profile is pending approval from admin. Please wait for approval.",
-        status: "pending"
+      return res.status(403).json({
+        message:
+          "Your profile is pending approval from admin. Please wait for approval.",
+        status: "pending",
       });
     }
 
     // Finally check in the approved collection
     const approvedProvider = await ApprovedServiceProvider.findOne({ email });
     if (!approvedProvider) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         message: "Invalid credentials or account not found",
-        status: "not_found"
+        status: "not_found",
       });
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, approvedProvider.password);
+    const isValidPassword = await bcrypt.compare(
+      password,
+      approvedProvider.password
+    );
     if (!isValidPassword) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         message: "Invalid credentials",
-        status: "invalid"
+        status: "invalid",
       });
     }
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
+      {
         id: approvedProvider._id,
         email: approvedProvider.email,
-        fullName: approvedProvider.fullName
+        fullName: approvedProvider.fullName,
       },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: "24h" }
     );
 
     // Send response
@@ -245,23 +257,23 @@ const loginServiceProvider = async (req, res) => {
       serviceProvider: {
         id: approvedProvider._id,
         fullName: approvedProvider.fullName,
-        email: approvedProvider.email
-      }
+        email: approvedProvider.email,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Server error during login",
-      status: "error"
+      status: "error",
     });
   }
 };
 
 const getServiceProviderProfile = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+
     const provider = await ApprovedServiceProvider.findOne({ _id: decoded.id });
     if (!provider) {
       return res.status(404).json({ message: "Provider not found" });
@@ -277,19 +289,19 @@ const getServiceProviderProfile = async (req, res) => {
       timeFrom: provider.timeFrom,
       timeTo: provider.timeTo,
       experience: provider.experience,
-      approvedAt: provider.approvedAt
+      approvedAt: provider.approvedAt,
+      serviceFee: provider.serviceFee, // Add this line
     });
   } catch (error) {
     console.error("Profile fetch error:", error);
     res.status(401).json({ message: "Authentication failed" });
   }
 };
-
 const updateServiceProviderProfile = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+
     const updatedProvider = await ApprovedServiceProvider.findByIdAndUpdate(
       decoded.id,
       req.body,
@@ -316,5 +328,5 @@ module.exports = {
   getRejectedServiceProviders,
   loginServiceProvider,
   getServiceProviderProfile,
-  updateServiceProviderProfile
+  updateServiceProviderProfile,
 };
