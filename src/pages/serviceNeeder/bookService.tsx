@@ -144,12 +144,13 @@ const BookService: React.FC = () => {
             </div>
             <div className="form-group-3">
               <FaClock />
-              <select required>
-                <option value="">Select Time</option>
-                <option value="morning">Morning (8 AM - 12 PM)</option>
-                <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
-                <option value="evening">Evening (4 PM - 8 PM)</option>
-              </select>
+              <input
+                type="time"
+                required
+                min="08:00"
+                max="20:00"
+                step="1800" // 30-minute intervals
+              />
             </div>
             <button type="submit" className="next-button">
               Next
