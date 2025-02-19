@@ -1,0 +1,104 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaUser, FaEnvelope, FaLock, FaPhone } from 'react-icons/fa';
+import './registerN.css';
+
+const ServiceNeederRegister: React.FC = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phoneNumber: ''
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // Add your registration API call here
+      console.log('Form submitted:', formData);
+      navigate('/service-needer/home');
+    } catch (error) {
+      console.error('Registration failed:', error);
+    }
+  };
+
+  return (
+    <div className="register-container">
+      <div className="register-card">
+        <h1>Create Account</h1>
+        <p>Join Fixify to find the best service providers</p>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <FaUser className="input-icon" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <FaEnvelope className="input-icon" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <FaLock className="input-icon" />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <FaPhone className="input-icon" />
+            <input
+              type="tel"
+              name="phoneNumber"
+              placeholder="Phone Number"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button type="submit" className="register-button">
+            Register
+          </button>
+        </form>
+
+        <p className="login-link">
+          Already have an account?{' '}
+          <span onClick={() => navigate('/service-needer/login')}>
+            Login here
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default ServiceNeederRegister;

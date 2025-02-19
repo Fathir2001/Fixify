@@ -148,7 +148,7 @@ const ServiceNeederHomePage: React.FC = () => {
           <p>Find trusted professionals for all your repair needs</p>
           <button
             className="cta-button"
-            onClick={() => navigate("/book-service")}
+            onClick={() => navigate("/service-needer/login")}
           >
             Book a Service
           </button>
