@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaTools,
   FaCheckCircle,
@@ -136,6 +137,8 @@ const ServiceNeederHomePage: React.FC = () => {
     e.preventDefault();
   };
 
+  const navigate = useNavigate();
+
   return (
     <div className="home-page">
       {/* Hero Section */}
@@ -143,7 +146,12 @@ const ServiceNeederHomePage: React.FC = () => {
         <div className="hero-content">
           <h1>Expert Repairs at Your Fingertips</h1>
           <p>Find trusted professionals for all your repair needs</p>
-          <button className="cta-button">Book a Service</button>
+          <button
+            className="cta-button"
+            onClick={() => navigate("/book-service")}
+          >
+            Book a Service
+          </button>
         </div>
         <div
           className="scroll-indicator"
