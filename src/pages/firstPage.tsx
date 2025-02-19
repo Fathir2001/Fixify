@@ -1,67 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-// import { FaBolt, FaWrench, FaHammer, FaCar, FaTools, 
-//          FaBroom, FaPaintRoller, FaTree, FaHome } from 'react-icons/fa';
+import { FaAward, FaStar, FaUsers, FaGlobe, FaHandshake, FaSmile } from 'react-icons/fa';
 import './FirstPage.css';
 
-// const services = [
-//     {
-//       id: 1,
-//       title: 'Electrician Services',
-//       description: 'Professional electrical installation and repair services',
-//       icon: FaBolt
-//     },
-//     {
-//       id: 2,
-//       title: 'Plumbing Services',
-//       description: 'Expert plumbing solutions for your home',
-//       icon: FaWrench
-//     },
-//     {
-//       id: 3,
-//       title: 'Carpentry Services',
-//       description: 'Custom woodwork and furniture repairs',
-//       icon: FaHammer
-//     },
-//     {
-//       id: 4,
-//       title: 'Vehicle Breakdown',
-//       description: '24/7 roadside assistance services',
-//       icon: FaCar
-//     },
-//     {
-//       id: 5,
-//       title: 'Appliance Repair',
-//       description: 'Fixing all types of home appliances',
-//       icon: FaTools
-//     },
-//     {
-//       id: 6,
-//       title: 'House Cleaning',
-//       description: 'Professional cleaning services',
-//       icon: FaBroom
-//     },
-//     {
-//       id: 7,
-//       title: 'Painting Services',
-//       description: 'Interior and exterior painting solutions',
-//       icon: FaPaintRoller
-//     },
-//     {
-//       id: 8,
-//       title: 'Gardening & Landscaping',
-//       description: 'Transform your outdoor spaces',
-//       icon: FaTree
-//     },
-//     {
-//       id: 9,
-//       title: 'Roof Repair',
-//       description: 'Waterproofing and roof maintenance',
-//       icon: FaHome
-//     }
-// ];
+const achievements = [
+  { icon: FaAward, value: '5+', label: 'Years Experience' },
+  { icon: FaStar, value: '1000+', label: 'Happy Customers' },
+  { icon: FaUsers, value: '500+', label: 'Expert Technicians' },
+  { icon: FaGlobe, value: '50+', label: 'Service Locations' }
+];
 
+const features = [
+  {
+    icon: FaHandshake,
+    title: 'Trust & Reliability',
+    description: 'We build lasting relationships through quality service and transparency'
+  },
+  {
+    icon: FaSmile,
+    title: 'Customer Satisfaction',
+    description: 'Your happiness is our top priority - we go above and beyond'
+  }
+];
 
 const FirstPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -71,12 +32,9 @@ const FirstPage: React.FC = () => {
     setIsVisible(true);
   }, []);
 
-  const handleEstimateClick = () => {
-    navigate('/user-type');
-  };
-
   return (
     <div className="container">
+      {/* Hero Section */}
       <section className="hero">
         <motion.div
           className="hero-content"
@@ -89,45 +47,83 @@ const FirstPage: React.FC = () => {
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            Professional Home Repair Services
+            Your Trusted Partner in Home Solutions
           </motion.h1>
-          <p className="hero-subtitle">Transform your home with our expert repair and renovation services</p>
-          <motion.button 
-            className="cta-button"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleEstimateClick}
-          >
-            Get Started
-          </motion.button>
+          <p className="hero-subtitle">
+            Experience excellence in home services with our network of verified professionals
+          </p>
+          <div className="hero-cta">
+            <motion.button 
+              className="cta-button primary"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/user-type')}
+            >
+              Explore Services
+            </motion.button>
+          </div>
         </motion.div>
       </section>
 
-      {/* <section className="services-section">
-        <h2 className="section-title">Our Services</h2>
-        <div className="service-grid">
-          {services.map((service, index) => (
+      {/* Stats Section */}
+      <section className="stats-section">
+        <div className="stats-grid">
+          {achievements.map((item, index) => (
             <motion.div
-              key={service.id}
-              className="service-card"
-              initial={{ opacity: 0, y: 30 }}
+              key={index}
+              className="stat-card"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ scale: 1.03 }}
+              transition={{ delay: index * 0.1 }}
             >
-              <motion.div 
-                className="service-icon"
-                animate={{ y: [-5, 5, -5] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                <service.icon />
-              </motion.div>
-              <h3 className="service-title">{service.title}</h3>
-              <p className="service-description">{service.description}</p>
+              <item.icon className="stat-icon" />
+              <h3 className="stat-value">{item.value}</h3>
+              <p className="stat-label">{item.label}</p>
             </motion.div>
           ))}
         </div>
-      </section> */}
+      </section>
+
+      {/* Features Section */}
+      <section className="features-section">
+        <h2 className="section-title">Why Choose Us</h2>
+        <div className="features-grid">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              className="feature-card"
+              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 * index }}
+            >
+              <feature.icon className="feature-icon" />
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="bottom-cta">
+        <motion.div
+          className="cta-content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h2>Ready to Transform Your Space?</h2>
+          <p>Join thousands of satisfied customers who trust Fixify</p>
+          <motion.button
+            className="cta-button primary"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/user-type')}
+          >
+            Start Your Journey
+          </motion.button>
+        </motion.div>
+      </section>
     </div>
   );
 };
