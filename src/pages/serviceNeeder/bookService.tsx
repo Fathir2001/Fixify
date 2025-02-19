@@ -13,6 +13,8 @@ import {
   FaPaintRoller,
   FaTree,
   FaHome,
+  FaBell,
+  FaUser,
 } from "react-icons/fa";
 
 const BookService: React.FC = () => {
@@ -81,79 +83,91 @@ const BookService: React.FC = () => {
   };
 
   return (
-    <div className="book-service">
-      <h1>Book a Service</h1>
-      <h2>Steps</h2>
+    <div>
+      <nav className="navbar-2">
+        <div className="nav-left">
+          <FaBell className="notification-icon" />
+          <span className="notification-badge">2</span>
+        </div>
+        <div className="nav-center">
+          <h1>Fixify</h1>
+        </div>
+        <div className="nav-right">
+          <FaUser className="user-icon" />
+        </div>
+      </nav>
 
-      <div className="booking-progress">
-        <div className={`progress-step ${step >= 1 ? "active" : ""}`}>
-          1. Select Service
+      <div className="book-service">
+        <div className="booking-progress">
+          <div className={`progress-step ${step >= 1 ? "active" : ""}`}>
+            1. Select Service
+          </div>
+          <div className={`progress-step ${step >= 2 ? "active" : ""}`}>
+            2. Schedule
+          </div>
+          <div className={`progress-step ${step >= 3 ? "active" : ""}`}>
+            3. Confirm
+          </div>
         </div>
-        <div className={`progress-step ${step >= 2 ? "active" : ""}`}>
-          2. Schedule
-        </div>
-        <div className={`progress-step ${step >= 3 ? "active" : ""}`}>
-          3. Confirm
-        </div>
+
+        {step === 1 && (
+          <div className="service-selection">
+            <h2>Select a Service</h2>
+            <div className="services-grid">
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="service-card"
+                  onClick={() => setStep(2)}
+                >
+                  <span className="service-icon">
+                    <service.icon />
+                  </span>
+                  <h3>{service.name}</h3>
+                  <p>{service.price}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <form className="booking-form" onSubmit={handleSubmit}>
+            <h2>Schedule Your Service</h2>
+            <div className="form-group-3">
+              <FaMapMarkerAlt />
+              <input type="text" placeholder="Service Location" required />
+            </div>
+            <div className="form-group-3">
+              <FaCalendar />
+              <input type="date" required />
+            </div>
+            <div className="form-group-3">
+              <FaClock />
+              <select required>
+                <option value="">Select Time</option>
+                <option value="morning">Morning (8 AM - 12 PM)</option>
+                <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
+                <option value="evening">Evening (4 PM - 8 PM)</option>
+              </select>
+            </div>
+            <button type="submit" className="next-button">
+              Next
+            </button>
+          </form>
+        )}
+
+        {step === 3 && (
+          <div className="booking-confirmation">
+            <h2>Confirm Your Booking</h2>
+            <div className="booking-summary">
+              <h3>Booking Summary</h3>
+              {/* Add booking summary details */}
+            </div>
+            <button className="confirm-button">Confirm Booking</button>
+          </div>
+        )}
       </div>
-
-      {step === 1 && (
-        <div className="service-selection">
-          <h2>Select a Service</h2>
-          <div className="services-grid">
-            {services.map((service) => (
-              <div
-                key={service.id}
-                className="service-card"
-                onClick={() => setStep(2)}
-              >
-                <span className="service-icon">
-                  <service.icon />
-                </span>
-                <h3>{service.name}</h3>
-                <p>{service.price}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {step === 2 && (
-        <form className="booking-form" onSubmit={handleSubmit}>
-          <h2>Schedule Your Service</h2>
-          <div className="form-group-3">
-            <FaMapMarkerAlt />
-            <input type="text" placeholder="Service Location" required />
-          </div>
-          <div className="form-group-3">
-            <FaCalendar />
-            <input type="date" required />
-          </div>
-          <div className="form-group-3">
-            <FaClock />
-            <select required>
-              <option value="">Select Time</option>
-              <option value="morning">Morning (8 AM - 12 PM)</option>
-              <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
-              <option value="evening">Evening (4 PM - 8 PM)</option>
-            </select>
-          </div>
-          <button type="submit" className="next-button">
-            Next
-          </button>
-        </form>
-      )}
-
-      {step === 3 && (
-        <div className="booking-confirmation">
-          <h2>Confirm Your Booking</h2>
-          <div className="booking-summary">
-            <h3>Booking Summary</h3>
-            {/* Add booking summary details */}
-          </div>
-          <button className="confirm-button">Confirm Booking</button>
-        </div>
-      )}
     </div>
   );
 };
