@@ -202,6 +202,14 @@ const BookService: React.FC = () => {
     return slots;
   };
 
+  const getTodayString = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   return (
     <div>
       <nav className="navbar-2">
@@ -273,6 +281,7 @@ const BookService: React.FC = () => {
                 name="date"
                 value={bookingData.date}
                 onChange={handleInputChange}
+                min={getTodayString()}
                 required
               />
             </div>
