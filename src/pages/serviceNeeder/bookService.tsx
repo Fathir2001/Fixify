@@ -15,7 +15,6 @@ import {
   FaHome,
   FaBell,
   FaUser,
-  FaStar,
 } from "react-icons/fa";
 
 interface ServiceProvider {
@@ -333,27 +332,7 @@ const BookService: React.FC = () => {
                       <p>
                         <strong>Service Fee:</strong> ${provider.serviceFee}
                       </p>
-                      <div className="rating">
-                        <strong>Rating:</strong>
-                        {provider.rating ? (
-                          <span>
-                            {Array(5)
-                              .fill(0)
-                              .map((_, index) => (
-                                <FaStar
-                                  key={index}
-                                  className={
-                                    index < provider.rating!
-                                      ? "star-filled"
-                                      : "star-empty"
-                                  }
-                                />
-                              ))}
-                          </span>
-                        ) : (
-                          <span className="new-provider">New Provider</span>
-                        )}
-                      </div>
+                      
                     </div>
                     <button
                       className="select-provider-button"
