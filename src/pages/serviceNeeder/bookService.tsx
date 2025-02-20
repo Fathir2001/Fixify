@@ -189,6 +189,19 @@ const BookService: React.FC = () => {
     }
   };
 
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 8; hour <= 20; hour++) {
+      // Add hour:00
+      slots.push(`${hour.toString().padStart(2, "0")}:00`);
+      // Add hour:30 if not 20:00
+      if (hour !== 20) {
+        slots.push(`${hour.toString().padStart(2, "0")}:30`);
+      }
+    }
+    return slots;
+  };
+
   return (
     <div>
       <nav className="navbar-2">
@@ -266,29 +279,45 @@ const BookService: React.FC = () => {
             <div className="time-range-group">
               <div className="form-group-3">
                 <FaClock />
-                <input
-                  type="time"
+                <select
                   name="timeFrom"
                   value={bookingData.timeFrom}
-                  onChange={handleInputChange}
+                  onChange={(e) =>
+                    handleInputChange(
+                      e as unknown as React.ChangeEvent<HTMLInputElement>
+                    )
+                  }
                   required
-                  min="08:00"
-                  max="20:00"
-                  step="1800"
-                />
+                >
+                  <option value="">Select start time</option>
+                  {generateTimeSlots().map((time) => (
+                    <option key={`from-${time}`} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="form-group-3">
                 <FaClock />
-                <input
-                  type="time"
+                <select
                   name="timeTo"
                   value={bookingData.timeTo}
-                  onChange={handleInputChange}
+                  onChange={(e) =>
+                    handleInputChange(
+                      e as unknown as React.ChangeEvent<HTMLInputElement>
+                    )
+                  }
                   required
-                  min="08:00"
-                  max="20:00"
-                  step="1800"
-                />
+                >
+                  <option value="">Select end time</option>
+                  {generateTimeSlots()
+                    .filter((time) => time > bookingData.timeFrom)
+                    .map((time) => (
+                      <option key={`to-${time}`} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                </select>
               </div>
             </div>
             <button type="submit" className="next-button">
@@ -330,9 +359,9 @@ const BookService: React.FC = () => {
                         <strong>Experience:</strong> {provider.experience}
                       </p>
                       <p>
-                        <strong>Service Fee / Hour :</strong> LKR {provider.serviceFee}
+                        <strong>Service Fee / Hour :</strong> LKR{" "}
+                        {provider.serviceFee}
                       </p>
-                      
                     </div>
                     <button
                       className="select-provider-button"
