@@ -330,7 +330,7 @@ const BookService: React.FC = () => {
                         <strong>Experience:</strong> {provider.experience}
                       </p>
                       <p>
-                        <strong>Service Fee:</strong> ${provider.serviceFee}
+                        <strong>Service Fee / Hour :</strong> LKR {provider.serviceFee}
                       </p>
                       
                     </div>
