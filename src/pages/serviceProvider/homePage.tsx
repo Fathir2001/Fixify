@@ -20,12 +20,22 @@ interface EditableData extends ServiceProvider {
   [key: string]: any;
 }
 
+interface Notification {
+  id: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+}
+
 const ServiceProviderHomePage: React.FC = () => {
   const navigate = useNavigate();
   const [provider, setProvider] = useState<ServiceProvider | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<EditableData | null>(null);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const availableServices = [
     "Electrician Services",
@@ -83,6 +93,22 @@ const ServiceProviderHomePage: React.FC = () => {
 
     fetchProviderData();
   }, [navigate]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showNotifications &&
+        !(event.target as Element).closest(".notification-wrapper")
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [showNotifications]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -149,11 +175,61 @@ const ServiceProviderHomePage: React.FC = () => {
     return <div className="loading">Loading...</div>;
   }
 
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map((notif) => ({ ...notif, read: true })));
+    setNotificationCount(0);
+  };
+
   return (
     <div className="home-container">
       <nav className="navbar">
         <h1 className="logo">Fixify</h1>
         <div className="nav-buttons">
+          <div className="notification-wrapper">
+            <div className="notification-icon-1" onClick={toggleNotifications}>
+              <i className="fas fa-bell"></i>
+              {notificationCount > 0 && (
+                <span className="notification-badge">{notificationCount}</span>
+              )}
+            </div>
+            {showNotifications && (
+              <div className="notification-popup">
+                <div className="notification-header">
+                  <span>Notifications</span>
+                  {notifications.some((n) => !n.read) && (
+                    <button className="mark-all-read" onClick={markAllAsRead}>
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
+                {notifications.length > 0 ? (
+                  <ul className="notification-list">
+                    {notifications.map((notification) => (
+                      <li
+                        key={notification.id}
+                        className={`notification-item ${
+                          !notification.read ? "unread" : ""
+                        }`}
+                      >
+                        <div className="notification-content">
+                          {notification.message}
+                        </div>
+                        <div className="notification-time">
+                          {new Date(notification.timestamp).toLocaleString()}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="no-notifications">No notifications</div>
+                )}
+              </div>
+            )}
+          </div>
           {!isEditing && (
             <button onClick={handleEdit} className="edit-button">
               Edit Profile
