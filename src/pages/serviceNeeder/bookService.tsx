@@ -36,6 +36,7 @@ const BookService: React.FC = () => {
   const [bookingData, setBookingData] = useState({
     serviceType: "",
     location: "",
+    address: "",
     date: "",
     timeFrom: "",
     timeTo: "",
@@ -205,8 +206,8 @@ const BookService: React.FC = () => {
   const getTodayString = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -270,6 +271,17 @@ const BookService: React.FC = () => {
                 name="location"
                 placeholder="Service Location"
                 value={bookingData.location}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="form-group-3">
+              <FaMapMarkerAlt />
+              <input
+                type="text"
+                name="address"
+                placeholder="Detailed Address"
+                value={bookingData.address}
                 onChange={handleInputChange}
                 required
               />
@@ -346,6 +358,9 @@ const BookService: React.FC = () => {
                 </p>
                 <p>
                   <strong>Location:</strong> {bookingData.location}
+                </p>
+                <p>
+                  <strong>Address:</strong> {bookingData.address}
                 </p>
                 <p>
                   <strong>Date:</strong>{" "}
