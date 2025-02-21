@@ -261,23 +261,54 @@ const ServiceProviderRegister: React.FC = () => {
           </div>
 
           <div className="form-group time-range">
-            <FaClock className="input-icon" />
             <div className="time-inputs">
-              <input
-                type="time"
-                name="timeFrom"
-                value={formData.timeFrom}
-                onChange={handleChange}
-                required
-              />
+              <div className="time-input-wrapper">
+                <FaClock className="input-icon" />
+                <select
+                  name="timeFrom"
+                  value={formData.timeFrom}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select start time</option>
+                  {Array.from({ length: 25 }).map((_, i) => {
+                    const hour = Math.floor(i / 2) + 8;
+                    const minute = i % 2 === 0 ? "00" : "30";
+                    const time = `${hour
+                      .toString()
+                      .padStart(2, "0")}:${minute}`;
+                    return (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
               <span className="time-separator">to</span>
-              <input
-                type="time"
-                name="timeTo"
-                value={formData.timeTo}
-                onChange={handleChange}
-                required
-              />
+              <div className="time-input-wrapper">
+                <FaClock className="input-icon" />
+                <select
+                  name="timeTo"
+                  value={formData.timeTo}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select end time</option>
+                  {Array.from({ length: 25 }).map((_, i) => {
+                    const hour = Math.floor(i / 2) + 8;
+                    const minute = i % 2 === 0 ? "00" : "30";
+                    const time = `${hour
+                      .toString()
+                      .padStart(2, "0")}:${minute}`;
+                    return (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
             </div>
           </div>
 

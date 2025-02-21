@@ -391,6 +391,22 @@
 .mark-all-read:hover {
   text-decoration: underline;
 }
+.time-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.time-input-wrapper .input-icon {
+  position: absolute;
+  left: 10px;
+  color: #FFD700;
+  z-index: 1;
+}
+
+.time-input-wrapper select {
+  padding-left: 35px;
+}
 
 @media (max-width: 768px) {
   .info-cards {
