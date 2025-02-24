@@ -45,4 +45,25 @@ router.patch("/notifications/mark-read", authMiddleware, async (req, res) => {
   }
 });
 
+router.delete("/notifications/:notificationId", authMiddleware, async (req, res) => {
+  try {
+    const { notificationId } = req.params;
+    const notification = await Notification.findById(notificationId);
+    
+    if (!notification) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+
+    // Check if the notification belongs to the logged-in provider
+    if (notification.serviceProviderId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    await Notification.findByIdAndDelete(notificationId);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting notification" });
+  }
+});
+
 module.exports = router;

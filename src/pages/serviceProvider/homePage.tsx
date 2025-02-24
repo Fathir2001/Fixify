@@ -115,32 +115,72 @@ const ServiceProviderHomePage: React.FC = () => {
     }
   };
 
-   useEffect(() => {
-    if (!provider?._id) return; 
-  
+  const handleRejectNotification = async (notificationId: string) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      "Are you sure you want to reject this notification?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:5000/api/service-requests/notifications/${notificationId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Remove the notification from state
+        setNotifications((prev) =>
+          prev.filter((n) => n._id !== notificationId)
+        );
+        // Update notification count if the notification was unread
+        const wasUnread =
+          notifications.find((n) => n._id === notificationId)?.read === false;
+        if (wasUnread) {
+          setNotificationCount((prev) => Math.max(0, prev - 1));
+        }
+      } else {
+        throw new Error("Failed to delete notification");
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      alert("Failed to delete notification");
+    }
+  };
+
+  useEffect(() => {
+    if (!provider?._id) return;
+
     const socket = io("http://localhost:5000");
     const providerId = provider._id;
-  
+
     console.log("Provider ID for socket:", providerId); // Add this log
-  
+
     socket.on("connect", () => {
       console.log("Connected to WebSocket");
     });
-  
+
     socket.on("newNotification", (notification: Notification) => {
       console.log("New notification received:", notification);
       console.log("Current provider ID:", providerId);
-      
+
       if (notification.serviceProviderId === providerId) {
-        setNotifications(prev => [notification, ...prev]);
-        setNotificationCount(prev => prev + 1);
+        setNotifications((prev) => [notification, ...prev]);
+        setNotificationCount((prev) => prev + 1);
       }
     });
-  
+
     socket.on("connect_error", (error) => {
       console.error("Socket connection error:", error);
     });
-  
+
     return () => {
       socket.disconnect();
     };
@@ -307,8 +347,19 @@ const ServiceProviderHomePage: React.FC = () => {
                         <div className="notification-content">
                           {notification.message}
                         </div>
-                        <div className="notification-time">
-                          {new Date(notification.createdAt).toLocaleString()}
+                        <div className="notification-footer">
+                          <div className="notification-time">
+                            {new Date(notification.createdAt).toLocaleString()}
+                          </div>
+                          <button
+                            className="reject-notification-button"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent notification item click
+                              handleRejectNotification(notification._id);
+                            }}
+                          >
+                            Reject
+                          </button>
                         </div>
                       </li>
                     ))}

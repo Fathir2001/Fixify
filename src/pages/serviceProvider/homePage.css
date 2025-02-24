@@ -348,7 +348,6 @@
 .notification-item {
   padding: 12px;
   border-bottom: 1px solid #eee;
-  cursor: pointer;
 }
 
 .notification-item:hover {
@@ -377,6 +376,28 @@
 .notification-time {
   font-size: 12px;
   color: #666;
+}
+
+.notification-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.reject-notification-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.reject-notification-button:hover {
+  background-color: #d32f2f;
 }
 
 .no-notifications {
