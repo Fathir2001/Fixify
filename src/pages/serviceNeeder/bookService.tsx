@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./bookService.css";
+import { CgSpinner } from "react-icons/cg";
 import Modal from "react-modal";
 Modal.setAppElement("#root");
 import {
@@ -213,6 +214,7 @@ const BookService: React.FC = () => {
           "Your service request has been sent successfully. Please wait for the provider to accept your request.",
       });
       setShowModal(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setBookingResponse({
         success: false,
@@ -450,18 +452,14 @@ const BookService: React.FC = () => {
           overlayClassName="modal-overlay"
         >
           <h2>{bookingResponse.success ? "Request Sent" : "Request Failed"}</h2>
-          <p>{bookingResponse.message}</p>
-          <button
-            className="modal-close-button"
-            onClick={() => {
-              setShowModal(false);
-              if (bookingResponse.success) {
-                window.location.href = "/dashboard";
-              }
-            }}
+          <div
+            className={
+              bookingResponse.success ? "success-message" : "error-message"
+            }
           >
-            {bookingResponse.success ? "Go to Dashboard" : "Close"}
-          </button>
+            <p>{bookingResponse.message}</p>
+            <CgSpinner className="loading-spinner" />
+          </div>
         </Modal>
       )}
     </div>

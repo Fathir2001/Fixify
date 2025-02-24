@@ -17,6 +17,7 @@ interface ServiceProvider {
 }
 
 interface EditableData extends ServiceProvider {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
