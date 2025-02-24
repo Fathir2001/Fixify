@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./homePage.css";
+import io from "socket.io-client";
 
 interface ServiceProvider {
+  _id: string;
   fullName: string;
   email: string;
   serviceType: string[];
@@ -22,10 +24,12 @@ interface EditableData extends ServiceProvider {
 }
 
 interface Notification {
-  id: string;
+  _id: string;
   message: string;
-  timestamp: string;
+  createdAt: string;
   read: boolean;
+  serviceRequestId: string;
+  serviceProviderId: string;
 }
 
 const ServiceProviderHomePage: React.FC = () => {
@@ -60,6 +64,94 @@ const ServiceProviderHomePage: React.FC = () => {
     "Sunday",
   ];
 
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Fetching notifications...");
+
+      const response = await fetch(
+        "http://localhost:5000/api/service-requests/notifications",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Notifications received:", data);
+        setNotifications(data);
+        setNotificationCount(data.filter((n: Notification) => !n.read).length);
+      } else {
+        console.error("Error response:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:5000/api/service-requests/notifications/mark-read",
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setNotifications(
+          notifications.map((notif) => ({ ...notif, read: true }))
+        );
+        setNotificationCount(0);
+      }
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+    }
+  };
+
+   useEffect(() => {
+    if (!provider?._id) return; 
+  
+    const socket = io("http://localhost:5000");
+    const providerId = provider._id;
+  
+    console.log("Provider ID for socket:", providerId); // Add this log
+  
+    socket.on("connect", () => {
+      console.log("Connected to WebSocket");
+    });
+  
+    socket.on("newNotification", (notification: Notification) => {
+      console.log("New notification received:", notification);
+      console.log("Current provider ID:", providerId);
+      
+      if (notification.serviceProviderId === providerId) {
+        setNotifications(prev => [notification, ...prev]);
+        setNotificationCount(prev => prev + 1);
+      }
+    });
+  
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+  
+    return () => {
+      socket.disconnect();
+    };
+  }, [provider?._id]);
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000); // Fetch every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -80,6 +172,7 @@ const ServiceProviderHomePage: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
+          console.log("Provider data:", data); // Add this log
           setProvider(data);
         } else {
           throw new Error("Failed to fetch provider data");
@@ -180,11 +273,6 @@ const ServiceProviderHomePage: React.FC = () => {
     setShowNotifications(!showNotifications);
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map((notif) => ({ ...notif, read: true })));
-    setNotificationCount(0);
-  };
-
   return (
     <div className="home-container">
       <nav className="navbar">
@@ -211,7 +299,7 @@ const ServiceProviderHomePage: React.FC = () => {
                   <ul className="notification-list">
                     {notifications.map((notification) => (
                       <li
-                        key={notification.id}
+                        key={notification._id}
                         className={`notification-item ${
                           !notification.read ? "unread" : ""
                         }`}
@@ -220,7 +308,7 @@ const ServiceProviderHomePage: React.FC = () => {
                           {notification.message}
                         </div>
                         <div className="notification-time">
-                          {new Date(notification.timestamp).toLocaleString()}
+                          {new Date(notification.createdAt).toLocaleString()}
                         </div>
                       </li>
                     ))}
