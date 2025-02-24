@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./bookService.css";
+import Modal from "react-modal";
+Modal.setAppElement("#root");
 import {
   FaCalendar,
   FaClock,
@@ -30,6 +32,7 @@ interface ServiceProvider {
 const BookService: React.FC = () => {
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [matchedProviders, setMatchedProviders] = useState<ServiceProvider[]>(
     []
   );
@@ -98,6 +101,14 @@ const BookService: React.FC = () => {
       icon: FaHome,
     },
   ];
+  const [showModal, setShowModal] = useState(false);
+  const [bookingResponse, setBookingResponse] = useState<{
+    success: boolean;
+    message: string;
+  }>({
+    success: false,
+    message: "",
+  });
 
   const handleServiceSelect = (serviceName: string) => {
     setSelectedService(serviceName);
@@ -105,7 +116,9 @@ const BookService: React.FC = () => {
     setStep(2);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setBookingData({
       ...bookingData,
       [e.target.name]: e.target.value,
@@ -161,10 +174,22 @@ const BookService: React.FC = () => {
     }
   };
 
-  const handleBookingConfirm = async (providerId: string) => {
+  const handleBookingConfirm = async (
+    providerId: string,
+    providerFee: number
+  ) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
+      // Calculate total hours
+      const timeFrom = new Date(`2000/01/01 ${bookingData.timeFrom}`);
+      const timeTo = new Date(`2000/01/01 ${bookingData.timeTo}`);
+      const totalHours =
+        (timeTo.getTime() - timeFrom.getTime()) / (1000 * 60 * 60);
+      const totalFee = totalHours * providerFee;
+
       const response = await fetch(
-        "http://localhost:5000/api/service-needers/book-service",
+        "http://localhost:5000/api/service-requests/create",
         {
           method: "POST",
           headers: {
@@ -174,19 +199,28 @@ const BookService: React.FC = () => {
           body: JSON.stringify({
             ...bookingData,
             providerId,
+            totalHours,
+            totalFee,
           }),
         }
       );
 
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message);
-      }
-
-      // Handle successful booking (e.g., redirect to booking confirmation page)
-      console.log("Booking confirmed:", data);
+      setBookingResponse({
+        success: response.ok,
+        message:
+          data.message ||
+          "Your service request has been sent successfully. Please wait for the provider to accept your request.",
+      });
+      setShowModal(true);
     } catch (error) {
-      console.error("Error confirming booking:", error);
+      setBookingResponse({
+        success: false,
+        message: "Failed to create service request. Please try again.",
+      });
+      setShowModal(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -303,11 +337,7 @@ const BookService: React.FC = () => {
                 <select
                   name="timeFrom"
                   value={bookingData.timeFrom}
-                  onChange={(e) =>
-                    handleInputChange(
-                      e as unknown as React.ChangeEvent<HTMLInputElement>
-                    )
-                  }
+                  onChange={handleInputChange}
                   required
                 >
                   <option value="">Select start time</option>
@@ -389,9 +419,12 @@ const BookService: React.FC = () => {
                     </div>
                     <button
                       className="select-provider-button"
-                      onClick={() => handleBookingConfirm(provider._id)}
+                      onClick={() =>
+                        handleBookingConfirm(provider._id, provider.serviceFee)
+                      }
+                      disabled={isSubmitting}
                     >
-                      Book Now
+                      {isSubmitting ? "Processing..." : "Book Now"}
                     </button>
                   </div>
                 ))
@@ -409,6 +442,28 @@ const BookService: React.FC = () => {
           </div>
         )}
       </div>
+      {showModal && (
+        <Modal
+          isOpen={showModal}
+          onRequestClose={() => setShowModal(false)}
+          className="modal-content"
+          overlayClassName="modal-overlay"
+        >
+          <h2>{bookingResponse.success ? "Request Sent" : "Request Failed"}</h2>
+          <p>{bookingResponse.message}</p>
+          <button
+            className="modal-close-button"
+            onClick={() => {
+              setShowModal(false);
+              if (bookingResponse.success) {
+                window.location.href = "/dashboard";
+              }
+            }}
+          >
+            {bookingResponse.success ? "Go to Dashboard" : "Close"}
+          </button>
+        </Modal>
+      )}
     </div>
   );
 };

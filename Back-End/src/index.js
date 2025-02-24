@@ -6,6 +6,7 @@ const requestedServiceProviderRoutes = require('./routes/requestedServiceProvide
 const adminRoutes = require('./routes/adminRoutes');
 const serviceNeederRoutes = require('./routes/serviceNeederRoutes');
 const authMiddleware = require('./middleware/auth');
+const serviceRequestRoutes = require('./routes/serviceRequestRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ app.use('/api/service-providers', requestedServiceProviderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin', authMiddleware, adminRoutes);
 app.use('/api/service-needers', serviceNeederRoutes);
+app.use('/api/service-requests', serviceRequestRoutes);
 
 
 // Connect to MongoDB
