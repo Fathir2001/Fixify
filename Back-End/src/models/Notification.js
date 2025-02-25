@@ -11,18 +11,30 @@ const notificationSchema = new mongoose.Schema({
     ref: 'ServiceRequest',
     required: true
   },
-  message: {
+  serviceNeeder: {
+    id: { type: mongoose.Schema.Types.ObjectId, ref: 'ServiceNeeder' },
+    name: { type: String },
+    phoneNumber: { type: String }
+  },
+  serviceDetails: {
+    serviceType: { type: String },
+    location: { type: String },
+    address: { type: String },
+    date: { type: String },
+    timeFrom: { type: String },
+    timeTo: { type: String },
+    totalHours: { type: Number },
+    feePerHour: { type: Number },
+    totalFee: { type: Number }
+  },
+  message: { type: String, required: true },
+  read: { type: Boolean, default: false },
+  status: {
     type: String,
-    required: true
+    enum: ['pending', 'accepted', 'rejected', 'completed'],
+    default: 'pending'
   },
-  read: {
-    type: Boolean,
-    default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+  createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

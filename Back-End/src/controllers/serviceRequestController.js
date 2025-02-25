@@ -5,65 +5,63 @@ const Notification = require("../models/Notification");
 
 const createServiceRequest = async (req, res) => {
   try {
-    const {
+    const { serviceType, location, address, date, timeFrom, timeTo, providerId, totalHours } = req.body;
+    
+    // Get service needer details
+    const serviceNeeder = await ServiceNeeder.findById(req.user.id);
+    const serviceProvider = await ApprovedServiceProvider.findById(providerId);
+
+    if (!serviceNeeder || !serviceProvider) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Calculate total fee
+    const totalFee = totalHours * serviceProvider.serviceFee;
+
+    // Create service request with all required fields
+    const serviceRequest = new ServiceRequest({
+      serviceNeeder: {
+        id: serviceNeeder._id,
+        name: serviceNeeder.name,
+        phoneNumber: serviceNeeder.phoneNumber
+      },
+      serviceProvider: {
+        id: providerId,
+        name: serviceProvider.fullName,
+        phoneNumber: serviceProvider.phoneNumber  
+      },
+      serviceDetails: {          //  serviceDetails object
+        serviceType,
+        location,
+        address,
+        date,
+        timeFrom,
+        timeTo,
+        totalHours,
+        feePerHour: serviceProvider.serviceFee,
+        totalFee
+      },
       serviceType,
       location,
       address,
       date,
       timeFrom,
       timeTo,
-      providerId,
-    } = req.body;
+      totalHours,
+      totalFee,
+      status: 'pending'
+    });
 
-    // Validate required fields
-    if (
-      !serviceType ||
-      !location ||
-      !address ||
-      !date ||
-      !timeFrom ||
-      !timeTo ||
-      !providerId
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
+    await serviceRequest.save();
 
-    // Calculate total hours
-    const startTime = new Date(`2000/01/01 ${timeFrom}`);
-    const endTime = new Date(`2000/01/01 ${timeTo}`);
-    const totalHours =
-      (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-
-    // Get service needer details
-    const serviceNeeder = await ServiceNeeder.findById(req.user.id);
-    if (!serviceNeeder) {
-      return res.status(404).json({
-        success: false,
-        message: "Service needer not found",
-      });
-    }
-
-    // Get service provider details
-    const serviceProvider = await ApprovedServiceProvider.findById(providerId);
-    if (!serviceProvider) {
-      return res.status(404).json({
-        success: false,
-        message: "Service provider not found",
-      });
-    }
-    const serviceRequest = new ServiceRequest({
+    // Create notification with matching structure
+    const notification = new Notification({
+      serviceProviderId: providerId,
+      serviceRequestId: serviceRequest._id,
       serviceNeeder: {
         id: serviceNeeder._id,
         name: serviceNeeder.name,
-        phoneNumber: serviceNeeder.phoneNumber,
-      },
-      serviceProvider: {
-        id: serviceProvider._id,
-        name: serviceProvider.fullName,
-        phoneNumber: serviceProvider.phoneNumber,
+        phoneNumber: serviceNeeder.phoneNumber
       },
       serviceDetails: {
         serviceType,
@@ -74,38 +72,35 @@ const createServiceRequest = async (req, res) => {
         timeTo,
         totalHours,
         feePerHour: serviceProvider.serviceFee,
-        totalFee: totalHours * serviceProvider.serviceFee,
+        totalFee
       },
+      message: `New service request for ${serviceType} at ${location} on ${date}`,
+      status: 'pending'
     });
 
-    await serviceRequest.save();
-
-    // Create notification
-    const notification = new Notification({
-      serviceProviderId: providerId,
-      serviceRequestId: serviceRequest._id,
-      message: `New service request received for ${serviceType} at ${location} on ${date}`,
-      read: false,
-    });
     await notification.save();
 
     // Emit socket event
-    const io = req.app.get("io");
-    io.emit("newNotification", {
+    const io = req.app.get('io');
+    io.emit('newNotification', {
       _id: notification._id,
       message: notification.message,
       createdAt: notification.createdAt,
       read: notification.read,
-      serviceRequestId: notification.serviceRequestId,
-      serviceProviderId: notification.serviceProviderId,
+      serviceRequestId: serviceRequest._id,
+      serviceProviderId: providerId,
+      serviceNeeder: notification.serviceNeeder,
+      serviceDetails: notification.serviceDetails,
+      status: 'pending'
     });
 
     res.status(201).json({
       success: true,
       message: "Service request created successfully",
+      requestId: serviceRequest._id
     });
   } catch (error) {
-    console.error("Error in createServiceRequest:", error);
+    console.error("Error creating service request:", error);
     res.status(500).json({ message: "Error creating service request" });
   }
 };
@@ -158,32 +153,31 @@ const updateRequestStatus = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-    try {
-      const provider = await ApprovedServiceProvider.findById(req.user.id);
-      if (!provider) {
-        return res.status(404).json({ message: "Provider not found" });
-      }
-  
-      res.json({
-        _id: provider._id,
-        fullName: provider.fullName,
-        email: provider.email,
-        serviceType: provider.serviceType,
-        phoneNumber: provider.phoneNumber,
-        serviceArea: provider.serviceArea,
-        availableDays: provider.availableDays,
-        timeFrom: provider.timeFrom,
-        timeTo: provider.timeTo,
-        experience: provider.experience,
-        approvedAt: provider.approvedAt,
-        serviceFee: provider.serviceFee
-      });
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-      res.status(500).json({ message: "Server error" });
+  try {
+    const provider = await ApprovedServiceProvider.findById(req.user.id);
+    if (!provider) {
+      return res.status(404).json({ message: "Provider not found" });
     }
-  };
-  
+
+    res.json({
+      _id: provider._id,
+      fullName: provider.fullName,
+      email: provider.email,
+      serviceType: provider.serviceType,
+      phoneNumber: provider.phoneNumber,
+      serviceArea: provider.serviceArea,
+      availableDays: provider.availableDays,
+      timeFrom: provider.timeFrom,
+      timeTo: provider.timeTo,
+      experience: provider.experience,
+      approvedAt: provider.approvedAt,
+      serviceFee: provider.serviceFee,
+    });
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 module.exports = {
   createServiceRequest,
