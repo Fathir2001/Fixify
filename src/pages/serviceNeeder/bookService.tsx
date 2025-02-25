@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./bookService.css";
-import { CgSpinner } from "react-icons/cg";
 import Modal from "react-modal";
 Modal.setAppElement("#root");
 import {
@@ -110,6 +109,7 @@ const BookService: React.FC = () => {
     success: false,
     message: "",
   });
+  const [countdown, setCountdown] = useState(8);
 
   const handleServiceSelect = (serviceName: string) => {
     setSelectedService(serviceName);
@@ -214,6 +214,20 @@ const BookService: React.FC = () => {
           "Your service request has been sent successfully. Please wait for the provider to accept your request.",
       });
       setShowModal(true);
+
+      // Start countdown timer and reload page after modal closes
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setShowModal(false);
+            window.location.reload(); // Reload the page
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setBookingResponse({
@@ -451,14 +465,22 @@ const BookService: React.FC = () => {
           className="modal-content"
           overlayClassName="modal-overlay"
         >
-          <h2>{bookingResponse.success ? "Request Sent" : "Request Failed"}</h2>
+          <h2>
+            {bookingResponse.success
+              ? "Request Sent Successfully! If the Service Provider accepts, you will be notified."
+              : "Request Failed"}
+          </h2>
           <div
             className={
               bookingResponse.success ? "success-message" : "error-message"
             }
           >
             <p>{bookingResponse.message}</p>
-            <CgSpinner className="loading-spinner" />
+            {bookingResponse.success && (
+              <div className="countdown-timer">
+                Closing in {countdown} seconds
+              </div>
+            )}
           </div>
         </Modal>
       )}
