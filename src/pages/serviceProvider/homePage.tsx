@@ -104,6 +104,7 @@ const ServiceProviderHomePage: React.FC = () => {
         const data = await response.json();
         setSelectedNotification(data);
         setIsModalOpen(true);
+        setShowNotifications(false); // Close the notification popup
       } else {
         throw new Error("Failed to fetch notification details");
       }
