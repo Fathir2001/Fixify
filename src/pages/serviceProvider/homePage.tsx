@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Modal from "react-modal";
 import "./homePage.css";
 import io from "socket.io-client";
+
+Modal.setAppElement("#root");
 
 interface ServiceProvider {
   _id: string;
@@ -32,6 +35,24 @@ interface Notification {
   serviceProviderId: string;
 }
 
+interface NotificationDetails {
+  serviceNeeder: {
+    name: string;
+    phoneNumber: string;
+  };
+  serviceDetails: {
+    serviceType: string;
+    location: string;
+    address: string;
+    date: string;
+    timeFrom: string;
+    timeTo: string;
+    totalHours: number;
+    feePerHour: number;
+    totalFee: number;
+  };
+}
+
 const ServiceProviderHomePage: React.FC = () => {
   const navigate = useNavigate();
   const [provider, setProvider] = useState<ServiceProvider | null>(null);
@@ -41,6 +62,9 @@ const ServiceProviderHomePage: React.FC = () => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [selectedNotification, setSelectedNotification] =
+    useState<NotificationDetails | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const availableServices = [
     "Electrician Services",
@@ -63,6 +87,31 @@ const ServiceProviderHomePage: React.FC = () => {
     "Saturday",
     "Sunday",
   ];
+
+  const handleViewNotification = async (notificationId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:5000/api/service-requests/notifications/${notificationId}/details`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedNotification(data);
+        setIsModalOpen(true);
+      } else {
+        throw new Error("Failed to fetch notification details");
+      }
+    } catch (error) {
+      console.error("Error fetching notification details:", error);
+      alert("Failed to fetch notification details");
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -351,15 +400,26 @@ const ServiceProviderHomePage: React.FC = () => {
                           <div className="notification-time">
                             {new Date(notification.createdAt).toLocaleString()}
                           </div>
-                          <button
-                            className="reject-notification-button"
-                            onClick={(e) => {
-                              e.stopPropagation(); // Prevent notification item click
-                              handleRejectNotification(notification._id);
-                            }}
-                          >
-                            Reject
-                          </button>
+                          <div className="notification-actions">
+                            <button
+                              className="view-notification-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewNotification(notification._id);
+                              }}
+                            >
+                              View
+                            </button>
+                            <button
+                              className="reject-notification-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRejectNotification(notification._id);
+                              }}
+                            >
+                              Reject
+                            </button>
+                          </div>
                         </div>
                       </li>
                     ))}
@@ -588,6 +648,73 @@ const ServiceProviderHomePage: React.FC = () => {
           </div>
         )}
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        className="notification-modal"
+        overlayClassName="notification-modal-overlay"
+      >
+        {selectedNotification && (
+          <div className="notification-details">
+            <h2>Service Request Details</h2>
+            <div className="detail-group">
+              <h3>Service Needer Information</h3>
+              <p>
+                <strong>Name:</strong> {selectedNotification.serviceNeeder.name}
+              </p>
+              <p>
+                <strong>Phone Number:</strong>{" "}
+                {selectedNotification.serviceNeeder.phoneNumber}
+              </p>
+            </div>
+            <div className="detail-group">
+              <h3>Service Details</h3>
+              <p>
+                <strong>Service Type:</strong>{" "}
+                {selectedNotification.serviceDetails.serviceType}
+              </p>
+              <p>
+                <strong>Location:</strong>{" "}
+                {selectedNotification.serviceDetails.location}
+              </p>
+              <p>
+                <strong>Address:</strong>{" "}
+                {selectedNotification.serviceDetails.address}
+              </p>
+              <p>
+                <strong>Date:</strong>{" "}
+                {selectedNotification.serviceDetails.date}
+              </p>
+              <p>
+                <strong>Time:</strong>{" "}
+                {selectedNotification.serviceDetails.timeFrom} -{" "}
+                {selectedNotification.serviceDetails.timeTo}
+              </p>
+            </div>
+            <div className="detail-group">
+              <h3>Cost Details</h3>
+              <p>
+                <strong>Total Hours:</strong>{" "}
+                {selectedNotification.serviceDetails.totalHours}
+              </p>
+              <p>
+                <strong>Fee per Hour:</strong> LKR{" "}
+                {selectedNotification.serviceDetails.feePerHour}
+              </p>
+              <p>
+                <strong>Total Fee:</strong> LKR{" "}
+                {selectedNotification.serviceDetails.totalFee}
+              </p>
+            </div>
+            <button
+              className="close-modal-button"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
