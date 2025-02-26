@@ -241,6 +241,7 @@
 
 .form-group-2 input[type="number"] {
   -moz-appearance: textfield;
+  appearance: textfield;
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #ddd;
@@ -252,6 +253,41 @@
 .form-group-2 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.modal-button-1s {
+  display: flex;
+  gap: 1rem;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.accept-modal-button-1 {
+  background-color: #45a049;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.accept-modal-button-1:hover {
+  background-color: #45a049;
+}
+
+.close-modal-button-1 {
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.close-modal-button-1:hover {
+  background-color: #333;
 }
 
 .checkbox-group {
@@ -503,7 +539,7 @@
   color: #444;
 }
 
-.close-modal-button {
+.close-modal-button-1 {
   background-color: #1a1a1a;
   color: white;
   border: none;
@@ -514,7 +550,7 @@
   margin-top: 16px;
 }
 
-.close-modal-button:hover {
+.close-modal-button-1:hover {
   background-color: #333;
 }
 

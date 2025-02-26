@@ -41,6 +41,7 @@ interface NotificationDetails {
     phoneNumber: string;
   };
   serviceDetails: {
+    serviceRequestId: string; 
     serviceType: string;
     location: string;
     address: string;
@@ -204,6 +205,33 @@ const ServiceProviderHomePage: React.FC = () => {
       alert("Failed to delete notification");
     }
   };
+
+const handleAcceptRequest = async (serviceRequestId: string) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      `http://localhost:5000/api/service-requests/${serviceRequestId}/accept`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.ok) {
+      alert("Service request accepted successfully!");
+      setIsModalOpen(false);
+      fetchNotifications(); // Refresh notifications
+    } else {
+      throw new Error("Failed to accept service request");
+    }
+  } catch (error) {
+    console.error("Error accepting request:", error);
+    alert("Failed to accept service request");
+  }
+};
 
   useEffect(() => {
     if (!provider?._id) return;
@@ -707,12 +735,20 @@ const ServiceProviderHomePage: React.FC = () => {
                 {selectedNotification.serviceDetails.totalFee}
               </p>
             </div>
-            <button
-              className="close-modal-button"
-              onClick={() => setIsModalOpen(false)}
-            >
-              Close
-            </button>
+            <div className="modal-button-1s">
+              <button
+                className="accept-modal-button-1"
+                onClick={() => handleAcceptRequest(selectedNotification.serviceDetails.serviceRequestId)}
+              >
+                Accept Request
+              </button>
+              <button
+                className="close-modal-button-1"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         )}
       </Modal>
