@@ -16,6 +16,11 @@ const notificationSchema = new mongoose.Schema({
     name: { type: String },
     phoneNumber: { type: String }
   },
+  serviceProvider: {  // Add this new field
+    id: { type: mongoose.Schema.Types.ObjectId, ref: 'ApprovedServiceProvider' },
+    name: { type: String },
+    phoneNumber: { type: String }
+  },
   serviceDetails: {
     serviceType: { type: String },
     location: { type: String },
@@ -36,5 +41,4 @@ const notificationSchema = new mongoose.Schema({
   },
   createdAt: { type: Date, default: Date.now }
 });
-
 module.exports = mongoose.model('Notification', notificationSchema);

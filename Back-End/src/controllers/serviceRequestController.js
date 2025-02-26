@@ -5,8 +5,17 @@ const Notification = require("../models/Notification");
 
 const createServiceRequest = async (req, res) => {
   try {
-    const { serviceType, location, address, date, timeFrom, timeTo, providerId, totalHours } = req.body;
-    
+    const {
+      serviceType,
+      location,
+      address,
+      date,
+      timeFrom,
+      timeTo,
+      providerId,
+      totalHours,
+    } = req.body;
+
     // Get service needer details
     const serviceNeeder = await ServiceNeeder.findById(req.user.id);
     const serviceProvider = await ApprovedServiceProvider.findById(providerId);
@@ -23,14 +32,15 @@ const createServiceRequest = async (req, res) => {
       serviceNeeder: {
         id: serviceNeeder._id,
         name: serviceNeeder.name,
-        phoneNumber: serviceNeeder.phoneNumber
+        phoneNumber: serviceNeeder.phoneNumber,
       },
       serviceProvider: {
         id: providerId,
         name: serviceProvider.fullName,
-        phoneNumber: serviceProvider.phoneNumber  
+        phoneNumber: serviceProvider.phoneNumber,
       },
-      serviceDetails: {          //  serviceDetails object
+      serviceDetails: {
+        //  serviceDetails object
         serviceType,
         location,
         address,
@@ -39,7 +49,7 @@ const createServiceRequest = async (req, res) => {
         timeTo,
         totalHours,
         feePerHour: serviceProvider.serviceFee,
-        totalFee
+        totalFee,
       },
       serviceType,
       location,
@@ -49,19 +59,24 @@ const createServiceRequest = async (req, res) => {
       timeTo,
       totalHours,
       totalFee,
-      status: 'pending'
+      status: "pending",
     });
 
     await serviceRequest.save();
 
-    // Create notification with matching structure
+    // Create notification with provider details
     const notification = new Notification({
       serviceProviderId: providerId,
       serviceRequestId: serviceRequest._id,
       serviceNeeder: {
         id: serviceNeeder._id,
         name: serviceNeeder.name,
-        phoneNumber: serviceNeeder.phoneNumber
+        phoneNumber: serviceNeeder.phoneNumber,
+      },
+      serviceProvider: {
+        id: serviceProvider._id,
+        name: serviceProvider.fullName,
+        phoneNumber: serviceProvider.phoneNumber,
       },
       serviceDetails: {
         serviceType,
@@ -72,17 +87,17 @@ const createServiceRequest = async (req, res) => {
         timeTo,
         totalHours,
         feePerHour: serviceProvider.serviceFee,
-        totalFee
+        totalFee,
       },
       message: `New service request for ${serviceType} at ${location} on ${date}`,
-      status: 'pending'
+      status: "pending",
     });
 
     await notification.save();
 
     // Emit socket event
-    const io = req.app.get('io');
-    io.emit('newNotification', {
+    const io = req.app.get("io");
+    io.emit("newNotification", {
       _id: notification._id,
       message: notification.message,
       createdAt: notification.createdAt,
@@ -91,13 +106,13 @@ const createServiceRequest = async (req, res) => {
       serviceProviderId: providerId,
       serviceNeeder: notification.serviceNeeder,
       serviceDetails: notification.serviceDetails,
-      status: 'pending'
+      status: "pending",
     });
 
     res.status(201).json({
       success: true,
       message: "Service request created successfully",
-      requestId: serviceRequest._id
+      requestId: serviceRequest._id,
     });
   } catch (error) {
     console.error("Error creating service request:", error);
