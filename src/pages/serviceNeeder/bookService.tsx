@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./bookService.css";
 import Modal from "react-modal";
 Modal.setAppElement("#root");
@@ -16,7 +17,6 @@ import {
   FaTree,
   FaHome,
   FaBell,
-  FaUser,
 } from "react-icons/fa";
 
 interface ServiceProvider {
@@ -33,6 +33,8 @@ const BookService: React.FC = () => {
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [matchedProviders, setMatchedProviders] = useState<ServiceProvider[]>(
     []
   );
@@ -110,6 +112,17 @@ const BookService: React.FC = () => {
     message: "",
   });
   const [countdown, setCountdown] = useState(8);
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    localStorage.removeItem("token");
+    setShowLogoutModal(false);
+    navigate("/service-needer/login");
+  };
+
 
   const handleServiceSelect = (serviceName: string) => {
     setSelectedService(serviceName);
@@ -272,7 +285,9 @@ const BookService: React.FC = () => {
           <h1>Fixify</h1>
         </div>
         <div className="nav-right">
-          <FaUser className="user-icon" />
+          <button className="logout-btn" onClick={handleLogoutClick}>
+            Logout
+          </button>
         </div>
       </nav>
 
@@ -481,6 +496,28 @@ const BookService: React.FC = () => {
                 Closing in {countdown} seconds
               </div>
             )}
+          </div>
+        </Modal>
+      )}
+      {showLogoutModal && (
+        <Modal
+          isOpen={showLogoutModal}
+          onRequestClose={() => setShowLogoutModal(false)}
+          className="modal-content"
+          overlayClassName="modal-overlay"
+        >
+          <h2>Confirm Logout</h2>
+          <p>Are you sure you want to log out from your account?</p>
+          <div className="modal-buttons">
+            <button className="confirm-button" onClick={handleLogoutConfirm}>
+              Yes, Logout
+            </button>
+            <button
+              className="cancel-button"
+              onClick={() => setShowLogoutModal(false)}
+            >
+              Cancel
+            </button>
           </div>
         </Modal>
       )}
