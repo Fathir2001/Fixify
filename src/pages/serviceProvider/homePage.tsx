@@ -33,6 +33,7 @@ interface Notification {
   read: boolean;
   serviceRequestId: string;
   serviceProviderId: string;
+  status?: string;
 }
 
 interface NotificationDetails {
@@ -147,8 +148,15 @@ const ServiceProviderHomePage: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Notifications received:", data);
-        setNotifications(data);
-        setNotificationCount(data.filter((n: Notification) => !n.read).length);
+        // Filter out notifications with status 'accepted'
+        const pendingNotifications = data.filter(
+          (notification: Notification & { status?: string }) =>
+            notification.status !== "accepted"
+        );
+        setNotifications(pendingNotifications);
+        setNotificationCount(
+          pendingNotifications.filter((n: Notification) => !n.read).length
+        );
       } else {
         console.error("Error response:", await response.text());
       }
@@ -251,6 +259,12 @@ const ServiceProviderHomePage: React.FC = () => {
         throw new Error(data.message || "Failed to accept service request");
       }
 
+      // Remove the accepted notification from the list
+      setNotifications((prev) =>
+        prev.filter((n) => n.serviceRequestId !== serviceRequestId)
+      );
+      setNotificationCount((prev) => Math.max(0, prev - 1));
+
       console.log("Accept request successful:", data);
       alert("Service request accepted successfully!");
       setIsModalOpen(false);
@@ -281,7 +295,10 @@ const ServiceProviderHomePage: React.FC = () => {
       console.log("New notification received:", notification);
       console.log("Current provider ID:", providerId);
 
-      if (notification.serviceProviderId === providerId) {
+      if (
+        notification.serviceProviderId === providerId &&
+        notification.status !== "accepted"
+      ) {
         setNotifications((prev) => [notification, ...prev]);
         setNotificationCount((prev) => prev + 1);
       }
