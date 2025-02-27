@@ -9,6 +9,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const serviceNeederRoutes = require("./routes/serviceNeederRoutes");
 const serviceRequestRoutes = require("./routes/serviceRequestRoutes");
 const authMiddleware = require("./middleware/auth");
+const { createTransport } = require('nodemailer');
 
 // Load environment variables
 dotenv.config();
@@ -71,8 +72,32 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Verify email configuration on startup
+const verifyEmailConfig = async () => {
+  try {
+    const transporter = createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+    
+    await transporter.verify();
+    console.log('Email configuration verified successfully');
+  } catch (error) {
+    console.error('Email configuration error:', {
+      message: error.message,
+      code: error.code
+    });
+  }
+};
+
 // Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+  await verifyEmailConfig();
 });

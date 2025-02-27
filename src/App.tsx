@@ -12,6 +12,9 @@ import ServiceNeederHomePage from './pages/serviceNeeder/homePage';
 import BookService from './pages/serviceNeeder/bookService';
 import ServiceNeederRegister from './pages/serviceNeeder/registerN';
 import ServiceNeederLogin from './pages/serviceNeeder/loginN';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
+
 
 function App() {
   return (
@@ -29,6 +32,8 @@ function App() {
         <Route path="/book-service" element={<BookService />} />
         <Route path="/service-needer/register" element={<ServiceNeederRegister />} />
         <Route path="/service-needer/login" element={<ServiceNeederLogin />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );
