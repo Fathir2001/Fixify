@@ -2,19 +2,20 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const http = require("http");
+const socketIo = require("socket.io");
 const requestedServiceProviderRoutes = require("./routes/requestedServiceProvider.js");
 const adminRoutes = require("./routes/adminRoutes");
 const serviceNeederRoutes = require("./routes/serviceNeederRoutes");
-const authMiddleware = require("./middleware/auth");
 const serviceRequestRoutes = require("./routes/serviceRequestRoutes");
-const http = require("http");
-const socketIo = require("socket.io");
+const authMiddleware = require("./middleware/auth");
 
 // Load environment variables
 dotenv.config();
-
 const app = express();
 const server = http.createServer(app);
+
+// Configure Socket.io
 const io = socketIo(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -22,15 +23,22 @@ const io = socketIo(server, {
   },
 });
 
-// Middleware
+// Configure CORS
 app.use(cors());
+
+// Middleware
 app.use(express.json());
+
+// Make io available in routes
+app.set('io', io);
 
 // Basic route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to Fixify API" });
 });
 
+
+// API Routes
 app.use("/api/service-providers", requestedServiceProviderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin", authMiddleware, adminRoutes);
@@ -52,6 +60,16 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
+
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    message: "Internal Server Error",
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;

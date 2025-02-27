@@ -41,7 +41,7 @@ interface NotificationDetails {
     phoneNumber: string;
   };
   serviceDetails: {
-    serviceRequestId: string; 
+    serviceRequestId: string;
     serviceType: string;
     location: string;
     address: string;
@@ -103,15 +103,30 @@ const ServiceProviderHomePage: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Received notification details:", data); // Debug log
+
+        // Validate the data structure
+        if (!data.serviceDetails || !data.serviceDetails.serviceRequestId) {
+          console.error("Invalid notification details structure:", data);
+          throw new Error("Invalid notification details received");
+        }
+
         setSelectedNotification(data);
         setIsModalOpen(true);
-        setShowNotifications(false); // Close the notification popup
+        setShowNotifications(false);
       } else {
-        throw new Error("Failed to fetch notification details");
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to fetch notification details"
+        );
       }
     } catch (error) {
       console.error("Error fetching notification details:", error);
-      alert("Failed to fetch notification details");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch notification details"
+      );
     }
   };
 
@@ -206,32 +221,49 @@ const ServiceProviderHomePage: React.FC = () => {
     }
   };
 
-const handleAcceptRequest = async (serviceRequestId: string) => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch(
-      `http://localhost:5000/api/service-requests/${serviceRequestId}/accept`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  const handleAcceptRequest = async (serviceRequestId: string) => {
+    try {
+      console.log("Attempting to accept request with ID:", serviceRequestId); // Debug log
 
-    if (response.ok) {
+      if (!serviceRequestId) {
+        throw new Error("Service request ID is required");
+      }
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Authentication token not found");
+      }
+
+      const response = await fetch(
+        `http://localhost:5000/api/service-requests/${serviceRequestId}/accept`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to accept service request");
+      }
+
+      console.log("Accept request successful:", data);
       alert("Service request accepted successfully!");
       setIsModalOpen(false);
-      fetchNotifications(); // Refresh notifications
-    } else {
-      throw new Error("Failed to accept service request");
+      fetchNotifications();
+    } catch (error) {
+      console.error("Error accepting request:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to accept service request"
+      );
     }
-  } catch (error) {
-    console.error("Error accepting request:", error);
-    alert("Failed to accept service request");
-  }
-};
+  };
 
   useEffect(() => {
     if (!provider?._id) return;
@@ -738,7 +770,20 @@ const handleAcceptRequest = async (serviceRequestId: string) => {
             <div className="modal-button-1s">
               <button
                 className="accept-modal-button-1"
-                onClick={() => handleAcceptRequest(selectedNotification.serviceDetails.serviceRequestId)}
+                onClick={() => {
+                  const requestId =
+                    selectedNotification?.serviceDetails?.serviceRequestId;
+                  console.log("Service Request ID to accept:", requestId); // Debug log
+
+                  if (!requestId) {
+                    alert("Service request ID not found");
+                    return;
+                  }
+                  handleAcceptRequest(requestId);
+                }}
+                disabled={
+                  !selectedNotification?.serviceDetails?.serviceRequestId
+                }
               >
                 Accept Request
               </button>

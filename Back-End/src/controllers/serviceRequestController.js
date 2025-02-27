@@ -1,7 +1,10 @@
+const mongoose = require('mongoose');
 const ServiceRequest = require("../models/ServiceRequest");
 const ServiceNeeder = require("../models/ServiceNeeder");
 const ApprovedServiceProvider = require("../models/ApprovedServiceProvider");
 const Notification = require("../models/Notification");
+const ServiceAccepted = require("../models/ServiceAccepted");
+const SNNotification = require("../models/SNNotification");
 
 const createServiceRequest = async (req, res) => {
   try {
@@ -194,10 +197,96 @@ const getProfile = async (req, res) => {
   }
 };
 
+const acceptServiceRequest = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+    
+    // Validate requestId
+    if (!requestId || !mongoose.Types.ObjectId.isValid(requestId)) {
+      return res.status(400).json({ message: "Invalid service request ID" });
+    }
+
+    console.log("Processing request ID:", requestId); // Debug log
+
+    const serviceRequest = await ServiceRequest.findById(requestId);
+    if (!serviceRequest) {
+      return res.status(404).json({ message: "Service request not found" });
+    }
+
+    // Check if already accepted
+    if (serviceRequest.status === 'accepted') {
+      return res.status(400).json({ message: "Service request already accepted" });
+    }
+
+    // Create accepted service record
+    const acceptedService = new ServiceAccepted({
+      serviceNeeder: {
+        id: serviceRequest.serviceNeeder.id,
+        name: serviceRequest.serviceNeeder.name,
+        phoneNumber: serviceRequest.serviceNeeder.phoneNumber
+      },
+      serviceProvider: {
+        id: serviceRequest.serviceProvider.id,
+        name: serviceRequest.serviceProvider.name,
+        phoneNumber: serviceRequest.serviceProvider.phoneNumber
+      },
+      serviceDetails: serviceRequest.serviceDetails,
+      status: 'accepted',
+      originalRequestId: serviceRequest._id
+    });
+
+    // Create service needer notification
+    const snNotification = new SNNotification({
+      serviceNeederId: serviceRequest.serviceNeeder.id,
+      serviceRequestId: serviceRequest._id,
+      serviceProvider: {
+        id: serviceRequest.serviceProvider.id,
+        name: serviceRequest.serviceProvider.name,
+        phoneNumber: serviceRequest.serviceProvider.phoneNumber
+      },
+      message: `Your service request for ${serviceRequest.serviceDetails.serviceType} has been accepted by ${serviceRequest.serviceProvider.name}`,
+      status: 'accepted'
+    });
+
+    // Save all changes using Promise.all
+    await Promise.all([
+      acceptedService.save(),
+      snNotification.save(),
+      ServiceRequest.findByIdAndUpdate(requestId, { status: 'accepted' }),
+      Notification.findOneAndUpdate(
+        { serviceRequestId: requestId },
+        { status: 'accepted' }
+      )
+    ]);
+
+    // Emit socket event if io is available
+    if (req.app.get('io')) {
+      const io = req.app.get('io');
+      io.emit('serviceRequestAccepted', {
+        serviceNeederId: serviceRequest.serviceNeeder.id,
+        notification: snNotification
+      });
+    }
+
+    res.status(200).json({
+      message: "Service request accepted successfully",
+      acceptedService
+    });
+
+  } catch (error) {
+    console.error("Error accepting service request:", error);
+    res.status(500).json({ 
+      message: "Error accepting service request",
+      error: error.message 
+    });
+  }
+};
+
 module.exports = {
   createServiceRequest,
   getServiceNeederRequests,
   getServiceProviderRequests,
   updateRequestStatus,
   getProfile,
+  acceptServiceRequest,
 };
