@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./bookService.css";
 import Modal from "react-modal";
@@ -29,6 +29,19 @@ interface ServiceProvider {
   email: string;
 }
 
+interface SNNotification {
+  _id: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+  serviceRequestId: string;
+  serviceProvider: {
+    name: string;
+    phoneNumber: string;
+  };
+  status: string;
+}
+
 const BookService: React.FC = () => {
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState("");
@@ -38,6 +51,9 @@ const BookService: React.FC = () => {
   const [matchedProviders, setMatchedProviders] = useState<ServiceProvider[]>(
     []
   );
+  const [snNotifications, setSNNotifications] = useState<SNNotification[]>([]);
+  const [showNotificationsList, setShowNotificationsList] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [bookingData, setBookingData] = useState({
     serviceType: "",
     location: "",
@@ -113,6 +129,80 @@ const BookService: React.FC = () => {
   });
   const [countdown, setCountdown] = useState(8);
 
+  const fetchSNNotifications = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      console.log("Fetching notifications..."); // Debug log
+
+      const response = await fetch(
+        "http://localhost:5000/api/service-requests/sn-notifications",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Received notifications:", data); // Debug log
+        setSNNotifications(data);
+        setUnreadCount(data.filter((n: SNNotification) => !n.read).length);
+      } else {
+        console.error("Failed to fetch notifications:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  // function to mark notifications as read
+  const markNotificationsAsRead = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(
+        "http://localhost:5000/api/service-requests/sn-notifications/mark-read",
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUnreadCount(0);
+      setSNNotifications(snNotifications.map((n) => ({ ...n, read: true })));
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+    }
+  };
+
+  // useEffect to fetch notifications
+  useEffect(() => {
+    // Initial fetch
+    fetchSNNotifications();
+
+    // Set up interval for periodic fetching
+    const interval = setInterval(fetchSNNotifications, 30000); // every 30 seconds
+
+    // Cleanup on unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  // Add click outside handler to close notifications
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".notification-wrapper") && showNotificationsList) {
+        setShowNotificationsList(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [showNotificationsList]);
+
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
@@ -122,7 +212,6 @@ const BookService: React.FC = () => {
     setShowLogoutModal(false);
     navigate("/service-needer/login");
   };
-
 
   const handleServiceSelect = (serviceName: string) => {
     setSelectedService(serviceName);
@@ -278,8 +367,55 @@ const BookService: React.FC = () => {
     <div>
       <nav className="navbar-2">
         <div className="nav-left">
-          <FaBell className="notification-icon" />
-          <span className="notification-badge">2</span>
+          <div className="notification-wrapper">
+            <FaBell
+              className="notification-icon"
+              onClick={() => {
+                setShowNotificationsList(!showNotificationsList);
+                if (!showNotificationsList && unreadCount > 0) {
+                  markNotificationsAsRead();
+                }
+              }}
+            />
+            {unreadCount > 0 && (
+              <span className="notification-badge">{unreadCount}</span>
+            )}
+            {showNotificationsList && (
+              <div className="notifications-dropdown">
+                <div className="notifications-header">
+                  <h3>Notifications</h3>
+                </div>
+                <div className="notifications-list">
+                  {snNotifications && snNotifications.length > 0 ? (
+                    snNotifications.map((notification) => (
+                      <div
+                        key={notification._id}
+                        className={`notification-item ${
+                          !notification.read ? "unread" : ""
+                        }`}
+                      >
+                        <p className="notification-message">
+                          {notification.message}
+                        </p>
+                        <p className="notification-time">
+                          {new Date(notification.createdAt).toLocaleString()}
+                        </p>
+                        {notification.status === "accepted" && (
+                          <div className="provider-contact">
+                            <p>Contact Provider:</p>
+                            <p>{notification.serviceProvider.name}</p>
+                            <p>{notification.serviceProvider.phoneNumber}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-notifications">No notifications</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <div className="nav-center">
           <h1>Fixify</h1>

@@ -201,4 +201,41 @@ router.post("/:requestId/accept", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/sn-notifications", authMiddleware, async (req, res) => {
+  try {
+    const notifications = await SNNotification.find({
+      serviceNeederId: req.user.id,
+    })
+      .populate("serviceRequestId")
+      .sort({ createdAt: -1 });
+
+    const uiNotifications = notifications.map((notification) => ({
+      _id: notification._id,
+      message: notification.message,
+      createdAt: notification.createdAt,
+      read: notification.read,
+      serviceRequestId: notification.serviceRequestId?._id,
+      serviceProvider: notification.serviceProvider,
+      status: notification.status,
+    }));
+
+    res.json(uiNotifications);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ message: "Error fetching notifications" });
+  }
+});
+
+router.patch("/sn-notifications/mark-read", authMiddleware, async (req, res) => {
+  try {
+    await SNNotification.updateMany(
+      { serviceNeederId: req.user.id },
+      { read: true }
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: "Error marking notifications as read" });
+  }
+});
+
 module.exports = router;
