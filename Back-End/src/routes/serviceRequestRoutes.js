@@ -26,15 +26,16 @@ router.get("/provider-requests", authMiddleware, getServiceProviderRequests);
 // Update request status (accept/reject/complete)
 router.patch("/:requestId/status", authMiddleware, updateRequestStatus);
 
+// notifications route for filter pending notifications
 router.get("/notifications", authMiddleware, async (req, res) => {
   try {
     const notifications = await Notification.find({
       serviceProviderId: req.user.id,
+      status: 'pending' // Add this filter
     })
       .populate("serviceRequestId")
       .sort({ createdAt: -1 });
 
-    // Map notifications with necessary fields
     const uiNotifications = notifications.map((notification) => ({
       _id: notification._id,
       message: notification.message,
