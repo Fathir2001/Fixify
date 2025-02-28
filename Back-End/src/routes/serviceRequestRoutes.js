@@ -31,7 +31,7 @@ router.get("/notifications", authMiddleware, async (req, res) => {
   try {
     const notifications = await Notification.find({
       serviceProviderId: req.user.id,
-      status: 'pending' // Add this filter
+      status: 'pending' 
     })
       .populate("serviceRequestId")
       .sort({ createdAt: -1 });
