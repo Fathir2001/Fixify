@@ -14,6 +14,7 @@ import ServiceNeederRegister from './pages/serviceNeeder/registerN';
 import ServiceNeederLogin from './pages/serviceNeeder/loginN';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
+import ForgotPasswordSP from './pages/serviceProvider/forgotPasswordSP';
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
         <Route path="/service-needer/login" element={<ServiceNeederLogin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/service-provider/forgot-password" element={<ForgotPasswordSP />} />
       </Routes>
     </Router>
   );

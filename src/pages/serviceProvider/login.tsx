@@ -18,7 +18,7 @@ const ServiceProviderLogin: React.FC = () => {
     }));
   };
 
-   // Update the handleSubmit function
+  // Update the handleSubmit function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -32,9 +32,9 @@ const ServiceProviderLogin: React.FC = () => {
           body: JSON.stringify(formData),
         }
       );
-  
+
       const data = await response.json();
-  
+
       if (response.ok && data.status === "approved") {
         // Handle successful login for approved providers
         localStorage.setItem("token", data.token);
@@ -43,7 +43,9 @@ const ServiceProviderLogin: React.FC = () => {
         // Handle different status messages
         switch (data.status) {
           case "pending":
-            alert("Your profile is pending approval from admin. Please wait for approval.");
+            alert(
+              "Your profile is pending approval from admin. Please wait for approval."
+            );
             break;
           case "not_found":
             alert("Account not found. Please register first.");
@@ -100,6 +102,11 @@ const ServiceProviderLogin: React.FC = () => {
               placeholder="Password"
               required
             />
+          </div>
+          <div className="forgot-password">
+            <span onClick={() => navigate("/service-provider/forgot-password")}>
+              Forgot Password?
+            </span>
           </div>
 
           <button type="submit" className="login-submit-button">
