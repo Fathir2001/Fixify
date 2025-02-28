@@ -70,6 +70,23 @@ body::before {
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 }
 
+.auth-link {
+  /* margin-top: 1.5rem; */
+  text-align: center;
+  color: #ffffff;
+}
+
+.auth-link a {
+  color: #FFD700;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.auth-link a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
 .login-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -92,7 +109,7 @@ body::before {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1rem;
 }
 
 .form-group {
@@ -143,7 +160,6 @@ body::before {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: bold;
-  margin-top: 1rem;
 }
 
 .login-submit-button:hover {
@@ -155,19 +171,19 @@ body::before {
 
 .forgot-password {
   text-align: right;
-  margin-bottom: 15px;
 }
 
 .forgot-password span {
-  color: #0066cc;
+  color: #FFD700;  /* Changed to match theme */
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
 }
 
 .forgot-password span:hover {
-  text-decoration: underline;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
-
 .success-message {
   color: #28a745;
   background-color: #d4edda;

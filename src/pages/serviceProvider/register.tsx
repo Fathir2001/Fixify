@@ -137,13 +137,10 @@ const ServiceProviderRegister: React.FC = () => {
   return (
     <div className="register-container">
       <div className="register-card">
-        <div className="login-button-container">
-          <button
-            onClick={() => (window.location.href = "/service-provider/login")}
-            className="login-button"
-          >
+        <div className="login-link-container">
+          <a href="/service-provider/login" className="login-text-link">
             Login
-          </button>
+          </a>
         </div>
         <div className="register-header">
           <FaTools className="register-icon" />
@@ -341,6 +338,10 @@ const ServiceProviderRegister: React.FC = () => {
             Register as Service Provider
           </button>
         </form>
+        <div className="auth-link">
+          Already have an account?
+          <a href="/service-provider/login">Login here</a>
+        </div>
       </div>
       {showSuccessModal && (
         <div className="modal-overlay">

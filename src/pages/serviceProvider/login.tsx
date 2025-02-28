@@ -66,14 +66,6 @@ const ServiceProviderLogin: React.FC = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <div className="register-button-container">
-          <button
-            onClick={() => navigate("/service-provider/register")}
-            className="register-link-button"
-          >
-            Register
-          </button>
-        </div>
         <div className="login-header">
           <FaUserCircle className="login-icon" />
           <h2>Service Provider Login</h2>
@@ -113,6 +105,10 @@ const ServiceProviderLogin: React.FC = () => {
             Login
           </button>
         </form>
+        <div className="auth-link">
+          Don't have an account?
+          <a href="/service-provider/register">Register here</a>
+        </div>
       </div>
     </div>
   );

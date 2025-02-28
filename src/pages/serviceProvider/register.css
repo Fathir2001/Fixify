@@ -28,6 +28,43 @@ body::before {
   right: 1rem;
 }
 
+.auth-link {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+.auth-link a {
+  color: #FFD700;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.auth-link a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.login-link-container {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.login-text-link {
+  color: #FFD700;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.login-text-link:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
 .login-button {
   background: transparent;
   color: #FFD700;
