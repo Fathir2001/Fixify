@@ -190,42 +190,54 @@ const ServiceProviderHomePage: React.FC = () => {
   };
 
   const handleRejectNotification = async (notificationId: string) => {
-    // Show confirmation dialog
     const confirmed = window.confirm(
       "Are you sure you want to reject this notification?"
     );
-
+  
     if (!confirmed) return;
-
+  
     try {
       const token = localStorage.getItem("token");
+      const serviceRequestId = notifications.find(
+        (n) => n._id === notificationId
+      )?.serviceRequestId;
+  
+      if (!serviceRequestId) {
+        throw new Error("Service request ID not found");
+      }
+  
       const response = await fetch(
-        `http://localhost:5000/api/service-requests/notifications/${notificationId}`,
+        `http://localhost:5000/api/service-requests/reject-service/${serviceRequestId}`,
         {
-          method: "DELETE",
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
+  
       if (response.ok) {
         // Remove the notification from state
         setNotifications((prev) =>
           prev.filter((n) => n._id !== notificationId)
         );
-        // Update notification count if the notification was unread
+        // Update notification count if needed
         const wasUnread =
           notifications.find((n) => n._id === notificationId)?.read === false;
         if (wasUnread) {
           setNotificationCount((prev) => Math.max(0, prev - 1));
         }
+        alert("Service request rejected successfully");
       } else {
-        throw new Error("Failed to delete notification");
+        throw new Error("Failed to reject service request");
       }
     } catch (error) {
-      console.error("Error deleting notification:", error);
-      alert("Failed to delete notification");
+      console.error("Error rejecting service:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to reject service request"
+      );
     }
   };
 

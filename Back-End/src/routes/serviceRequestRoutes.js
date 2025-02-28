@@ -7,6 +7,7 @@ const {
   getServiceProviderRequests,
   updateRequestStatus,
 } = require("../controllers/serviceRequestController");
+const handleServiceRejection = require('../controllers/serviceRejectionController');
 const ServiceRequest = require("../models/ServiceRequest");
 const ServiceAccepted = require("../models/ServiceAccepted");
 const Notification = require("../models/Notification");
@@ -50,6 +51,35 @@ router.get("/notifications", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error fetching notifications:", error);
     res.status(500).json({ message: "Error fetching notifications" });
+  }
+});
+
+
+router.post('/reject-service/:serviceId', authMiddleware, async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const result = await handleServiceRejection(serviceId);
+    
+    // Emit socket event for real-time notification
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('serviceRequestRejected', {
+        serviceNeederId: result.rejectedService.serviceNeeder.id,
+        notification: result.notification
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Service rejected successfully',
+      data: result.rejectedService
+    });
+  } catch (error) {
+    console.error('Error rejecting service:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
   }
 });
 
