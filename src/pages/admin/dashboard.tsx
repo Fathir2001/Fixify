@@ -67,10 +67,12 @@ const AdminDashboard: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleMenuClick = (itemId: string) => {
+    const handleMenuClick = (itemId: string) => {
     setSelectedSection(itemId);
     if (itemId === "ServiceProviders") {
       navigate("/admin/service-provider");
+    } else if (itemId === "services") {
+      navigate("/admin/services");
     }
   };
 
