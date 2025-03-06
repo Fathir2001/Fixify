@@ -10,6 +10,8 @@ const serviceNeederRoutes = require("./routes/serviceNeederRoutes");
 const serviceRequestRoutes = require("./routes/serviceRequestRoutes");
 const authMiddleware = require("./middleware/auth");
 const { createTransport } = require('nodemailer');
+const adminServiceRoutes = require('./routes/adminServiceRoutes');
+
 
 // Load environment variables
 dotenv.config();
@@ -45,6 +47,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/admin", authMiddleware, adminRoutes);
 app.use("/api/service-needers", serviceNeederRoutes);
 app.use("/api/service-requests", serviceRequestRoutes);
+app.use("/api/service-requests", adminServiceRoutes);
 app.set('io', io);
 
 // Socket.io connection handler
