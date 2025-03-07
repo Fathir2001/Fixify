@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaArrowLeft, FaCheck, FaTimes, FaEye, FaMapMarkerAlt, FaRegCalendarAlt } from "react-icons/fa";
+import { FaArrowLeft, FaEye, FaMapMarkerAlt, FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./services.css";
@@ -111,46 +111,6 @@ const ServicesPage: React.FC = () => {
     }));
   };
 
-  const handleApprove = async (serviceId: string) => {
-    setLoading(true);
-    try {
-      await axios.post(`${API_BASE_URL}/service-requests/${serviceId}/accept`);
-      
-      // Refresh data after approving
-      const response = await axios.get(`${API_BASE_URL}/service-requests`);
-      const formattedServices = formatServicesData(response.data, "requested");
-      setServices(formattedServices);
-      
-      // Show success message
-      alert("Service has been approved successfully!");
-    } catch (error) {
-      console.error("Error approving service:", error);
-      alert("Failed to approve service. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReject = async (serviceId: string) => {
-    setLoading(true);
-    try {
-      await axios.post(`${API_BASE_URL}/service-requests/reject-service/${serviceId}`);
-      
-      // Refresh data after rejecting
-      const response = await axios.get(`${API_BASE_URL}/service-requests`);
-      const formattedServices = formatServicesData(response.data, "requested");
-      setServices(formattedServices);
-      
-      // Show success message
-      alert("Service has been rejected successfully!");
-    } catch (error) {
-      console.error("Error rejecting service:", error);
-      alert("Failed to reject service. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="services-container-1">
       <header className="services-header-1">
@@ -240,22 +200,6 @@ const ServicesPage: React.FC = () => {
               </div>
               
               <div className="action-buttons">
-                {activeTab === "requested" && (
-                  <>
-                    <button 
-                      className="approve-btn" 
-                      onClick={() => handleApprove(service.id)}
-                    >
-                      <FaCheck /> Approve
-                    </button>
-                    <button 
-                      className="reject-btn" 
-                      onClick={() => handleReject(service.id)}
-                    >
-                      <FaTimes /> Reject
-                    </button>
-                  </>
-                )}
                 <button className="view-btn">
                   <FaEye /> View Details
                 </button>
