@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaArrowLeft, FaCheck, FaTimes, FaPlusCircle } from "react-icons/fa";
+import { FaArrowLeft, FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./services.css";
@@ -160,9 +160,7 @@ const ServicesPage: React.FC = () => {
           </button>
           <h1>Service Management</h1>
         </div>
-        <button className="add-service-btn-1">
-          <FaPlusCircle /> Add New Service
-        </button>
+        
       </header>
 
       <div className="tabs-container-1">
