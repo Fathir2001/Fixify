@@ -1,15 +1,20 @@
 .services-container-1 {
-  padding: 20px;
+  padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color, #f9fafb);
+  color: var(--text-primary, #333);
   height: 100%;
   overflow: auto;
-  font-family: 'Inter', sans-serif;
 }
 
 .services-header-1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
+  color: #333;
 }
 
 .header-left-1 {
@@ -17,10 +22,16 @@
   align-items: center;
 }
 
+.header-left-1 h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
 .back-button-1 {
   background: none;
   border: none;
-  color: #333;
+  color: var(--text-secondary, #555);
   font-size: 18px;
   cursor: pointer;
   margin-right: 16px;
@@ -32,137 +43,192 @@
 }
 
 .back-button-1:hover {
-  background-color: #f0f0f0;
+  background-color: var(--background-hover, #f0f0f0);
 }
 
-.add-service-btn-1 {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-}
-
-.add-service-btn-1:hover {
-  background-color: #45a049;
-}
-
-.tabs-container-1 {
-  margin-bottom: 20px;
+.controls-section {
+  margin-bottom: 1.5rem;
 }
 
 .tabs-1 {
   display: flex;
-  border-bottom: 1px solid #ddd;
+  gap: 0.5rem;
 }
 
 .tab-1 {
-  padding: 12px 24px;
-  border: none;
-  background: none;
-  font-weight: 500;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ddd);
+  background: var(--background-light, #fff);
+  color: var(--text-secondary, #555);
   cursor: pointer;
-  font-size: 15px;
-  color: #555;
-  position: relative;
-}
-
-.tab-1:hover {
-  color: #333;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .tab-1.active {
-  color: #2196F3;
-}
-
-.tab-1.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 100%;
-  height: 2px;
-  background-color: #2196F3;
-}
-
-.services-content-1 {
-    color: #000000;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  background: var(--active-color, rgba(33, 150, 243, 0.1));
+  color: var(--primary-color, #2196F3);
+  border-color: var(--primary-color, #2196F3);
 }
 
 .loading-1, .no-services-1 {
-  padding: 40px;
+  padding: 60px;
   text-align: center;
-  color: #777;
+  color: var(--text-secondary, #777);
   font-size: 16px;
+  background: var(--background-light, #fff);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.services-table-1 {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.services-table-1 th, .services-table-1 td {
-  padding: 12px 16px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-.services-table-1 th {
-  background-color: #f9f9f9;
-  color: #555;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.actions-cell-1 {
-  display: flex;
-  gap: 8px;
-}
-
-.action-btn-1 {
-  border: none;
+.error-message {
+  padding: 20px;
+  text-align: center;
+  color: var(--danger-color, #f44336);
+  background-color: var(--danger-bg, #fee8e7);
   border-radius: 4px;
-  padding: 6px 10px;
+  margin: 20px 0;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.service-card {
+  background: var(--background-light, #fff);
+  border: 1px solid var(--border-color, #eee);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.service-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color, #eee);
+  padding-bottom: 0.75rem;
+}
+
+.service-header h3 {
+  margin: 0;
+  color: var(--text-primary, #333);
+  font-weight: 600;
+}
+
+.service-category {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  background-color: var(--tag-bg, #f0f0f0);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.service-details {
+  margin-bottom: 1.5rem;
+}
+
+.service-details p {
+  margin: 0.5rem 0;
+  color: var(--text-secondary, #666);
+  display: flex;
+  justify-content: space-between;
+}
+
+.service-details .label {
+  font-weight: 500;
+  color: var(--text-primary, #333);
+}
+
+.service-details .value {
+  text-align: right;
+}
+
+.price-tag {
+  font-weight: 600;
+  color: var(--primary-color, #2196F3);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-buttons button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
-.approve-1 {
-  background-color: #e3f4e4;
-  color: #4CAF50;
+.approve-btn {
+  background-color: var(--success-color, #4CAF50);
+  color: white;
 }
 
-.reject-1 {
-  background-color: #fee8e7;
-  color: #f44336;
+.reject-btn {
+  background-color: var(--danger-color, #f44336);
+  color: white;
 }
 
-.view-1 {
-  background-color: #e8eaf6;
-  color: #3f51b5;
+.view-btn {
+  background-color: var(--info-color, #3f51b5);
+  color: white;
 }
 
-.approve-1:hover {
-  background-color: #d0ecd2;
+.action-buttons button:hover {
+  transform: scale(1.02);
+  opacity: 0.9;
 }
 
-.reject-1:hover {
-  background-color: #fcd5d3;
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-.view-1:hover {
-  background-color: #d8dcf0;
+.status-badge.requested {
+  background: rgba(33, 150, 243, 0.1);
+  color: var(--info-color, #2196F3);
+}
+
+.status-badge.approved {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-color, #4CAF50);
+}
+
+.status-badge.rejected {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--danger-color, #f44336);
+}
+
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tabs-1 {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaArrowLeft, FaCheck, FaTimes } from "react-icons/fa";
+import { FaArrowLeft, FaCheck, FaTimes, FaEye, FaMapMarkerAlt, FaRegCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./services.css";
@@ -160,10 +160,9 @@ const ServicesPage: React.FC = () => {
           </button>
           <h1>Service Management</h1>
         </div>
-        
       </header>
 
-      <div className="tabs-container-1">
+      <div className="controls-section">
         <div className="tabs-1">
           <button 
             className={`tab-1 ${activeTab === "requested" ? "active" : ""}`} 
@@ -186,68 +185,85 @@ const ServicesPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="services-content-1">
-        {loading ? (
-          <div className="loading-1">Loading services...</div>
-        ) : error ? (
-          <div className="error-message">{error}</div>
-        ) : services.length === 0 ? (
-          <div className="no-services-1">No {activeTab} services found.</div>
-        ) : (
-          <table className="services-table-1">
-            <thead>
-              <tr>
-                <th>Service Name</th>
-                <th>Category</th>
-                <th>Provider</th>
-                {activeTab !== "requested" && <th>Customer</th>}
-                <th>Price</th>
-                <th>Location</th>
-                <th>Date</th>
-                <th>Created Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {services.map((service) => (
-                <tr key={service.id}>
-                  <td>{service.name}</td>
-                  <td>{service.category}</td>
-                  <td>{service.providerName}</td>
-                  {activeTab !== "requested" && <td>{service.neederName || "N/A"}</td>}
-                  <td>${service.price}</td>
-                  <td>{service.location || "N/A"}</td>
-                  <td>{service.date || "N/A"}</td>
-                  <td>{new Date(service.createdAt).toLocaleDateString()}</td>
-                  <td className="actions-cell-1">
-                    {activeTab === "requested" && (
-                      <>
-                        <button 
-                          className="action-btn-1 approve-1" 
-                          onClick={() => handleApprove(service.id)}
-                          title="Approve"
-                        >
-                          <FaCheck />
-                        </button>
-                        <button 
-                          className="action-btn-1 reject-1" 
-                          onClick={() => handleReject(service.id)}
-                          title="Reject"
-                        >
-                          <FaTimes />
-                        </button>
-                      </>
-                    )}
-                    <button className="action-btn-1 view-1" title="View Details">
-                      View
+      {loading ? (
+        <div className="loading-1">Loading services...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : services.length === 0 ? (
+        <div className="no-services-1">No {activeTab} services found.</div>
+      ) : (
+        <div className="services-grid">
+          {services.map((service) => (
+            <div key={service.id} className="service-card">
+              <div className="service-header">
+                <h3>{service.name}</h3>
+                <span className="service-category">{service.category}</span>
+              </div>
+              
+              <div className="service-details">
+                <p>
+                  <span className="label">Provider</span>
+                  <span className="value">{service.providerName}</span>
+                </p>
+                {activeTab !== "requested" && service.neederName && (
+                  <p>
+                    <span className="label">Customer</span>
+                    <span className="value">{service.neederName}</span>
+                  </p>
+                )}
+                <p>
+                  <span className="label">Price</span>
+                  <span className="value price-tag">${service.price.toFixed(2)}</span>
+                </p>
+                {service.location && (
+                  <p>
+                    <span className="label"><FaMapMarkerAlt /> Location</span>
+                    <span className="value">{service.location}</span>
+                  </p>
+                )}
+                {service.date && (
+                  <p>
+                    <span className="label"><FaRegCalendarAlt /> Date</span>
+                    <span className="value">{service.date}</span>
+                  </p>
+                )}
+                <p>
+                  <span className="label">Created</span>
+                  <span className="value">{new Date(service.createdAt).toLocaleDateString()}</span>
+                </p>
+                <p>
+                  <span className="label">Status</span>
+                  <span className={`status-badge ${service.status}`}>
+                    {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
+                  </span>
+                </p>
+              </div>
+              
+              <div className="action-buttons">
+                {activeTab === "requested" && (
+                  <>
+                    <button 
+                      className="approve-btn" 
+                      onClick={() => handleApprove(service.id)}
+                    >
+                      <FaCheck /> Approve
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+                    <button 
+                      className="reject-btn" 
+                      onClick={() => handleReject(service.id)}
+                    >
+                      <FaTimes /> Reject
+                    </button>
+                  </>
+                )}
+                <button className="view-btn">
+                  <FaEye /> View Details
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
