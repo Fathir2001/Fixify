@@ -71,8 +71,10 @@
 
 .tab-1.active {
   background: var(--active-color, rgba(33, 150, 243, 0.1));
-  color: var(--primary-color, #2196F3);
-  border-color: var(--primary-color, #2196F3);
+  /* color: var(--primary-color, #2196F3); */
+  /* border-color: var(--primary-color, #2196F3); */
+  color: #333;
+  border-color: #333;
 }
 
 .loading-1, .no-services-1 {
