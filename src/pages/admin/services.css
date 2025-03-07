@@ -183,20 +183,13 @@
   font-weight: 500;
 }
 
-.approve-btn {
-  background-color: var(--success-color, #4CAF50);
-  color: white;
-}
 
-.reject-btn {
-  background-color: var(--danger-color, #f44336);
-  color: white;
-}
 
 .view-btn {
-  background-color: var(--info-color, #3f51b5);
-  color: white;
+  background-color: var(--primary-color, #3f51b5);
+  color: rgb(0, 0, 0);
 }
+
 
 .action-buttons button:hover {
   transform: scale(1.02);
