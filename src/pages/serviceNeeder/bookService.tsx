@@ -421,6 +421,12 @@ const BookService: React.FC = () => {
           <h1>Fixify</h1>
         </div>
         <div className="nav-right">
+          <button
+            className="track-service-btn"
+            onClick={() => navigate("/service-needer/track-service")}
+          >
+            Track Service
+          </button>
           <button className="logout-btn" onClick={handleLogoutClick}>
             Logout
           </button>
