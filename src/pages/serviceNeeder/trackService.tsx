@@ -18,23 +18,32 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 
+// Updated interface to match the backend structure
 interface ServiceRequest {
   _id: string;
-  serviceType: string;
-  location: string;
-  address: string;
-  date: string;
-  timeFrom: string;
-  timeTo: string;
-  status: string;
-  totalFee: number;
-  totalHours: number;
-  createdAt: string;
-  provider: {
-    _id: string;
-    fullName: string;
+  serviceNeeder: {
+    id: string;
+    name: string;
     phoneNumber: string;
   };
+  serviceProvider: {
+    id: string;
+    name: string;
+    phoneNumber: string;
+  };
+  serviceDetails: {
+    serviceType: string;
+    location: string;
+    address: string;
+    date: string;
+    timeFrom: string;
+    timeTo: string;
+    totalHours: number;
+    feePerHour: number;
+    totalFee: number;
+  };
+  status: string;
+  createdAt: string;
 }
 
 interface SNNotification {
@@ -85,7 +94,7 @@ const TrackService: React.FC = () => {
       }
 
       const response = await fetch(
-        "http://localhost:5000/api/service-requests/sn-requests",
+        "http://localhost:5000/api/service-requests/my-requests",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -98,6 +107,7 @@ const TrackService: React.FC = () => {
       }
 
       const data = await response.json();
+      console.log("Service requests retrieved:", data);
       setServiceRequests(data);
       setLoading(false);
     } catch (err) {
@@ -112,7 +122,7 @@ const TrackService: React.FC = () => {
       if (!token) return;
 
       const response = await fetch(
-        "http://localhost:5000/api/service-requests/sn-notifications",
+        "http://localhost:5000/api/service-requests/notifications",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -134,7 +144,7 @@ const TrackService: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       await fetch(
-        "http://localhost:5000/api/service-requests/sn-notifications/mark-read",
+        "http://localhost:5000/api/service-requests/notifications/mark-read",
         {
           method: "PATCH",
           headers: {
@@ -316,16 +326,16 @@ const TrackService: React.FC = () => {
             All Requests
           </button>
           <button
-            className={activeTab === "accepted" ? "active" : ""}
-            onClick={() => setActiveTab("accepted")}
-          >
-            Accepted
-          </button>
-          <button
             className={activeTab === "active" ? "active" : ""}
             onClick={() => setActiveTab("active")}
           >
             Active
+          </button>
+          <button
+            className={activeTab === "accepted" ? "active" : ""}
+            onClick={() => setActiveTab("accepted")}
+          >
+            Accepted
           </button>
           <button
             className={activeTab === "completed" ? "active" : ""}
@@ -363,7 +373,7 @@ const TrackService: React.FC = () => {
             {filteredRequests.map((request) => (
               <div key={request._id} className="service-request-card">
                 <div className="service-header">
-                  <h3>{request.serviceType}</h3>
+                  <h3>{request.serviceDetails.serviceType}</h3>
                   <div
                     className={`service-status ${getStatusClass(
                       request.status
@@ -376,27 +386,27 @@ const TrackService: React.FC = () => {
                   <div className="detail-item">
                     <FaCalendarCheck className="detail-icon" />
                     <span>
-                      <strong>Date:</strong> {formatDate(request.date)}
+                      <strong>Date:</strong> {formatDate(request.serviceDetails.date)}
                     </span>
                   </div>
                   <div className="detail-item">
                     <FaClock className="detail-icon" />
                     <span>
-                      <strong>Time:</strong> {request.timeFrom} -{" "}
-                      {request.timeTo}
+                      <strong>Time:</strong> {request.serviceDetails.timeFrom} -{" "}
+                      {request.serviceDetails.timeTo}
                     </span>
                   </div>
                   <div className="detail-item">
                     <FaMapMarkerAlt className="detail-icon" />
                     <span>
-                      <strong>Location:</strong> {request.location}
+                      <strong>Location:</strong> {request.serviceDetails.location}
                     </span>
                   </div>
                   <div className="detail-item">
                     <FaTools className="detail-icon" />
                     <span>
                       <strong>Total Fee:</strong> LKR{" "}
-                      {request.totalFee.toFixed(2)}
+                      {request.serviceDetails.totalFee.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -420,7 +430,7 @@ const TrackService: React.FC = () => {
           className="modal-content details-modal"
           overlayClassName="modal-overlay"
         >
-          <h2>{selectedRequest.serviceType} Details</h2>
+          <h2>{selectedRequest.serviceDetails.serviceType} Details</h2>
           <div className="request-full-details">
             <div className="detail-section">
               <h3>Service Information</h3>
@@ -436,21 +446,21 @@ const TrackService: React.FC = () => {
               </div>
               <div className="detail-row">
                 <span className="detail-label">Date:</span>
-                <span>{formatDate(selectedRequest.date)}</span>
+                <span>{formatDate(selectedRequest.serviceDetails.date)}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Time:</span>
                 <span>
-                  {selectedRequest.timeFrom} - {selectedRequest.timeTo}
+                  {selectedRequest.serviceDetails.timeFrom} - {selectedRequest.serviceDetails.timeTo}
                 </span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Duration:</span>
-                <span>{selectedRequest.totalHours} hours</span>
+                <span>{selectedRequest.serviceDetails.totalHours} hours</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Total Fee:</span>
-                <span>LKR {selectedRequest.totalFee.toFixed(2)}</span>
+                <span>LKR {selectedRequest.serviceDetails.totalFee.toFixed(2)}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Requested on:</span>
@@ -462,31 +472,29 @@ const TrackService: React.FC = () => {
               <h3>Location Details</h3>
               <div className="detail-row">
                 <span className="detail-label">Location:</span>
-                <span>{selectedRequest.location}</span>
+                <span>{selectedRequest.serviceDetails.location}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Address:</span>
-                <span>{selectedRequest.address}</span>
+                <span>{selectedRequest.serviceDetails.address}</span>
               </div>
             </div>
 
-            {selectedRequest.provider && (
-              <div className="detail-section">
-                <h3>Service Provider</h3>
-                <div className="detail-row">
-                  <span className="detail-label">
-                    <FaUser className="provider-icon" /> Name:
-                  </span>
-                  <span>{selectedRequest.provider.fullName}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">
-                    <FaPhone className="provider-icon" /> Contact:
-                  </span>
-                  <span>{selectedRequest.provider.phoneNumber}</span>
-                </div>
+            <div className="detail-section">
+              <h3>Service Provider</h3>
+              <div className="detail-row">
+                <span className="detail-label">
+                  <FaUser className="provider-icon" /> Name:
+                </span>
+                <span>{selectedRequest.serviceProvider.name}</span>
               </div>
-            )}
+              <div className="detail-row">
+                <span className="detail-label">
+                  <FaPhone className="provider-icon" /> Contact:
+                </span>
+                <span>{selectedRequest.serviceProvider.phoneNumber}</span>
+              </div>
+            </div>
           </div>
 
           <div className="modal-footer">
