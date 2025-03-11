@@ -13,6 +13,7 @@ const ServiceAccepted = require("../models/ServiceAccepted");
 const Notification = require("../models/Notification");
 const SNNotification = require("../models/SNNotification");
 const authMiddleware = require("../middleware/auth");
+const ServiceRejected = require("../models/ServiceRejected");
 
 // Create service request
 router.post("/create", authMiddleware, createServiceRequest);
@@ -266,6 +267,19 @@ router.patch("/sn-notifications/mark-read", authMiddleware, async (req, res) => 
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ message: "Error marking notifications as read" });
+  }
+});
+
+// Get service needer's rejected requests
+router.get("/my-rejected-services", authMiddleware, async (req, res) => {
+  try {
+    const rejectedServices = await ServiceRejected.find({
+      "serviceNeeder.id": req.user.id,
+    }).sort({ createdAt: -1 });
+    res.status(200).json(rejectedServices);
+  } catch (error) {
+    console.error("Error fetching rejected services:", error);
+    res.status(500).json({ message: "Error fetching rejected services" });
   }
 });
 

@@ -44,6 +44,7 @@ interface ServiceRequest {
   };
   status: string;
   createdAt: string;
+  isRejected?: boolean; // Flag to identify rejected services from ServiceRejected collection
 }
 
 interface SNNotification {
@@ -62,6 +63,7 @@ interface SNNotification {
 const TrackService: React.FC = () => {
   const navigate = useNavigate();
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
+  const [rejectedServices, setRejectedServices] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -75,7 +77,7 @@ const TrackService: React.FC = () => {
   const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
-    fetchServiceRequests();
+    fetchAllServiceData();
     fetchSNNotifications();
 
     // Set up interval for periodic fetching of notifications
@@ -84,7 +86,7 @@ const TrackService: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const fetchServiceRequests = async () => {
+  const fetchAllServiceData = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -93,7 +95,8 @@ const TrackService: React.FC = () => {
         return;
       }
 
-      const response = await fetch(
+      // Fetch regular service requests
+      const requestsResponse = await fetch(
         "http://localhost:5000/api/service-requests/my-requests",
         {
           headers: {
@@ -102,13 +105,38 @@ const TrackService: React.FC = () => {
         }
       );
 
-      if (!response.ok) {
+      // Fetch rejected services
+      const rejectedResponse = await fetch(
+        "http://localhost:5000/api/service-requests/my-rejected-services",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!requestsResponse.ok) {
         throw new Error("Failed to fetch your service requests");
       }
 
-      const data = await response.json();
-      console.log("Service requests retrieved:", data);
-      setServiceRequests(data);
+      const requestsData = await requestsResponse.json();
+      
+      let rejectedData: ServiceRequest[] = [];
+      if (rejectedResponse.ok) {
+        rejectedData = await rejectedResponse.json();
+        // Add a flag to identify rejected services
+        rejectedData = rejectedData.map(service => ({
+          ...service,
+          isRejected: true,
+          status: "rejected" // Make sure status is "rejected" for display purposes
+        }));
+      }
+
+      console.log("Service requests retrieved:", requestsData);
+      console.log("Rejected services retrieved:", rejectedData);
+      
+      setServiceRequests(requestsData);
+      setRejectedServices(rejectedData);
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -234,14 +262,17 @@ const TrackService: React.FC = () => {
     });
   };
 
-  const filteredRequests = serviceRequests.filter((req) => {
+  // Combine both regular requests and rejected services
+  const allServices = [...serviceRequests, ...rejectedServices];
+
+  const filteredRequests = allServices.filter((req) => {
     if (activeTab === "all") return true;
     if (activeTab === "active")
       return ["pending", "ongoing"].includes(req.status);
     if (activeTab === "accepted") return req.status === "accepted";
     if (activeTab === "completed") return req.status === "completed";
     if (activeTab === "cancelled")
-      return ["cancelled", "rejected"].includes(req.status);
+      return req.status === "cancelled" || req.status === "rejected" || req.isRejected === true;
     return true;
   });
 
@@ -441,7 +472,7 @@ const TrackService: React.FC = () => {
                     selectedRequest.status
                   )}`}
                 >
-                  {selectedRequest.status}
+                  {selectedRequest.isRejected ? "Rejected" : selectedRequest.status}
                 </span>
               </div>
               <div className="detail-row">
