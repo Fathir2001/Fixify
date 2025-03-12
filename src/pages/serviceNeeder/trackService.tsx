@@ -320,15 +320,15 @@ const TrackService: React.FC = () => {
   const canStartService = (
     request: ServiceRequest
   ): { canStart: boolean; message?: string } => {
-    // Only allow for accepted services that haven't expired
-    if (request.status !== "accepted" || isServiceExpired(request)) {
+    // Only check for accepted services
+    if (request.status !== "accepted") {
       return { canStart: false };
     }
 
     const currentDate = new Date();
     const serviceDate = new Date(request.serviceDetails.date);
 
-    // Parse start time (handle formats like "8:00 AM")
+    // Parse start time
     const timeParts = request.serviceDetails.timeFrom.split(" ");
     const timeString = timeParts[0];
     const period = timeParts[1] || "";
@@ -348,11 +348,12 @@ const TrackService: React.FC = () => {
     // Convert to minutes
     const minutesDiff = Math.floor(timeDiff / (1000 * 60));
 
-    // Service can be started 30 minutes before the scheduled time
-    if (minutesDiff <= 30 && minutesDiff > -60) {
-      // Allow starting up to 30 min before, prevent after 60 min past
+    // Service can ONLY be started within 30 minutes before the scheduled time
+    if (minutesDiff <= 30 && minutesDiff > 0) {
+      // Within the 30-minute window before start time
       return { canStart: true };
     } else if (minutesDiff > 30) {
+      // More than 30 minutes before start time
       // Calculate the time when service can be started
       const startTime = new Date(serviceDate);
       startTime.setMinutes(startTime.getMinutes() - 30);
@@ -365,6 +366,7 @@ const TrackService: React.FC = () => {
         )}`,
       };
     } else {
+      // After the start time
       return { canStart: false };
     }
   };
@@ -573,54 +575,96 @@ const TrackService: React.FC = () => {
                           {expired ? "Expired" : request.status}
                         </div>
 
-                        {request.status === "accepted" && !expired && (
-                          <div className="start-button-container">
-                            <button
-                              className={`header-start-btn ${
-                                !startServiceInfo.canStart ? "disabled" : ""
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
+                        {request.status === "accepted" &&
+                          !isServiceExpired(request) &&
+                          (() => {
+                            const startInfo = canStartService(request);
+                            const currentDate = new Date();
+                            const serviceDate = new Date(
+                              request.serviceDetails.date
+                            );
 
-                                if (startServiceInfo.canStart) {
-                                  handleStartService(request._id);
-                                } else if (startServiceInfo.message) {
-                                  // Toggle message visibility
-                                  if (
-                                    startButtonMessage &&
-                                    startButtonMessage.id === request._id
-                                  ) {
-                                    setStartButtonMessage(null);
-                                  } else {
-                                    setStartButtonMessage({
-                                      id: request._id,
-                                      message: startServiceInfo.message,
-                                    });
+                            // Parse start time
+                            const timeParts =
+                              request.serviceDetails.timeFrom.split(" ");
+                            const timeString = timeParts[0];
+                            const period = timeParts[1] || "";
 
-                                    // Auto-hide after 5 seconds
-                                    setTimeout(() => {
-                                      setStartButtonMessage((prev) =>
-                                        prev && prev.id === request._id
-                                          ? null
-                                          : prev
-                                      );
-                                    }, 5000);
-                                  }
-                                }
-                              }}
-                            >
-                              Start
-                            </button>
+                            let [hours, minutes] = timeString
+                              .split(":")
+                              .map(Number);
 
-                            {/* Show message tooltip if this is the card user clicked on */}
-                            {startButtonMessage &&
-                              startButtonMessage.id === request._id && (
-                                <div className="start-button-message-tooltip">
-                                  {startButtonMessage.message}
+                            // Convert to 24-hour format if PM
+                            if (period.toUpperCase() === "PM" && hours < 12)
+                              hours += 12;
+                            if (period.toUpperCase() === "AM" && hours === 12)
+                              hours = 0;
+
+                            // Set the start time on the service date
+                            serviceDate.setHours(hours, minutes, 0, 0);
+
+                            // Calculate time difference in minutes
+                            const timeDiff =
+                              serviceDate.getTime() - currentDate.getTime();
+                            const minutesDiff = Math.floor(
+                              timeDiff / (1000 * 60)
+                            );
+
+                            // Only show button if we're within 30 minutes of start time or earlier
+                            // (don't show button if service should have already started)
+                            if (minutesDiff > 0) {
+                              return (
+                                <div className="start-button-container">
+                                  <button
+                                    className={`header-start-btn ${
+                                      !startInfo.canStart ? "disabled" : ""
+                                    }`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+
+                                      if (startInfo.canStart) {
+                                        handleStartService(request._id);
+                                      } else if (startInfo.message) {
+                                        if (
+                                          startButtonMessage &&
+                                          startButtonMessage.id === request._id
+                                        ) {
+                                          setStartButtonMessage(null);
+                                        } else {
+                                          setStartButtonMessage({
+                                            id: request._id,
+                                            message: startInfo.message,
+                                          });
+
+                                          setTimeout(() => {
+                                            setStartButtonMessage((prev) =>
+                                              prev && prev.id === request._id
+                                                ? null
+                                                : prev
+                                            );
+                                          }, 5000);
+                                        }
+                                      }
+                                    }}
+                                    title={
+                                      startInfo.message || "Start the service"
+                                    }
+                                  >
+                                    Start
+                                  </button>
+
+                                  {startButtonMessage &&
+                                    startButtonMessage.id === request._id && (
+                                      <div className="start-button-message-tooltip">
+                                        {startButtonMessage.message}
+                                      </div>
+                                    )}
                                 </div>
-                              )}
-                          </div>
-                        )}
+                              );
+                            }
+
+                            return null; // Don't show button if past start time
+                          })()}
                       </div>
                     );
                   })()}
