@@ -224,6 +224,20 @@ const TrackService: React.FC = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [startButtonMessage]);
 
+  useEffect(() => {
+    if (startButtonMessage) {
+      document.documentElement.style.setProperty(
+        "--show-hover-tooltip",
+        "none"
+      );
+    } else {
+      document.documentElement.style.setProperty(
+        "--show-hover-tooltip",
+        "block"
+      );
+    }
+  }, [startButtonMessage]);
+
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
@@ -583,7 +597,6 @@ const TrackService: React.FC = () => {
                             const serviceDate = new Date(
                               request.serviceDetails.date
                             );
-
                             // Parse start time
                             const timeParts =
                               request.serviceDetails.timeFrom.split(" ");
@@ -625,6 +638,7 @@ const TrackService: React.FC = () => {
                                       if (startInfo.canStart) {
                                         handleStartService(request._id);
                                       } else if (startInfo.message) {
+                                        // Always toggle tooltip on click, regardless of device type
                                         if (
                                           startButtonMessage &&
                                           startButtonMessage.id === request._id
@@ -646,9 +660,8 @@ const TrackService: React.FC = () => {
                                         }
                                       }
                                     }}
-                                    title={
-                                      startInfo.message || "Start the service"
-                                    }
+                                    // Add data-tooltip attribute with the message for CSS hover tooltip
+                                    data-tooltip={startInfo.message}
                                   >
                                     Start
                                   </button>

@@ -578,7 +578,8 @@
 }
 
 .header-start-btn.disabled:hover::after {
-  content: attr(title);
+  /* Only show the hover tooltip on devices that support hover */
+  content: attr(data-tooltip);
   position: absolute;
   top: calc(100% + 5px);
   right: 0;
@@ -589,7 +590,11 @@
   font-size: 0.8rem;
   white-space: nowrap;
   z-index: 1000;
+  /* Only show hover tooltip if no click tooltip is visible */
+  display: var(--show-hover-tooltip, block);
 }
+
+
 
 
 .start-button-container {
