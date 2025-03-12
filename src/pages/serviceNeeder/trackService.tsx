@@ -77,6 +77,10 @@ const TrackService: React.FC = () => {
   const [showNotificationsList, setShowNotificationsList] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeTab, setActiveTab] = useState("all");
+  const [startButtonMessage, setStartButtonMessage] = useState<{
+    id: string;
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchAllServiceData();
@@ -201,6 +205,24 @@ const TrackService: React.FC = () => {
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [showNotificationsList]);
+
+  useEffect(() => {
+    if (!startButtonMessage) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Close if clicking outside of tooltip and button
+      if (
+        !target.closest(".start-button-message-tooltip") &&
+        !target.closest(".header-start-btn")
+      ) {
+        setStartButtonMessage(null);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [startButtonMessage]);
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -552,26 +574,52 @@ const TrackService: React.FC = () => {
                         </div>
 
                         {request.status === "accepted" && !expired && (
-                          <button
-                            className={`header-start-btn ${
-                              !startServiceInfo.canStart ? "disabled" : ""
-                            }`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const startInfo = canStartService(request);
-                              if (startInfo.canStart) {
-                                handleStartService(request._id);
-                              } else if (startInfo.message) {
-                                alert(startInfo.message);
-                              }
-                            }}
-                            disabled={!startServiceInfo.canStart}
-                            title={
-                              startServiceInfo.message || "Start the service"
-                            }
-                          >
-                            Start
-                          </button>
+                          <div className="start-button-container">
+                            <button
+                              className={`header-start-btn ${
+                                !startServiceInfo.canStart ? "disabled" : ""
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+
+                                if (startServiceInfo.canStart) {
+                                  handleStartService(request._id);
+                                } else if (startServiceInfo.message) {
+                                  // Toggle message visibility
+                                  if (
+                                    startButtonMessage &&
+                                    startButtonMessage.id === request._id
+                                  ) {
+                                    setStartButtonMessage(null);
+                                  } else {
+                                    setStartButtonMessage({
+                                      id: request._id,
+                                      message: startServiceInfo.message,
+                                    });
+
+                                    // Auto-hide after 5 seconds
+                                    setTimeout(() => {
+                                      setStartButtonMessage((prev) =>
+                                        prev && prev.id === request._id
+                                          ? null
+                                          : prev
+                                      );
+                                    }, 5000);
+                                  }
+                                }
+                              }}
+                            >
+                              Start
+                            </button>
+
+                            {/* Show message tooltip if this is the card user clicked on */}
+                            {startButtonMessage &&
+                              startButtonMessage.id === request._id && (
+                                <div className="start-button-message-tooltip">
+                                  {startButtonMessage.message}
+                                </div>
+                              )}
+                          </div>
                         )}
                       </div>
                     );
