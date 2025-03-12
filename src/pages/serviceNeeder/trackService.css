@@ -172,8 +172,8 @@
 }
 
 .status-cancelled, .status-rejected {
-  background-color: #f8d7da;
-  color: #dc3545;
+  background-color: #e48d94;
+  color: #5b0009;
   border: 1px solid #f5c2c7;
 }
 
@@ -510,4 +510,64 @@
 
 .status-icon.expired {
   color: #d9534f;
+}
+
+.start-service-container {
+  padding: 0.8rem 1.2rem 0;
+}
+
+.start-service-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.start-service-btn:hover:not(.disabled) {
+  background-color: #218838;
+}
+
+.start-service-btn.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.start-service-message {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.status-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-start-btn {
+  padding: 2px 8px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-start-btn:hover:not(.disabled) {
+  background-color: #218838;
+}
+
+.header-start-btn.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
 }

@@ -295,6 +295,96 @@ const TrackService: React.FC = () => {
     return serviceDate < currentDate;
   };
 
+  const canStartService = (
+    request: ServiceRequest
+  ): { canStart: boolean; message?: string } => {
+    // Only allow for accepted services that haven't expired
+    if (request.status !== "accepted" || isServiceExpired(request)) {
+      return { canStart: false };
+    }
+
+    const currentDate = new Date();
+    const serviceDate = new Date(request.serviceDetails.date);
+
+    // Parse start time (handle formats like "8:00 AM")
+    const timeParts = request.serviceDetails.timeFrom.split(" ");
+    const timeString = timeParts[0];
+    const period = timeParts[1] || "";
+
+    let [hours, minutes] = timeString.split(":").map(Number);
+
+    // Convert to 24-hour format if PM
+    if (period.toUpperCase() === "PM" && hours < 12) hours += 12;
+    if (period.toUpperCase() === "AM" && hours === 12) hours = 0;
+
+    // Set the start time on the service date
+    serviceDate.setHours(hours, minutes, 0, 0);
+
+    // Calculate time difference in milliseconds
+    const timeDiff = serviceDate.getTime() - currentDate.getTime();
+
+    // Convert to minutes
+    const minutesDiff = Math.floor(timeDiff / (1000 * 60));
+
+    // Service can be started 30 minutes before the scheduled time
+    if (minutesDiff <= 30 && minutesDiff > -60) {
+      // Allow starting up to 30 min before, prevent after 60 min past
+      return { canStart: true };
+    } else if (minutesDiff > 30) {
+      // Calculate the time when service can be started
+      const startTime = new Date(serviceDate);
+      startTime.setMinutes(startTime.getMinutes() - 30);
+
+      return {
+        canStart: false,
+        message: `You can start this service after ${startTime.toLocaleTimeString(
+          [],
+          { hour: "2-digit", minute: "2-digit" }
+        )}`,
+      };
+    } else {
+      return { canStart: false };
+    }
+  };
+
+  // Add this function to handle starting a service
+  const handleStartService = async (requestId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(
+        `http://localhost:5000/api/service-requests/${requestId}/start`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Update the service status in UI
+        setServiceRequests(
+          serviceRequests.map((req) =>
+            req._id === requestId ? { ...req, status: "ongoing" } : req
+          )
+        );
+        // If details modal is open and showing this service, update it
+        if (selectedRequest && selectedRequest._id === requestId) {
+          setSelectedRequest({ ...selectedRequest, status: "ongoing" });
+        }
+      } else {
+        const error = await response.json();
+        setError(error.message || "Failed to start service");
+      }
+    } catch (error) {
+      console.error("Error starting service:", error);
+      setError("An error occurred when trying to start the service");
+    }
+  };
+
   // Combine both regular requests and rejected services
   const allServices = [...serviceRequests, ...rejectedServices];
 
@@ -448,19 +538,46 @@ const TrackService: React.FC = () => {
                   {(() => {
                     const expired = isServiceExpired(request);
                     const displayStatus = expired ? "expired" : request.status;
+                    const startServiceInfo = canStartService(request);
 
                     return (
-                      <div
-                        className={`service-status ${getStatusClass(
-                          displayStatus
-                        )}`}
-                      >
-                        {getStatusIcon(displayStatus)}{" "}
-                        {expired ? "Expired" : request.status}
+                      <div className="status-wrapper">
+                        <div
+                          className={`service-status ${getStatusClass(
+                            displayStatus
+                          )}`}
+                        >
+                          {getStatusIcon(displayStatus)}{" "}
+                          {expired ? "Expired" : request.status}
+                        </div>
+
+                        {request.status === "accepted" && !expired && (
+                          <button
+                            className={`header-start-btn ${
+                              !startServiceInfo.canStart ? "disabled" : ""
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const startInfo = canStartService(request);
+                              if (startInfo.canStart) {
+                                handleStartService(request._id);
+                              } else if (startInfo.message) {
+                                alert(startInfo.message);
+                              }
+                            }}
+                            disabled={!startServiceInfo.canStart}
+                            title={
+                              startServiceInfo.message || "Start the service"
+                            }
+                          >
+                            Start
+                          </button>
+                        )}
                       </div>
                     );
                   })()}
                 </div>
+
                 <div className="service-details">
                   <div className="detail-item">
                     <FaCalendarCheck className="detail-icon" />
