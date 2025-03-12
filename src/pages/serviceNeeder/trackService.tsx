@@ -63,7 +63,9 @@ interface SNNotification {
 const TrackService: React.FC = () => {
   const navigate = useNavigate();
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
-  const [rejectedServices, setRejectedServices] = useState<ServiceRequest[]>([]);
+  const [rejectedServices, setRejectedServices] = useState<ServiceRequest[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -120,21 +122,21 @@ const TrackService: React.FC = () => {
       }
 
       const requestsData = await requestsResponse.json();
-      
+
       let rejectedData: ServiceRequest[] = [];
       if (rejectedResponse.ok) {
         rejectedData = await rejectedResponse.json();
         // Add a flag to identify rejected services
-        rejectedData = rejectedData.map(service => ({
+        rejectedData = rejectedData.map((service) => ({
           ...service,
           isRejected: true,
-          status: "rejected" // Make sure status is "rejected" for display purposes
+          status: "rejected", // Make sure status is "rejected" for display purposes
         }));
       }
 
       console.log("Service requests retrieved:", requestsData);
       console.log("Rejected services retrieved:", rejectedData);
-      
+
       setServiceRequests(requestsData);
       setRejectedServices(rejectedData);
       setLoading(false);
@@ -229,6 +231,8 @@ const TrackService: React.FC = () => {
         return "status-cancelled";
       case "rejected":
         return "status-rejected";
+      case "expired":
+        return "status-expired";
       default:
         return "";
     }
@@ -248,6 +252,8 @@ const TrackService: React.FC = () => {
         return <FaTimesCircle className="status-icon cancelled" />;
       case "rejected":
         return <FaTimesCircle className="status-icon rejected" />;
+      case "expired":
+        return <FaTimesCircle className="status-icon expired" />;
       default:
         return null;
     }
@@ -262,17 +268,51 @@ const TrackService: React.FC = () => {
     });
   };
 
+  const isServiceExpired = (request: ServiceRequest): boolean => {
+    // Skip already completed, cancelled or rejected services
+    if (["completed", "cancelled", "rejected"].includes(request.status)) {
+      return false;
+    }
+
+    const currentDate = new Date();
+    const serviceDate = new Date(request.serviceDetails.date);
+
+    // Parse end time (handle formats like "5:00 PM")
+    const timeParts = request.serviceDetails.timeTo.split(" ");
+    const timeString = timeParts[0];
+    const period = timeParts[1] || "";
+
+    let [hours, minutes] = timeString.split(":").map(Number);
+
+    // Convert to 24-hour format if PM
+    if (period.toUpperCase() === "PM" && hours < 12) hours += 12;
+    if (period.toUpperCase() === "AM" && hours === 12) hours = 0;
+
+    // Set the end time on the service date
+    serviceDate.setHours(hours, minutes, 0, 0);
+
+    // Check if the service end time has passed
+    return serviceDate < currentDate;
+  };
+
   // Combine both regular requests and rejected services
   const allServices = [...serviceRequests, ...rejectedServices];
 
   const filteredRequests = allServices.filter((req) => {
+    const expired = isServiceExpired(req);
+
     if (activeTab === "all") return true;
     if (activeTab === "active")
-      return ["pending", "ongoing"].includes(req.status);
-    if (activeTab === "accepted") return req.status === "accepted";
+      return ["pending", "ongoing"].includes(req.status) && !expired;
+    if (activeTab === "accepted") return req.status === "accepted" && !expired;
     if (activeTab === "completed") return req.status === "completed";
     if (activeTab === "cancelled")
-      return req.status === "cancelled" || req.status === "rejected" || req.isRejected === true;
+      return (
+        req.status === "cancelled" ||
+        req.status === "rejected" ||
+        req.isRejected === true ||
+        expired
+      );
     return true;
   });
 
@@ -405,19 +445,28 @@ const TrackService: React.FC = () => {
               <div key={request._id} className="service-request-card">
                 <div className="service-header">
                   <h3>{request.serviceDetails.serviceType}</h3>
-                  <div
-                    className={`service-status ${getStatusClass(
-                      request.status
-                    )}`}
-                  >
-                    {getStatusIcon(request.status)} {request.status}
-                  </div>
+                  {(() => {
+                    const expired = isServiceExpired(request);
+                    const displayStatus = expired ? "expired" : request.status;
+
+                    return (
+                      <div
+                        className={`service-status ${getStatusClass(
+                          displayStatus
+                        )}`}
+                      >
+                        {getStatusIcon(displayStatus)}{" "}
+                        {expired ? "Expired" : request.status}
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div className="service-details">
                   <div className="detail-item">
                     <FaCalendarCheck className="detail-icon" />
                     <span>
-                      <strong>Date:</strong> {formatDate(request.serviceDetails.date)}
+                      <strong>Date:</strong>{" "}
+                      {formatDate(request.serviceDetails.date)}
                     </span>
                   </div>
                   <div className="detail-item">
@@ -430,7 +479,8 @@ const TrackService: React.FC = () => {
                   <div className="detail-item">
                     <FaMapMarkerAlt className="detail-icon" />
                     <span>
-                      <strong>Location:</strong> {request.serviceDetails.location}
+                      <strong>Location:</strong>{" "}
+                      {request.serviceDetails.location}
                     </span>
                   </div>
                   <div className="detail-item">
@@ -469,10 +519,16 @@ const TrackService: React.FC = () => {
                 <span className="detail-label">Status:</span>
                 <span
                   className={`status-badge ${getStatusClass(
-                    selectedRequest.status
+                    isServiceExpired(selectedRequest)
+                      ? "expired"
+                      : selectedRequest.status
                   )}`}
                 >
-                  {selectedRequest.isRejected ? "Rejected" : selectedRequest.status}
+                  {selectedRequest.isRejected
+                    ? "Rejected"
+                    : isServiceExpired(selectedRequest)
+                    ? "Expired"
+                    : selectedRequest.status}
                 </span>
               </div>
               <div className="detail-row">
@@ -482,7 +538,8 @@ const TrackService: React.FC = () => {
               <div className="detail-row">
                 <span className="detail-label">Time:</span>
                 <span>
-                  {selectedRequest.serviceDetails.timeFrom} - {selectedRequest.serviceDetails.timeTo}
+                  {selectedRequest.serviceDetails.timeFrom} -{" "}
+                  {selectedRequest.serviceDetails.timeTo}
                 </span>
               </div>
               <div className="detail-row">
@@ -491,7 +548,9 @@ const TrackService: React.FC = () => {
               </div>
               <div className="detail-row">
                 <span className="detail-label">Total Fee:</span>
-                <span>LKR {selectedRequest.serviceDetails.totalFee.toFixed(2)}</span>
+                <span>
+                  LKR {selectedRequest.serviceDetails.totalFee.toFixed(2)}
+                </span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Requested on:</span>
