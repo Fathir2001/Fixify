@@ -7,7 +7,7 @@ const {
   getServiceProviderRequests,
   updateRequestStatus,
 } = require("../controllers/serviceRequestController");
-const handleServiceRejection = require('../controllers/serviceRejectionController');
+const handleServiceRejection = require("../controllers/serviceRejectionController");
 const ServiceRequest = require("../models/ServiceRequest");
 const ServiceAccepted = require("../models/ServiceAccepted");
 const Notification = require("../models/Notification");
@@ -32,7 +32,7 @@ router.get("/notifications", authMiddleware, async (req, res) => {
   try {
     const notifications = await Notification.find({
       serviceProviderId: req.user.id,
-      status: 'pending' 
+      status: "pending",
     })
       .populate("serviceRequestId")
       .sort({ createdAt: -1 });
@@ -56,31 +56,30 @@ router.get("/notifications", authMiddleware, async (req, res) => {
   }
 });
 
-
-router.post('/reject-service/:serviceId', authMiddleware, async (req, res) => {
+router.post("/reject-service/:serviceId", authMiddleware, async (req, res) => {
   try {
     const { serviceId } = req.params;
     const result = await handleServiceRejection(serviceId);
-    
+
     // Emit socket event for real-time notification
-    const io = req.app.get('io');
+    const io = req.app.get("io");
     if (io) {
-      io.emit('serviceRequestRejected', {
+      io.emit("serviceRequestRejected", {
         serviceNeederId: result.rejectedService.serviceNeeder.id,
-        notification: result.notification
+        notification: result.notification,
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Service rejected successfully',
-      data: result.rejectedService
+      message: "Service rejected successfully",
+      data: result.rejectedService,
     });
   } catch (error) {
-    console.error('Error rejecting service:', error);
+    console.error("Error rejecting service:", error);
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -258,17 +257,21 @@ router.get("/sn-notifications", authMiddleware, async (req, res) => {
   }
 });
 
-router.patch("/sn-notifications/mark-read", authMiddleware, async (req, res) => {
-  try {
-    await SNNotification.updateMany(
-      { serviceNeederId: req.user.id },
-      { read: true }
-    );
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ message: "Error marking notifications as read" });
+router.patch(
+  "/sn-notifications/mark-read",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      await SNNotification.updateMany(
+        { serviceNeederId: req.user.id },
+        { read: true }
+      );
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Error marking notifications as read" });
+    }
   }
-});
+);
 
 // Get service needer's rejected requests
 router.get("/my-rejected-services", authMiddleware, async (req, res) => {
@@ -280,6 +283,20 @@ router.get("/my-rejected-services", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error fetching rejected services:", error);
     res.status(500).json({ message: "Error fetching rejected services" });
+  }
+});
+
+router.get("/provider-accepted-services", authMiddleware, async (req, res) => {
+  try {
+    // Find all accepted services where the current provider is the service provider
+    const acceptedServices = await ServiceAccepted.find({
+      "serviceProvider.id": req.user.id,
+    }).sort({ acceptedAt: -1 });
+
+    res.status(200).json(acceptedServices);
+  } catch (error) {
+    console.error("Error fetching accepted services:", error);
+    res.status(500).json({ message: "Error fetching accepted services" });
   }
 });
 

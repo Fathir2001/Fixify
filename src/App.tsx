@@ -17,6 +17,7 @@ import ResetPassword from './pages/auth/ResetPassword';
 import ForgotPasswordSP from './pages/serviceProvider/forgotPasswordSP';
 import ServicesPage from './pages/admin/services';
 import TrackService from './pages/serviceNeeder/trackService';
+import ServiceProviderServices from './pages/serviceProvider/services';
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
         <Route path="/service-provider/forgot-password" element={<ForgotPasswordSP />} />
         <Route path="/admin/services" element={<ServicesPage />} />
         <Route path="/service-needer/track-service" element={<TrackService />} />
+        <Route path="/service-provider/services" element={<ServiceProviderServices />} />
       </Routes>
     </Router>
   );

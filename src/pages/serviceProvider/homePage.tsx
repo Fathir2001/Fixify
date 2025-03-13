@@ -193,19 +193,19 @@ const ServiceProviderHomePage: React.FC = () => {
     const confirmed = window.confirm(
       "Are you sure you want to reject this notification?"
     );
-  
+
     if (!confirmed) return;
-  
+
     try {
       const token = localStorage.getItem("token");
       const serviceRequestId = notifications.find(
         (n) => n._id === notificationId
       )?.serviceRequestId;
-  
+
       if (!serviceRequestId) {
         throw new Error("Service request ID not found");
       }
-  
+
       const response = await fetch(
         `http://localhost:5000/api/service-requests/reject-service/${serviceRequestId}`,
         {
@@ -215,7 +215,7 @@ const ServiceProviderHomePage: React.FC = () => {
           },
         }
       );
-  
+
       if (response.ok) {
         // Remove the notification from state
         setNotifications((prev) =>
@@ -520,6 +520,12 @@ const ServiceProviderHomePage: React.FC = () => {
               </div>
             )}
           </div>
+          <button
+            onClick={() => navigate("/service-provider/services")}
+            className="services-button"
+          >
+            Services
+          </button>
           {!isEditing && (
             <button onClick={handleEdit} className="edit-button">
               Edit Profile
