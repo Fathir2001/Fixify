@@ -4,7 +4,6 @@ import "./trackService.css";
 import Modal from "react-modal";
 Modal.setAppElement("#root");
 import {
-  FaBell,
   FaCalendarCheck,
   FaTools,
   FaMapMarkerAlt,
@@ -47,19 +46,6 @@ interface ServiceRequest {
   isRejected?: boolean; // Flag to identify rejected services from ServiceRejected collection
 }
 
-interface SNNotification {
-  _id: string;
-  message: string;
-  createdAt: string;
-  read: boolean;
-  serviceRequestId: string;
-  serviceProvider: {
-    name: string;
-    phoneNumber: string;
-  };
-  status: string;
-}
-
 const TrackService: React.FC = () => {
   const navigate = useNavigate();
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
@@ -73,9 +59,8 @@ const TrackService: React.FC = () => {
     null
   );
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [snNotifications, setSNNotifications] = useState<SNNotification[]>([]);
   const [showNotificationsList, setShowNotificationsList] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+
   const [activeTab, setActiveTab] = useState("all");
   const [startButtonMessage, setStartButtonMessage] = useState<{
     id: string;
@@ -84,12 +69,6 @@ const TrackService: React.FC = () => {
 
   useEffect(() => {
     fetchAllServiceData();
-    fetchSNNotifications();
-
-    // Set up interval for periodic fetching of notifications
-    const interval = setInterval(fetchSNNotifications, 30000); // every 30 seconds
-
-    return () => clearInterval(interval);
   }, []);
 
   const fetchAllServiceData = async () => {
@@ -147,49 +126,6 @@ const TrackService: React.FC = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       setLoading(false);
-    }
-  };
-
-  const fetchSNNotifications = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const response = await fetch(
-        "http://localhost:5000/api/service-requests/notifications",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setSNNotifications(data);
-        setUnreadCount(data.filter((n: SNNotification) => !n.read).length);
-      }
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-    }
-  };
-
-  const markNotificationsAsRead = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await fetch(
-        "http://localhost:5000/api/service-requests/notifications/mark-read",
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setUnreadCount(0);
-      setSNNotifications(snNotifications.map((n) => ({ ...n, read: true })));
-    } catch (error) {
-      console.error("Error marking notifications as read:", error);
     }
   };
 
@@ -447,57 +383,6 @@ const TrackService: React.FC = () => {
   return (
     <div className="track-service-container">
       <nav className="navbar-2">
-        <div className="nav-left">
-          <div className="notification-wrapper">
-            <FaBell
-              className="notification-icon"
-              onClick={() => {
-                setShowNotificationsList(!showNotificationsList);
-                if (!showNotificationsList && unreadCount > 0) {
-                  markNotificationsAsRead();
-                }
-              }}
-            />
-            {unreadCount > 0 && (
-              <span className="notification-badge">{unreadCount}</span>
-            )}
-            {showNotificationsList && (
-              <div className="notifications-dropdown">
-                <div className="notifications-header">
-                  <h3>Notifications</h3>
-                </div>
-                <div className="notifications-list">
-                  {snNotifications && snNotifications.length > 0 ? (
-                    snNotifications.map((notification) => (
-                      <div
-                        key={notification._id}
-                        className={`notification-item ${
-                          !notification.read ? "unread" : ""
-                        }`}
-                      >
-                        <p className="notification-message">
-                          {notification.message}
-                        </p>
-                        <p className="notification-time">
-                          {new Date(notification.createdAt).toLocaleString()}
-                        </p>
-                        {notification.status === "accepted" && (
-                          <div className="provider-contact">
-                            <p>Contact Provider:</p>
-                            <p>{notification.serviceProvider.name}</p>
-                            <p>{notification.serviceProvider.phoneNumber}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="no-notifications">No notifications</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
         <div className="nav-center">
           <h1>Fixify</h1>
         </div>
