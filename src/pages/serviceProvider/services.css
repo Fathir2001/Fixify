@@ -1,3 +1,7 @@
+body::before {
+    background-image: none;
+}
+
 .sp-services-container {
     max-width: 1200px;
     margin: 0 auto;
