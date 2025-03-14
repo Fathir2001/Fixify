@@ -522,7 +522,7 @@ const ServiceProviderHomePage: React.FC = () => {
           </div>
           <button
             onClick={() => navigate("/service-provider/services")}
-            className="services-button"
+            className="service-button"
           >
             Services
           </button>
