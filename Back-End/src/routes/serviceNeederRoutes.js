@@ -72,10 +72,16 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({ message: "OTP has expired" });
     }
 
-    // Update password
-    user.password = await bcrypt.hash(newPassword, 10);
+    // Here is where we need to be careful to set the password correctly
+    // The pre-save middleware should handle the hashing if we set user.password directly
+    user.password = newPassword;
     user.resetOTP = undefined;
+    
+    // Use console logs for debugging
+    console.log(`Setting new password (pre-hash): ${newPassword.slice(0, 3)}... (length: ${newPassword.length})`);
+    
     await user.save();
+    console.log(`Password saved, hash length: ${user.password.length}`);
 
     res.json({ message: "Password reset successful" });
   } catch (error) {
@@ -84,7 +90,7 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
-// Add the reset password route
-router.post("/reset-password", resetPassword);
+// Add route for token-based password reset (separate from OTP reset)
+router.post("/reset-password-token", resetPassword);
 
 module.exports = router;

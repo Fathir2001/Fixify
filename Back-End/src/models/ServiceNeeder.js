@@ -34,19 +34,41 @@ const serviceNeederSchema = new mongoose.Schema({
 
 // Hash password before saving
 // Remove any pre-save middleware for password hashing
-serviceNeederSchema.pre("save", function (next) {
+// Hash password before saving
+serviceNeederSchema.pre("save", async function (next) {
+  // Only hash if password is modified
   if (!this.isModified("password")) {
     return next();
   }
-  next();
+
+  try {
+    // Generate salt
+    const salt = await bcrypt.genSalt(10);
+    // Hash the password
+    this.password = await bcrypt.hash(this.password, salt);
+    // Log the hash for debugging
+    console.log(
+      `Password hashed successfully. Hash length: ${this.password.length}`
+    );
+    next();
+  } catch (error) {
+    console.error("Error hashing password:", error);
+    next(error);
+  }
 });
 
 //comparePassword method
 serviceNeederSchema.methods.comparePassword = async function (
   candidatePassword
 ) {
-  return bcrypt.compare(candidatePassword, this.password);
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    console.error("Error comparing passwords:", error);
+    return false;
+  }
 };
 
 const ServiceNeeder = mongoose.model("ServiceNeeder", serviceNeederSchema);
 module.exports = ServiceNeeder;
+

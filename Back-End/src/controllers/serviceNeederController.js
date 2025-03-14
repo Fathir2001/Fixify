@@ -13,15 +13,23 @@ const registerServiceNeeder = async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    // Create new service needer
+    // Create new service needer - let the pre-save hook handle password hashing
     const serviceNeeder = new ServiceNeeder({
       name,
       email,
-      password,
+      password, // Don't hash here, let the pre-save hook do it
       phoneNumber,
     });
 
+    // Log before saving
+    console.log("Saving new user with password length:", password.length);
+
     await serviceNeeder.save();
+
+    console.log(
+      "User saved with hashed password length:",
+      serviceNeeder.password.length
+    );
 
     // Generate JWT token
     const token = jwt.sign(
@@ -51,7 +59,7 @@ const loginServiceNeeder = async (req, res) => {
     const { email, password } = req.body;
     console.log("Login attempt details:", {
       email,
-      passwordAttempt: password.slice(0, 3) + "...",
+      passwordLength: password.length,
     });
 
     // Find user by email
@@ -63,25 +71,18 @@ const loginServiceNeeder = async (req, res) => {
 
     console.log("Found user:", {
       id: serviceNeeder._id,
-      storedPasswordHash: serviceNeeder.password,
+      storedPasswordHashLength: serviceNeeder.password.length,
     });
 
-    // Debug: Log the password comparison
-    console.log("Attempting password comparison...");
-    const isValidPassword = await bcrypt.compare(
-      password,
-      serviceNeeder.password
-    );
-    console.log("Password validation result:", {
-      attemptedPassword: password.slice(0, 3) + "...",
-      storedHash: serviceNeeder.password,
-      isValid: isValidPassword,
-    });
+    // Use the model's comparePassword method for consistency
+    const isPasswordMatch = await serviceNeeder.comparePassword(password);
+    console.log("Password comparison result:", isPasswordMatch);
 
-    if (!isValidPassword) {
+    if (!isPasswordMatch) {
       console.log("Password validation failed");
       return res.status(401).json({ message: "Invalid credentials" });
     }
+
     // Generate JWT token
     const token = jwt.sign(
       { id: serviceNeeder._id, email: serviceNeeder.email },
