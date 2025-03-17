@@ -669,12 +669,49 @@ const TrackService: React.FC = () => {
                 >
                   <div className="service-header">
                     <h3>{request.serviceDetails.serviceType}</h3>
-                    <div
-                      className={`status-badge ${getStatusClass(
-                        request.status
-                      )}`}
-                    >
-                      {getStatusIcon(request.status)} {request.status}
+                    <div className="status-section">
+                      <div
+                        className={`status-badge ${getStatusClass(
+                          request.status
+                        )}`}
+                      >
+                        {getStatusIcon(request.status)} {request.status}
+                      </div>
+
+                      {request.status === "accepted" &&
+                        startServiceInfo.canStart && (
+                          <button
+                            className="mini-start-btn"
+                            onClick={() => handleStartService(request._id)}
+                            disabled={otpGenerating}
+                            title="Start Service"
+                          >
+                            {otpGenerating ? "..." : "Start"}
+                          </button>
+                        )}
+
+                      {request.status === "accepted" &&
+                        !startServiceInfo.canStart &&
+                        startServiceInfo.message && (
+                          <button
+                            className="mini-start-btn disabled"
+                            onClick={() =>
+                              setStartButtonMessage({
+                                id: request._id,
+                                message: startServiceInfo.message || "",
+                              })
+                            }
+                            disabled
+                            title={startServiceInfo.message}
+                          >
+                            Start
+                            {startButtonMessage?.id === request._id && (
+                              <div className="start-button-message-tooltip">
+                                {startButtonMessage.message}
+                              </div>
+                            )}
+                          </button>
+                        )}
                     </div>
                   </div>
 
@@ -702,39 +739,6 @@ const TrackService: React.FC = () => {
                     >
                       View Details
                     </button>
-
-                    {request.status === "accepted" &&
-                      startServiceInfo.canStart && (
-                        <button
-                          className="start-service-btn"
-                          onClick={() => handleStartService(request._id)}
-                          disabled={otpGenerating}
-                        >
-                          {otpGenerating ? "Generating..." : "Start Service"}
-                        </button>
-                      )}
-
-                    {request.status === "accepted" &&
-                      !startServiceInfo.canStart &&
-                      startServiceInfo.message && (
-                        <button
-                          className="start-service-btn disabled"
-                          onClick={() =>
-                            setStartButtonMessage({
-                              id: request._id,
-                              message: startServiceInfo.message || "",
-                            })
-                          }
-                          disabled
-                        >
-                          Start Service
-                          {startButtonMessage?.id === request._id && (
-                            <div className="start-button-message-tooltip">
-                              {startButtonMessage.message}
-                            </div>
-                          )}
-                        </button>
-                      )}
                   </div>
                 </div>
               );
