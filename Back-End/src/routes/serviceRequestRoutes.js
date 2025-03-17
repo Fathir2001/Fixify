@@ -14,7 +14,11 @@ const Notification = require("../models/Notification");
 const SNNotification = require("../models/SNNotification");
 const authMiddleware = require("../middleware/auth");
 const ServiceRejected = require("../models/ServiceRejected");
-
+const ConnectedService = require("../models/ConnectedService");
+const {
+  generateServiceOTP,
+  verifyServiceOTP,
+} = require("../controllers/connectedServiceController");
 // Create service request
 router.post("/create", authMiddleware, createServiceRequest);
 
@@ -299,5 +303,92 @@ router.get("/provider-accepted-services", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Error fetching accepted services" });
   }
 });
+
+// Route for Service Needer to generate OTP
+router.post(
+  "/start-service/:serviceId/generate-otp",
+  authMiddleware,
+  generateServiceOTP
+);
+
+// Route for Service Provider to verify OTP
+router.post("/start-service/verify-otp", authMiddleware, verifyServiceOTP);
+
+// Route to get connected service status
+router.get(
+  "/connected-service/:serviceId",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const { serviceId } = req.params;
+      const connectedService = await ConnectedService.findOne({
+        originalServiceId: serviceId,
+      });
+
+      if (!connectedService) {
+        return res.status(404).json({ message: "Connected service not found" });
+      }
+
+      // Check if request is from either service needer or provider
+      const isAuthorized =
+        connectedService.serviceNeeder.id.toString() === req.user.id ||
+        connectedService.serviceProvider.id.toString() === req.user.id;
+
+      if (!isAuthorized) {
+        return res
+          .status(403)
+          .json({ message: "Not authorized to access this service" });
+      }
+
+      res.status(200).json(connectedService);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching connected service" });
+    }
+  }
+);
+
+// Add a test route
+router.get("/test-service/:serviceId", authMiddleware, async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const service = await ServiceAccepted.findById(serviceId);
+    if (service) {
+      res.status(200).json({ found: true, service });
+    } else {
+      res.status(404).json({ found: false, message: "Service not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Add this route to get accepted service ID from request ID
+router.get(
+  "/accepted-service-id/:requestId",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const { requestId } = req.params;
+      
+      // Find the accepted service that references this request ID
+      const acceptedService = await ServiceAccepted.findOne({
+        originalRequestId: requestId
+      });
+      
+      if (!acceptedService) {
+        return res.status(404).json({ 
+          message: "No accepted service found for this request ID" 
+        });
+      }
+      
+      res.status(200).json({ 
+        acceptedServiceId: acceptedService._id.toString() 
+      });
+    } catch (error) {
+      console.error("Error getting accepted service ID:", error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
 
 module.exports = router;

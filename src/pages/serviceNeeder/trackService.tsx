@@ -17,9 +17,8 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 
-// Updated interface to match the backend structure
 interface ServiceRequest {
-  _id: string;
+  _id: string; // This should be the MongoDB ObjectId as a string
   serviceNeeder: {
     id: string;
     name: string;
@@ -66,6 +65,172 @@ const TrackService: React.FC = () => {
     id: string;
     message: string;
   } | null>(null);
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [generatedOTP, setGeneratedOTP] = useState<string | null>(null);
+  const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
+  const [otpServiceId, setOtpServiceId] = useState<string | null>(null);
+  const [otpCountdown, setOtpCountdown] = useState<number>(0);
+  const [otpGenerating, setOtpGenerating] = useState(false);
+
+  const debugRequestId = (requestId: string) => {
+    console.log("Debug requestId:", requestId);
+    console.log("Length:", requestId.length);
+    console.log("Is ObjectId format:", /^[0-9a-fA-F]{24}$/.test(requestId));
+  };
+
+  useEffect(() => {
+    const fetchServiceRequests = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await fetch(
+          "http://localhost:5000/api/service-requests/my-requests",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch service requests");
+        }
+
+        const data = await response.json();
+        console.log("Service requests data:", data); // Debug output
+
+        // Log all service IDs for debugging
+        console.log(
+          "Available service IDs:",
+          data.map((service: any) => service._id)
+        );
+
+        setServiceRequests(data);
+
+        // Also fetch rejected services
+        const rejectedResponse = await fetch(
+          "http://localhost:5000/api/service-requests/my-rejected-services",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (rejectedResponse.ok) {
+          const rejectedData = await rejectedResponse.json();
+          // Add a flag to identify rejected services
+          const rejectedWithFlag = rejectedData.map((item: any) => ({
+            ...item,
+            isRejected: true,
+          }));
+          console.log("Rejected services:", rejectedWithFlag);
+          setRejectedServices(rejectedWithFlag);
+        }
+      } catch (error) {
+        console.error("Error fetching service requests:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServiceRequests();
+  }, [navigate]);
+
+  // Add a debug function in your component
+  const testServiceById = async (serviceId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      console.log("Testing service with ID:", serviceId);
+      const response = await fetch(
+        `http://localhost:5000/api/service-requests/test-service/${serviceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      console.log("Test service response:", data);
+
+      if (data.found) {
+        console.log("Service found:", data.service);
+        return true;
+      } else {
+        console.log("Service not found");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error testing service:", error);
+      return false;
+    }
+  };
+
+  // Add this function to fetch the accepted service ID based on request ID
+  const getAcceptedServiceId = async (requestId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return null;
+
+      // Make a request to get accepted service ID for this request
+      const response = await fetch(
+        `http://localhost:5000/api/service-requests/accepted-service-id/${requestId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+      return data.acceptedServiceId;
+    } catch (error) {
+      console.error("Error getting accepted service ID:", error);
+      return null;
+    }
+  };
+
+  // Update your handleStartService function
+  const handleStartService = async (requestId: string) => {
+    try {
+      console.log("Starting service with request ID:", requestId);
+
+      // Get the corresponding accepted service ID
+      const acceptedServiceId = await getAcceptedServiceId(requestId);
+
+      if (!acceptedServiceId) {
+        setError(
+          "Cannot start service: No accepted service found for this request"
+        );
+        return;
+      }
+
+      console.log("Found accepted service ID:", acceptedServiceId);
+
+      // Now use the accepted service ID for OTP generation
+      handleRequestOTP(acceptedServiceId);
+    } catch (error) {
+      console.error("Error starting service:", error);
+      setError("An error occurred when trying to start the service");
+    }
+  };
 
   useEffect(() => {
     fetchAllServiceData();
@@ -182,6 +347,83 @@ const TrackService: React.FC = () => {
     localStorage.removeItem("token");
     setShowLogoutModal(false);
     navigate("/service-needer/login");
+  };
+
+  const handleRequestOTP = async (requestId: string) => {
+    try {
+      setOtpGenerating(true);
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      console.log("Requesting OTP for service:", requestId);
+
+      const response = await fetch(
+        `http://localhost:5000/api/service-requests/start-service/${requestId}/generate-otp`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("OTP Response status:", response.status);
+
+      // If response is not ok, get the error text
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("OTP Error response:", errorText);
+        setError(
+          `Failed to generate OTP: ${response.status} ${response.statusText}`
+        );
+        return;
+      }
+
+      const data = await response.json();
+      console.log("OTP Response data:", data);
+
+      if (data.success) {
+        setGeneratedOTP(data.otp);
+        setOtpExpiry(new Date(data.otpExpiry));
+        setOtpServiceId(requestId);
+        setOtpModalOpen(true);
+
+        // Start countdown timer (10 minutes)
+        setOtpCountdown(10 * 60);
+      } else {
+        setError(data.message || "Failed to generate OTP");
+      }
+    } catch (error) {
+      console.error("Error generating OTP:", error);
+      setError("An error occurred when trying to generate OTP");
+    } finally {
+      setOtpGenerating(false);
+    }
+  };
+
+  // Add a useEffect to handle the OTP countdown timer
+  useEffect(() => {
+    if (!otpModalOpen || otpCountdown <= 0) return;
+
+    const timer = setInterval(() => {
+      setOtpCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [otpModalOpen, otpCountdown]);
+
+  // Format the countdown time
+  const formatCountdown = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const handleViewDetails = (request: ServiceRequest) => {
@@ -321,44 +563,6 @@ const TrackService: React.FC = () => {
     }
   };
 
-  // Add this function to handle starting a service
-  const handleStartService = async (requestId: string) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const response = await fetch(
-        `http://localhost:5000/api/service-requests/${requestId}/start`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.ok) {
-        // Update the service status in UI
-        setServiceRequests(
-          serviceRequests.map((req) =>
-            req._id === requestId ? { ...req, status: "ongoing" } : req
-          )
-        );
-        // If details modal is open and showing this service, update it
-        if (selectedRequest && selectedRequest._id === requestId) {
-          setSelectedRequest({ ...selectedRequest, status: "ongoing" });
-        }
-      } else {
-        const error = await response.json();
-        setError(error.message || "Failed to start service");
-      }
-    } catch (error) {
-      console.error("Error starting service:", error);
-      setError("An error occurred when trying to start the service");
-    }
-  };
-
   // Combine both regular requests and rejected services
   const allServices = [...serviceRequests, ...rejectedServices];
 
@@ -454,158 +658,87 @@ const TrackService: React.FC = () => {
           </div>
         ) : (
           <div className="service-requests-list">
-            {filteredRequests.map((request) => (
-              <div key={request._id} className="service-request-card">
-                <div className="service-header">
-                  <h3>{request.serviceDetails.serviceType}</h3>
-                  {(() => {
-                    const expired = isServiceExpired(request);
-                    const displayStatus = expired ? "expired" : request.status;
-                    const startServiceInfo = canStartService(request);
-
-                    return (
-                      <div className="status-wrapper">
-                        <div
-                          className={`service-status ${getStatusClass(
-                            displayStatus
-                          )}`}
-                        >
-                          {getStatusIcon(displayStatus)}{" "}
-                          {expired ? "Expired" : request.status}
-                        </div>
-
-                        {request.status === "accepted" &&
-                          !isServiceExpired(request) &&
-                          (() => {
-                            const startInfo = canStartService(request);
-                            const currentDate = new Date();
-                            const serviceDate = new Date(
-                              request.serviceDetails.date
-                            );
-                            // Parse start time
-                            const timeParts =
-                              request.serviceDetails.timeFrom.split(" ");
-                            const timeString = timeParts[0];
-                            const period = timeParts[1] || "";
-
-                            let [hours, minutes] = timeString
-                              .split(":")
-                              .map(Number);
-
-                            // Convert to 24-hour format if PM
-                            if (period.toUpperCase() === "PM" && hours < 12)
-                              hours += 12;
-                            if (period.toUpperCase() === "AM" && hours === 12)
-                              hours = 0;
-
-                            // Set the start time on the service date
-                            serviceDate.setHours(hours, minutes, 0, 0);
-
-                            // Calculate time difference in minutes
-                            const timeDiff =
-                              serviceDate.getTime() - currentDate.getTime();
-                            const minutesDiff = Math.floor(
-                              timeDiff / (1000 * 60)
-                            );
-
-                            // Only show button if we're within 30 minutes of start time or earlier
-                            // (don't show button if service should have already started)
-                            if (minutesDiff > 0) {
-                              return (
-                                <div className="start-button-container">
-                                  <button
-                                    className={`header-start-btn ${
-                                      !startInfo.canStart ? "disabled" : ""
-                                    }`}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-
-                                      if (startInfo.canStart) {
-                                        handleStartService(request._id);
-                                      } else if (startInfo.message) {
-                                        // Always toggle tooltip on click, regardless of device type
-                                        if (
-                                          startButtonMessage &&
-                                          startButtonMessage.id === request._id
-                                        ) {
-                                          setStartButtonMessage(null);
-                                        } else {
-                                          setStartButtonMessage({
-                                            id: request._id,
-                                            message: startInfo.message,
-                                          });
-
-                                          setTimeout(() => {
-                                            setStartButtonMessage((prev) =>
-                                              prev && prev.id === request._id
-                                                ? null
-                                                : prev
-                                            );
-                                          }, 5000);
-                                        }
-                                      }
-                                    }}
-                                    // Add data-tooltip attribute with the message for CSS hover tooltip
-                                    data-tooltip={startInfo.message}
-                                  >
-                                    Start
-                                  </button>
-
-                                  {startButtonMessage &&
-                                    startButtonMessage.id === request._id && (
-                                      <div className="start-button-message-tooltip">
-                                        {startButtonMessage.message}
-                                      </div>
-                                    )}
-                                </div>
-                              );
-                            }
-
-                            return null; // Don't show button if past start time
-                          })()}
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                <div className="service-details">
-                  <div className="detail-item">
-                    <FaCalendarCheck className="detail-icon" />
-                    <span>
-                      <strong>Date:</strong>{" "}
-                      {formatDate(request.serviceDetails.date)}
-                    </span>
+            {filteredRequests.map((request) => {
+              const startServiceInfo = canStartService(request);
+              return (
+                <div
+                  key={request._id}
+                  className={`service-request-card ${
+                    request.isRejected ? "rejected" : ""
+                  }`}
+                >
+                  <div className="service-header">
+                    <h3>{request.serviceDetails.serviceType}</h3>
+                    <div
+                      className={`status-badge ${getStatusClass(
+                        request.status
+                      )}`}
+                    >
+                      {getStatusIcon(request.status)} {request.status}
+                    </div>
                   </div>
-                  <div className="detail-item">
-                    <FaClock className="detail-icon" />
-                    <span>
+
+                  <div className="service-info">
+                    <p>
+                      <strong>Service Provider:</strong>{" "}
+                      {request.serviceProvider.name}
+                    </p>
+                    <p>
+                      <strong>Date:</strong> {request.serviceDetails.date}
+                    </p>
+                    <p>
                       <strong>Time:</strong> {request.serviceDetails.timeFrom} -{" "}
                       {request.serviceDetails.timeTo}
-                    </span>
+                    </p>
+                    <p>
+                      <strong>Status:</strong> {request.status}
+                    </p>
                   </div>
-                  <div className="detail-item">
-                    <FaMapMarkerAlt className="detail-icon" />
-                    <span>
-                      <strong>Location:</strong>{" "}
-                      {request.serviceDetails.location}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <FaTools className="detail-icon" />
-                    <span>
-                      <strong>Total Fee:</strong> LKR{" "}
-                      {request.serviceDetails.totalFee.toFixed(2)}
-                    </span>
+
+                  <div className="service-actions">
+                    <button
+                      className="view-details-btn"
+                      onClick={() => handleViewDetails(request)}
+                    >
+                      View Details
+                    </button>
+
+                    {request.status === "accepted" &&
+                      startServiceInfo.canStart && (
+                        <button
+                          className="start-service-btn"
+                          onClick={() => handleStartService(request._id)}
+                          disabled={otpGenerating}
+                        >
+                          {otpGenerating ? "Generating..." : "Start Service"}
+                        </button>
+                      )}
+
+                    {request.status === "accepted" &&
+                      !startServiceInfo.canStart &&
+                      startServiceInfo.message && (
+                        <button
+                          className="start-service-btn disabled"
+                          onClick={() =>
+                            setStartButtonMessage({
+                              id: request._id,
+                              message: startServiceInfo.message || "",
+                            })
+                          }
+                          disabled
+                        >
+                          Start Service
+                          {startButtonMessage?.id === request._id && (
+                            <div className="start-button-message-tooltip">
+                              {startButtonMessage.message}
+                            </div>
+                          )}
+                        </button>
+                      )}
                   </div>
                 </div>
-                <button
-                  className="view-details-btn"
-                  onClick={() => handleViewDetails(request)}
-                >
-                  View Full Details
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -724,6 +857,44 @@ const TrackService: React.FC = () => {
               onClick={() => setShowLogoutModal(false)}
             >
               Cancel
+            </button>
+          </div>
+        </Modal>
+      )}
+      {otpModalOpen && generatedOTP && (
+        <Modal
+          isOpen={otpModalOpen}
+          onRequestClose={() => setOtpModalOpen(false)}
+          className="modal-content otp-modal"
+          overlayClassName="modal-overlay"
+        >
+          <h2>Start Service Verification</h2>
+          <div className="otp-content">
+            <p className="otp-instructions">
+              Share this 4-digit code with your service provider to start the
+              service:
+            </p>
+            <div className="otp-display">
+              {generatedOTP.split("").map((digit, idx) => (
+                <div key={idx} className="otp-digit">
+                  {digit}
+                </div>
+              ))}
+            </div>
+            <p className="otp-expiry">
+              This code expires in: {formatCountdown(otpCountdown)}
+            </p>
+            <p className="otp-note">
+              Note: The service provider must enter this code to start the
+              service.
+            </p>
+          </div>
+          <div className="modal-footer">
+            <button
+              className="modal-close-button"
+              onClick={() => setOtpModalOpen(false)}
+            >
+              Close
             </button>
           </div>
         </Modal>

@@ -622,6 +622,55 @@
   word-wrap: break-word;
 }
 
+.otp-modal {
+  max-width: 400px;
+}
+
+.otp-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.otp-instructions {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.otp-display {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+.otp-digit {
+  width: 50px;
+  height: 60px;
+  margin: 0 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.otp-expiry {
+  margin-top: 15px;
+  color: #d9534f;
+  font-weight: bold;
+}
+
+.otp-note {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+}
+
 @media (max-width: 500px) {
   .start-button-message-tooltip {
     width: 200px;

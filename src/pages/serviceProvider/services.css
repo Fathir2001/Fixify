@@ -284,6 +284,61 @@
     max-width: 90%;
 }
 
+.otp-verify-modal {
+  max-width: 400px;
+}
+
+.otp-verify-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.otp-input-container {
+  margin: 20px 0;
+}
+
+.otp-input {
+  width: 120px;
+  height: 50px;
+  font-size: 24px;
+  text-align: center;
+  letter-spacing: 5px;
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.otp-error {
+  color: #d9534f;
+  margin: 10px 0;
+}
+
+.otp-modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.verify-otp-button {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.verify-otp-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.verify-otp-button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
 @keyframes fadeInOut {
     0% {
         opacity: 0;

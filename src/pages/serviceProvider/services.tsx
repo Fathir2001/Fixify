@@ -1,5 +1,8 @@
+import { io } from "socket.io-client";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Modal from "react-modal";
+Modal.setAppElement("#root");
 import "./services.css";
 
 interface ServiceDetails {
@@ -30,12 +33,15 @@ interface AcceptedService {
 
 const ServiceProviderServices: React.FC = () => {
   const navigate = useNavigate();
-  const [acceptedServices, setAcceptedServices] = useState<AcceptedService[]>(
-    []
-  );
+  const [acceptedServices, setAcceptedServices] = useState<AcceptedService[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  const [otpValue, setOtpValue] = useState("");
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -81,6 +87,93 @@ const ServiceProviderServices: React.FC = () => {
     navigate("/service-provider/dashboard"); // Update this to match your home route
   };
 
+  // function to handle OTP verification
+  const verifyOTP = async () => {
+    if (!selectedServiceId || !otpValue) return;
+
+    try {
+      setVerifying(true);
+      setOtpError(null);
+
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:5000/api/service-requests/start-service/verify-otp",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            serviceId: selectedServiceId,
+            otp: otpValue,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update the UI to show the service has started
+        setAcceptedServices(
+          acceptedServices.map((service) =>
+            service._id === selectedServiceId
+              ? { ...service, status: "ongoing" }
+              : service
+          )
+        );
+        setOtpModalOpen(false);
+        setOtpValue("");
+        setNotification("Service started successfully!");
+      } else {
+        setOtpError(data.message || "Failed to verify OTP");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      setOtpError("Error verifying OTP. Please try again.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  // Add socket connection to listen for OTP generation events
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    // Get user ID from token
+    const tokenParts = token.split(".");
+    if (tokenParts.length !== 3) return;
+
+    try {
+      const payload = JSON.parse(atob(tokenParts[1]));
+      const userId = payload.id;
+
+      const socket = io("http://localhost:5000");
+
+      socket.on("serviceOtpGenerated", (data) => {
+        // Check if this event is for current provider
+        if (data.serviceProviderId === userId) {
+          // Find the service in our list
+          const service = acceptedServices.find(
+            (s) => s._id === data.serviceId
+          );
+          if (service) {
+            setNotification(
+              "A service is ready to be started! Please enter OTP."
+            );
+          }
+        }
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    } catch (error) {
+      console.error("Socket connection error:", error);
+    }
+  }, [acceptedServices]);
+
   // Check if current time is within 30 minutes of the service start time
   const isWithinStartTimeWindow = (date: string, timeFrom: string): boolean => {
     // Create date object for the service start time
@@ -99,19 +192,19 @@ const ServiceProviderServices: React.FC = () => {
       (serviceStartTime.getTime() - currentTime.getTime()) / (1000 * 60);
 
     // Return true if time difference is between 0 and 30 minutes
-    return timeDiff >= 0 && timeDiff <= 30;
+    return timeDiff >= -30 && timeDiff <= 30; // Allow 30 minutes before and after
   };
 
+  // Combined function for handling start service click
   const handleStartServiceClick = (service: AcceptedService) => {
     const { date, timeFrom } = service.serviceDetails;
+    
     if (isWithinStartTimeWindow(date, timeFrom)) {
-      // Handle starting the service (you can replace this with actual implementation)
-      setNotification(`Service started: ${service.serviceDetails.serviceType}`);
-
-      // Clear notification after 3 seconds
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
+      // Open OTP modal for verification
+      setSelectedServiceId(service._id);
+      setOtpValue("");
+      setOtpError(null);
+      setOtpModalOpen(true);
     } else {
       // Get the 30-minute window start time
       const [year, month, day] = service.serviceDetails.date
@@ -133,16 +226,16 @@ const ServiceProviderServices: React.FC = () => {
         `You can only start this service between ${windowStartTime.toLocaleTimeString(
           [],
           { hour: "2-digit", minute: "2-digit" }
-        )} and ${serviceStartTime.toLocaleTimeString([], {
+        )} and ${new Date(serviceStartTime.getTime() + 30 * 60 * 1000).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         })}`
       );
 
-      // Clear notification after 3 seconds
+      // Clear notification after 5 seconds
       setTimeout(() => {
         setNotification(null);
-      }, 3000);
+      }, 5000);
     }
   };
 
@@ -194,7 +287,7 @@ const ServiceProviderServices: React.FC = () => {
                 <div className="sp-service-header-actions">
                   <button
                     className={`sp-start-service-button ${
-                      isWithinStartTimeWindow(
+                      service.status === "accepted" && isWithinStartTimeWindow(
                         service.serviceDetails.date,
                         service.serviceDetails.timeFrom
                       )
@@ -202,6 +295,7 @@ const ServiceProviderServices: React.FC = () => {
                         : "disabled"
                     }`}
                     onClick={() => handleStartServiceClick(service)}
+                    disabled={service.status !== "accepted"}
                   >
                     Start Service
                   </button>
@@ -259,7 +353,7 @@ const ServiceProviderServices: React.FC = () => {
 
               <div className="sp-service-footer">
                 <p>Accepted on: {formatDate(service.acceptedAt)}</p>
-                {service.status === "accepted" && (
+                {service.status === "ongoing" && (
                   <button className="sp-complete-button">
                     Mark as Complete
                   </button>
@@ -268,6 +362,61 @@ const ServiceProviderServices: React.FC = () => {
             </div>
           ))}
         </div>
+      )}
+      {otpModalOpen && (
+        <Modal
+          isOpen={otpModalOpen}
+          onRequestClose={() => {
+            if (!verifying) setOtpModalOpen(false);
+          }}
+          className="modal-content otp-verify-modal"
+          overlayClassName="modal-overlay"
+        >
+          <h2>Enter OTP to Start Service</h2>
+          <div className="otp-verify-content">
+            <p className="otp-instructions">
+              Please ask the service needer for the 4-digit verification code:
+            </p>
+            <div className="otp-input-container">
+              <input
+                type="text"
+                className="otp-input"
+                value={otpValue}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow 4 digits
+                  if (/^\d{0,4}$/.test(value)) {
+                    setOtpValue(value);
+                    setOtpError(null);
+                  }
+                }}
+                placeholder="Enter 4-digit code"
+                maxLength={4}
+              />
+            </div>
+            {otpError && <p className="otp-error">{otpError}</p>}
+            <p className="otp-note">
+              This code was provided to the service needer and is valid for 10
+              minutes.
+            </p>
+          </div>
+          <div className="modal-footer otp-modal-footer">
+            <button
+              className="verify-otp-button"
+              onClick={verifyOTP}
+              disabled={otpValue.length !== 4 || verifying}
+            >
+              {verifying ? "Verifying..." : "Verify & Start Service"}
+            </button>
+            <button
+              className="cancel-button"
+              onClick={() => setOtpModalOpen(false)}
+              disabled={verifying}
+            >
+              Cancel
+            </button>
+          </div>
+        </Modal>
       )}
     </div>
   );

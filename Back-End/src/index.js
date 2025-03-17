@@ -9,9 +9,9 @@ const adminRoutes = require("./routes/adminRoutes");
 const serviceNeederRoutes = require("./routes/serviceNeederRoutes");
 const serviceRequestRoutes = require("./routes/serviceRequestRoutes");
 const authMiddleware = require("./middleware/auth");
-const { createTransport } = require('nodemailer');
-const adminServiceRoutes = require('./routes/adminServiceRoutes');
-
+const { createTransport } = require("nodemailer");
+const adminServiceRoutes = require("./routes/adminServiceRoutes");
+const ConnectedService = require('./models/ConnectedService');
 
 // Load environment variables
 dotenv.config();
@@ -33,13 +33,12 @@ app.use(cors());
 app.use(express.json());
 
 // Make io available in routes
-app.set('io', io);
+app.set("io", io);
 
 // Basic route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to Fixify API" });
 });
-
 
 // API Routes
 app.use("/api/service-providers", requestedServiceProviderRoutes);
@@ -48,7 +47,7 @@ app.use("/api/admin", authMiddleware, adminRoutes);
 app.use("/api/service-needers", serviceNeederRoutes);
 app.use("/api/service-requests", serviceRequestRoutes);
 app.use("/api/service-requests", adminServiceRoutes);
-app.set('io', io);
+app.set("io", io);
 
 // Socket.io connection handler
 io.on("connection", (socket) => {
@@ -56,6 +55,15 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("Client disconnected");
+  });
+
+  // Custom event listeners here if needed
+  socket.on("requestOTP", (data) => {
+    console.log("OTP requested for service:", data.serviceId);
+  });
+
+  socket.on("verifyOTP", (data) => {
+    console.log("OTP verification for service:", data.serviceId);
   });
 });
 
@@ -65,13 +73,12 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     message: "Internal Server Error",
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
 
@@ -79,21 +86,21 @@ app.use((err, req, res, next) => {
 const verifyEmailConfig = async () => {
   try {
     const transporter = createTransport({
-      host: 'smtp.gmail.com',
+      host: "smtp.gmail.com",
       port: 587,
       secure: false,
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
+        pass: process.env.EMAIL_PASS,
+      },
     });
-    
+
     await transporter.verify();
-    console.log('Email configuration verified successfully');
+    console.log("Email configuration verified successfully");
   } catch (error) {
-    console.error('Email configuration error:', {
+    console.error("Email configuration error:", {
       message: error.message,
-      code: error.code
+      code: error.code,
     });
   }
 };
