@@ -33,12 +33,16 @@ interface AcceptedService {
 
 const ServiceProviderServices: React.FC = () => {
   const navigate = useNavigate();
-  const [acceptedServices, setAcceptedServices] = useState<AcceptedService[]>([]);
+  const [acceptedServices, setAcceptedServices] = useState<AcceptedService[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
-  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
+    null
+  );
   const [otpValue, setOtpValue] = useState("");
   const [otpError, setOtpError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
@@ -198,7 +202,7 @@ const ServiceProviderServices: React.FC = () => {
   // Combined function for handling start service click
   const handleStartServiceClick = (service: AcceptedService) => {
     const { date, timeFrom } = service.serviceDetails;
-    
+
     if (isWithinStartTimeWindow(date, timeFrom)) {
       // Open OTP modal for verification
       setSelectedServiceId(service._id);
@@ -226,7 +230,9 @@ const ServiceProviderServices: React.FC = () => {
         `You can only start this service between ${windowStartTime.toLocaleTimeString(
           [],
           { hour: "2-digit", minute: "2-digit" }
-        )} and ${new Date(serviceStartTime.getTime() + 30 * 60 * 1000).toLocaleTimeString([], {
+        )} and ${new Date(
+          serviceStartTime.getTime() + 30 * 60 * 1000
+        ).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         })}`
@@ -287,7 +293,8 @@ const ServiceProviderServices: React.FC = () => {
                 <div className="sp-service-header-actions">
                   <button
                     className={`sp-start-service-button ${
-                      service.status === "accepted" && isWithinStartTimeWindow(
+                      service.status === "accepted" &&
+                      isWithinStartTimeWindow(
                         service.serviceDetails.date,
                         service.serviceDetails.timeFrom
                       )

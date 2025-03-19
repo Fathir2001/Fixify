@@ -152,28 +152,22 @@ const verifyServiceOTP = async (req, res) => {
       "Connected service provider ID:",
       connectedService.serviceProvider.id
     );
-    console.log("Current user ID:", req.user.id);
     console.log(
-      "Provider ID type:",
-      typeof connectedService.serviceProvider.id
+      "Connected service needer ID:",
+      connectedService.serviceNeeder.id
     );
-    console.log("User ID type:", typeof req.user.id);
+    console.log("Current user ID:", req.user.id);
 
-    // Compare the string representations
-    const connectedProviderIdStr =
-      connectedService.serviceProvider.id.toString();
-    const currentUserIdStr = req.user.id.toString();
+    // Check if user is either the service provider or service needer
+    const isServiceProvider =
+      connectedService.serviceProvider.id.toString() === req.user.id.toString();
+    const isServiceNeeder =
+      connectedService.serviceNeeder.id.toString() === req.user.id.toString();
 
-    console.log("Connected provider ID as string:", connectedProviderIdStr);
-    console.log("Current user ID as string:", currentUserIdStr);
-    console.log("IDs match?", connectedProviderIdStr === currentUserIdStr);
-
-    // Check if service provider is authorized
-    if (connectedProviderIdStr !== currentUserIdStr) {
+    // Allow either service provider OR service needer to verify
+    if (!isServiceProvider && !isServiceNeeder) {
       return res.status(403).json({
-        message: "Not authorized to verify this OTP",
-        providerId: connectedProviderIdStr,
-        userId: currentUserIdStr,
+        message: "You are not authorized to verify this OTP",
       });
     }
 
