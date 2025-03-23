@@ -31,12 +31,6 @@ const AdminDashboard: React.FC = () => {
     { id: "customers", icon: FaUsers, label: "Customers", category: "main" },
     { id: "services", icon: FaTools, label: "Services", category: "main" },
     {
-      id: "appointments",
-      icon: FaCalendarAlt,
-      label: "Appointments",
-      category: "main",
-    },
-    {
       id: "ServiceProviders",
       icon: FaUserPlus,
       label: "Service Providers",
