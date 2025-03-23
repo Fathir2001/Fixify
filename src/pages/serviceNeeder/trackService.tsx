@@ -16,6 +16,7 @@ import {
   FaTimesCircle,
   FaSpinner,
 } from "react-icons/fa";
+import { io } from "socket.io-client";
 
 interface ServiceRequest {
   _id: string; // This should be the MongoDB ObjectId as a string
@@ -231,6 +232,56 @@ const TrackService: React.FC = () => {
       setError("An error occurred when trying to start the service");
     }
   };
+
+  // Set up socket connection for real-time service start notification
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    // Get user ID from token
+    const tokenParts = token.split(".");
+    if (tokenParts.length !== 3) return;
+
+    try {
+      const payload = JSON.parse(atob(tokenParts[1]));
+      const userId = payload.id;
+
+      const socket = io("http://localhost:5000");
+
+      socket.on("connect", () => {
+        console.log("Connected to WebSocket for service start notifications");
+      });
+
+      socket.on("serviceStarted", (data) => {
+        console.log("Service started notification received:", data);
+
+        // Only show notification if it's for this user
+        if (data.serviceNeederId === userId) {
+          // Update the service status in the UI
+          setServiceRequests((prev) =>
+            prev.map((req) =>
+              req._id === data.serviceId ? { ...req, status: "ongoing" } : req
+            )
+          );
+
+          // Show notification
+          alert(
+            `Your ${data.serviceDetails.serviceType} service with ${data.serviceDetails.providerName} has started successfully!`
+          );
+        }
+      });
+
+      socket.on("connect_error", (error) => {
+        console.error("Socket connection error:", error);
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    } catch (error) {
+      console.error("Error setting up socket connection:", error);
+    }
+  }, []);
 
   useEffect(() => {
     fetchAllServiceData();

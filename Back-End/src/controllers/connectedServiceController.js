@@ -204,6 +204,10 @@ const verifyServiceOTP = async (req, res) => {
         serviceProviderId: connectedService.serviceProvider.id,
         serviceId: serviceId,
         message: "Service has started successfully",
+        serviceDetails: {
+          serviceType: connectedService.serviceDetails.serviceType,
+          providerName: connectedService.serviceProvider.name,
+        },
       });
     }
 
