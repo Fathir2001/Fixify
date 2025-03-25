@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaArrowLeft, FaEye, FaMapMarkerAlt, FaRegCalendarAlt } from "react-icons/fa";
+import { FaArrowLeft, FaEye, FaMapMarkerAlt, FaRegCalendarAlt, FaSearch, FaFilter } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./services.css";
@@ -12,6 +12,7 @@ interface Service {
     totalFee: number;
     location?: string;
     date?: string;
+    description?: string;
   };
   serviceProvider: {
     name: string;
@@ -38,16 +39,98 @@ interface FormattedService {
   neederName?: string;
   location?: string;
   date?: string;
+  description?: string;
 }
 
-const API_BASE_URL = "http://localhost:5000/api"; // Update with your actual API URL
+interface ServiceDetailsModalProps {
+  service: FormattedService | null;
+  onClose: () => void;
+}
+
+const API_BASE_URL = "http://localhost:5000/api";
+
+// Service Details Modal Component
+const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({ service, onClose }) => {
+  if (!service) return null;
+  
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>{service.name}</h2>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">
+          <div className="detail-row">
+            <span className="detail-label">Status:</span>
+            <span className={`status-badge ${service.status}`}>
+              {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
+            </span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Category:</span>
+            <span>{service.category}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Price:</span>
+            <span className="price-tag">${service.price.toFixed(2)}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Service Provider:</span>
+            <span>{service.providerName}</span>
+          </div>
+          {service.neederName && (
+            <div className="detail-row">
+              <span className="detail-label">Customer:</span>
+              <span>{service.neederName}</span>
+            </div>
+          )}
+          {service.location && (
+            <div className="detail-row">
+              <span className="detail-label"><FaMapMarkerAlt /> Location:</span>
+              <span>{service.location}</span>
+            </div>
+          )}
+          {service.date && (
+            <div className="detail-row">
+              <span className="detail-label"><FaRegCalendarAlt /> Scheduled Date:</span>
+              <span>{service.date}</span>
+            </div>
+          )}
+          <div className="detail-row">
+            <span className="detail-label">Created On:</span>
+            <span>{new Date(service.createdAt).toLocaleString()}</span>
+          </div>
+          {service.description && (
+            <div className="detail-description">
+              <h3>Description</h3>
+              <p>{service.description}</p>
+            </div>
+          )}
+        </div>
+        <div className="modal-footer">
+          <button className="secondary-btn" onClick={onClose}>Close</button>
+          {service.status === "requested" && (
+            <>
+              <button className="approve-btn">Approve Request</button>
+              <button className="reject-btn">Reject Request</button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"requested" | "approved" | "rejected">("requested");
   const [services, setServices] = useState<FormattedService[]>([]);
+  const [filteredServices, setFilteredServices] = useState<FormattedService[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedService, setSelectedService] = useState<FormattedService | null>(null);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -69,12 +152,10 @@ const ServicesPage: React.FC = () => {
             break;
         }
         
-        console.log(`Fetching data from: ${endpoint}`);
         const response = await axios.get(endpoint);
-        console.log("API Response:", response.data);
-        
         const formattedServices = formatServicesData(response.data, activeTab);
         setServices(formattedServices);
+        setFilteredServices(formattedServices);
       } catch (error) {
         console.error("Error fetching services:", error);
         setError("Failed to fetch services. Please try again later.");
@@ -85,6 +166,21 @@ const ServicesPage: React.FC = () => {
 
     fetchServices();
   }, [activeTab]);
+
+  // Effect to filter services based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredServices(services);
+    } else {
+      const filtered = services.filter(
+        service => 
+          service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          service.providerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (service.neederName && service.neederName.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredServices(filtered);
+    }
+  }, [searchTerm, services]);
 
   // Format the data from backend to match our frontend requirements
   const formatServicesData = (
@@ -99,7 +195,7 @@ const ServicesPage: React.FC = () => {
     return data.map((service) => ({
       id: service._id,
       name: service.serviceDetails.serviceType,
-      category: service.serviceDetails.serviceType.split(" ")[0], // Using first word as category
+      category: service.serviceDetails.serviceType.split(" ")[0],
       price: service.serviceDetails.totalFee,
       status: status,
       createdAt: service.createdAt ? new Date(service.createdAt).toISOString().split("T")[0] : 
@@ -107,8 +203,17 @@ const ServicesPage: React.FC = () => {
       providerName: service.serviceProvider.name,
       neederName: service.serviceNeeder?.name,
       location: service.serviceDetails.location,
-      date: service.serviceDetails.date
+      date: service.serviceDetails.date,
+      description: service.serviceDetails.description
     }));
+  };
+
+  const handleViewDetails = (service: FormattedService) => {
+    setSelectedService(service);
+  };
+
+  const closeModal = () => {
+    setSelectedService(null);
   };
 
   return (
@@ -119,6 +224,12 @@ const ServicesPage: React.FC = () => {
             <FaArrowLeft />
           </button>
           <h1>Service Management</h1>
+        </div>
+        <div className="services-summary">
+          <div className="summary-item">
+            <span className="summary-value">{services.length}</span>
+            <span className="summary-label">{activeTab} Services</span>
+          </div>
         </div>
       </header>
 
@@ -143,17 +254,36 @@ const ServicesPage: React.FC = () => {
             Rejected
           </button>
         </div>
+        
+        <div className="search-filter-container">
+          <div className="search-box">
+            <FaSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by service or provider name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
       {loading ? (
-        <div className="loading-1">Loading services...</div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading services...</p>
+        </div>
       ) : error ? (
         <div className="error-message">{error}</div>
-      ) : services.length === 0 ? (
-        <div className="no-services-1">No {activeTab} services found.</div>
+      ) : filteredServices.length === 0 ? (
+        <div className="no-services-1">
+          {searchTerm ? 
+            `No results found for "${searchTerm}". Try a different search term.` : 
+            `No ${activeTab} services found.`}
+        </div>
       ) : (
         <div className="services-grid">
-          {services.map((service) => (
+          {filteredServices.map((service) => (
             <div key={service.id} className="service-card">
               <div className="service-header">
                 <h3>{service.name}</h3>
@@ -200,13 +330,21 @@ const ServicesPage: React.FC = () => {
               </div>
               
               <div className="action-buttons">
-                <button className="view-btn">
+                <button className="view-btn" onClick={() => handleViewDetails(service)}>
                   <FaEye /> View Details
                 </button>
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {/* Service Details Modal */}
+      {selectedService && (
+        <ServiceDetailsModal 
+          service={selectedService}
+          onClose={closeModal}
+        />
       )}
     </div>
   );
