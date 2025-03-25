@@ -182,81 +182,87 @@ const ServiceProviders: React.FC = () => {
         </div>
       </div>
 
-      <div className="requests-grid">
-        {filteredRequests.map((request) => (
-          <div key={request._id} className="request-card">
-            <div className="request-header">
-              <h3>{request.fullName}</h3>
-              <span className={`status-badge ${request.status}`}>
-                {request.status === "pending" && (
-                  <FaSpinner className="spinning" />
-                )}
-                {request.status.charAt(0).toUpperCase() +
-                  request.status.slice(1)}
-              </span>
-            </div>
-            <div className="request-details">
-              <p>
-                <strong>Email:</strong> {request.email}
-              </p>
-              <p>
-                <strong>Phone:</strong> {request.phoneNumber}
-              </p>
-              <p>
-                <strong>Services:</strong> {request.serviceType.join(", ")}
-              </p>
-              <p>
-                <strong>Service Fee:</strong> LKR {request.serviceFee}/hr
-              </p>
-              <p>
-                <strong>Experience:</strong> {request.experience}
-              </p>
-              <p>
-                <strong>Service Area:</strong> {request.serviceArea}
-              </p>
-              <p>
-                <strong>Available Days:</strong>{" "}
-                {request.availableDays.join(", ")}
-              </p>
-              <p>
-                <strong>Hours:</strong> {request.timeFrom} - {request.timeTo}
-              </p>
-              <p>
-                <strong>Date Applied:</strong>{" "}
-                {new Date(request.createdAt).toLocaleDateString()}
-              </p>
-              {request.approvedAt && (
-                <p>
-                  <strong>Date Approved:</strong>{" "}
-                  {new Date(request.approvedAt).toLocaleDateString()}
-                </p>
-              )}
-              {request.rejectedAt && (
-                <p>
-                  <strong>Date Rejected:</strong>{" "}
-                  {new Date(request.rejectedAt).toLocaleDateString()}
-                </p>
-              )}
-            </div>
-            {request.status === "pending" && (
-              <div className="action-buttons">
-                <button
-                  className="approve-btn"
-                  onClick={() => handleStatusChange(request._id, "approved")}
-                >
-                  <FaCheck /> Approve
-                </button>
-                <button
-                  className="reject-btn"
-                  onClick={() => handleStatusChange(request._id, "rejected")}
-                >
-                  <FaTimes /> Reject
-                </button>
+      {filteredRequests.length > 0 ? (
+        <div className="requests-grid">
+          {filteredRequests.map((request) => (
+            <div key={request._id} className="request-card">
+              <div className="request-header">
+                <h3>{request.fullName}</h3>
+                <span className={`status-badge ${request.status}`}>
+                  {request.status === "pending" && (
+                    <FaSpinner className="spinning" />
+                  )}
+                  {request.status.charAt(0).toUpperCase() +
+                    request.status.slice(1)}
+                </span>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+              <div className="request-details">
+                <p>
+                  <strong>Email:</strong> {request.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {request.phoneNumber}
+                </p>
+                <p>
+                  <strong>Services:</strong> {request.serviceType.join(", ")}
+                </p>
+                <p>
+                  <strong>Service Fee:</strong> LKR {request.serviceFee}/hr
+                </p>
+                <p>
+                  <strong>Experience:</strong> {request.experience}
+                </p>
+                <p>
+                  <strong>Service Area:</strong> {request.serviceArea}
+                </p>
+                <p>
+                  <strong>Available Days:</strong>{" "}
+                  {request.availableDays.join(", ")}
+                </p>
+                <p>
+                  <strong>Hours:</strong> {request.timeFrom} - {request.timeTo}
+                </p>
+                <p>
+                  <strong>Date Applied:</strong>{" "}
+                  {new Date(request.createdAt).toLocaleDateString()}
+                </p>
+                {request.approvedAt && (
+                  <p>
+                    <strong>Date Approved:</strong>{" "}
+                    {new Date(request.approvedAt).toLocaleDateString()}
+                  </p>
+                )}
+                {request.rejectedAt && (
+                  <p>
+                    <strong>Date Rejected:</strong>{" "}
+                    {new Date(request.rejectedAt).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+              {request.status === "pending" && (
+                <div className="action-buttons">
+                  <button
+                    className="approve-btn"
+                    onClick={() => handleStatusChange(request._id, "approved")}
+                  >
+                    <FaCheck /> Approve
+                  </button>
+                  <button
+                    className="reject-btn"
+                    onClick={() => handleStatusChange(request._id, "rejected")}
+                  >
+                    <FaTimes /> Reject
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="no-data-message">
+          <p>No {filter} service providers found.</p>
+        </div>
+      )}
     </div>
   );
 };
