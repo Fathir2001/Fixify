@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { FaArrowLeft, FaEye, FaMapMarkerAlt, FaRegCalendarAlt, FaSearch, FaFilter } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaEye,
+  FaMapMarkerAlt,
+  FaRegCalendarAlt,
+  FaSearch,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./services.css";
@@ -50,15 +56,20 @@ interface ServiceDetailsModalProps {
 const API_BASE_URL = "http://localhost:5000/api";
 
 // Service Details Modal Component
-const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({ service, onClose }) => {
+const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
+  service,
+  onClose,
+}) => {
   if (!service) return null;
-  
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{service.name}</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
         </div>
         <div className="modal-body">
           <div className="detail-row">
@@ -87,13 +98,17 @@ const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({ service, onCl
           )}
           {service.location && (
             <div className="detail-row">
-              <span className="detail-label"><FaMapMarkerAlt /> Location:</span>
+              <span className="detail-label">
+                <FaMapMarkerAlt /> Location:
+              </span>
               <span>{service.location}</span>
             </div>
           )}
           {service.date && (
             <div className="detail-row">
-              <span className="detail-label"><FaRegCalendarAlt /> Scheduled Date:</span>
+              <span className="detail-label">
+                <FaRegCalendarAlt /> Scheduled Date:
+              </span>
               <span>{service.date}</span>
             </div>
           )}
@@ -109,7 +124,9 @@ const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({ service, onCl
           )}
         </div>
         <div className="modal-footer">
-          <button className="secondary-btn" onClick={onClose}>Close</button>
+          <button className="secondary-btn" onClick={onClose}>
+            Close
+          </button>
           {service.status === "requested" && (
             <>
               <button className="approve-btn">Approve Request</button>
@@ -124,13 +141,18 @@ const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({ service, onCl
 
 const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"requested" | "approved" | "rejected">("requested");
+  const [activeTab, setActiveTab] = useState<
+    "requested" | "approved" | "rejected"
+  >("requested");
   const [services, setServices] = useState<FormattedService[]>([]);
-  const [filteredServices, setFilteredServices] = useState<FormattedService[]>([]);
+  const [filteredServices, setFilteredServices] = useState<FormattedService[]>(
+    []
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedService, setSelectedService] = useState<FormattedService | null>(null);
+  const [selectedService, setSelectedService] =
+    useState<FormattedService | null>(null);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -138,9 +160,9 @@ const ServicesPage: React.FC = () => {
       setError(null);
       try {
         let endpoint = "";
-        
+
         // Select the appropriate endpoint based on active tab
-        switch(activeTab) {
+        switch (activeTab) {
           case "requested":
             endpoint = `${API_BASE_URL}/service-requests`;
             break;
@@ -151,9 +173,11 @@ const ServicesPage: React.FC = () => {
             endpoint = `${API_BASE_URL}/service-requests/rejected`;
             break;
         }
-        
+
         const response = await axios.get(endpoint);
+        console.log("Raw service data:", response.data);
         const formattedServices = formatServicesData(response.data, activeTab);
+        console.log("Formatted services:", formattedServices);
         setServices(formattedServices);
         setFilteredServices(formattedServices);
       } catch (error) {
@@ -171,40 +195,47 @@ const ServicesPage: React.FC = () => {
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredServices(services);
+      console.log("Showing all services:", services.length);
     } else {
+      const searchTermLower = searchTerm.toLowerCase();
       const filtered = services.filter(
-        service => 
-          service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          service.providerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (service.neederName && service.neederName.toLowerCase().includes(searchTerm.toLowerCase()))
+        (service) =>
+          service.name.toLowerCase().includes(searchTermLower) ||
+          service.providerName.toLowerCase().includes(searchTermLower) ||
+          (service.neederName &&
+            service.neederName.toLowerCase().includes(searchTermLower))
       );
+      console.log(`Filtered services for "${searchTerm}":`, filtered.length);
       setFilteredServices(filtered);
     }
   }, [searchTerm, services]);
 
   // Format the data from backend to match our frontend requirements
   const formatServicesData = (
-    data: Service[], 
+    data: Service[],
     status: "requested" | "approved" | "rejected"
   ): FormattedService[] => {
     if (!Array.isArray(data)) {
       console.error("Expected array but received:", data);
       return [];
     }
-    
+
     return data.map((service) => ({
       id: service._id,
       name: service.serviceDetails.serviceType,
       category: service.serviceDetails.serviceType.split(" ")[0],
       price: service.serviceDetails.totalFee,
       status: status,
-      createdAt: service.createdAt ? new Date(service.createdAt).toISOString().split("T")[0] : 
-                (service.acceptedAt ? new Date(service.acceptedAt).toISOString().split("T")[0] : "N/A"),
+      createdAt: service.createdAt
+        ? new Date(service.createdAt).toISOString().split("T")[0]
+        : service.acceptedAt
+        ? new Date(service.acceptedAt).toISOString().split("T")[0]
+        : "N/A",
       providerName: service.serviceProvider.name,
       neederName: service.serviceNeeder?.name,
       location: service.serviceDetails.location,
       date: service.serviceDetails.date,
-      description: service.serviceDetails.description
+      description: service.serviceDetails.description,
     }));
   };
 
@@ -216,11 +247,26 @@ const ServicesPage: React.FC = () => {
     setSelectedService(null);
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    console.log("Search term updated:", value);
+  };
+
   return (
-    <div className="services-container-1">
+    <div
+      className={`services-container-1 ${
+        filteredServices.length === 0 && !loading && !error
+          ? "empty-background"
+          : ""
+      }`}
+    >
       <header className="services-header-1">
         <div className="header-left-1">
-          <button className="back-button-1" onClick={() => navigate("/admin/dashboard")}>
+          <button
+            className="back-button-1"
+            onClick={() => navigate("/admin/dashboard")}
+          >
             <FaArrowLeft />
           </button>
           <h1>Service Management</h1>
@@ -235,26 +281,26 @@ const ServicesPage: React.FC = () => {
 
       <div className="controls-section">
         <div className="tabs-1">
-          <button 
-            className={`tab-1 ${activeTab === "requested" ? "active" : ""}`} 
+          <button
+            className={`tab-1 ${activeTab === "requested" ? "active" : ""}`}
             onClick={() => setActiveTab("requested")}
           >
             Requested
           </button>
-          <button 
-            className={`tab-1 ${activeTab === "approved" ? "active" : ""}`} 
+          <button
+            className={`tab-1 ${activeTab === "approved" ? "active" : ""}`}
             onClick={() => setActiveTab("approved")}
           >
             Approved
           </button>
-          <button 
-            className={`tab-1 ${activeTab === "rejected" ? "active" : ""}`} 
+          <button
+            className={`tab-1 ${activeTab === "rejected" ? "active" : ""}`}
             onClick={() => setActiveTab("rejected")}
           >
             Rejected
           </button>
         </div>
-        
+
         <div className="search-filter-container">
           <div className="search-box">
             <FaSearch className="search-icon" />
@@ -262,7 +308,8 @@ const ServicesPage: React.FC = () => {
               type="text"
               placeholder="Search by service or provider name..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
         </div>
@@ -277,9 +324,25 @@ const ServicesPage: React.FC = () => {
         <div className="error-message">{error}</div>
       ) : filteredServices.length === 0 ? (
         <div className="no-services-1">
-          {searchTerm ? 
-            `No results found for "${searchTerm}". Try a different search term.` : 
-            `No ${activeTab} services found.`}
+          {searchTerm ? (
+            <>
+              <p>
+                No results found for <strong>"{searchTerm}"</strong>
+              </p>
+              <p>
+                Try a different search term or clear the search to see all{" "}
+                {activeTab} services.
+              </p>
+              <button
+                onClick={() => setSearchTerm("")}
+                className="clear-search-btn"
+              >
+                Clear Search
+              </button>
+            </>
+          ) : (
+            `No ${activeTab} services found.`
+          )}
         </div>
       ) : (
         <div className="services-grid">
@@ -289,7 +352,7 @@ const ServicesPage: React.FC = () => {
                 <h3>{service.name}</h3>
                 <span className="service-category">{service.category}</span>
               </div>
-              
+
               <div className="service-details">
                 <p>
                   <span className="label">Provider</span>
@@ -303,34 +366,46 @@ const ServicesPage: React.FC = () => {
                 )}
                 <p>
                   <span className="label">Price</span>
-                  <span className="value price-tag">${service.price.toFixed(2)}</span>
+                  <span className="value price-tag">
+                    ${service.price.toFixed(2)}
+                  </span>
                 </p>
                 {service.location && (
                   <p>
-                    <span className="label"><FaMapMarkerAlt /> Location</span>
+                    <span className="label">
+                      <FaMapMarkerAlt /> Location
+                    </span>
                     <span className="value">{service.location}</span>
                   </p>
                 )}
                 {service.date && (
                   <p>
-                    <span className="label"><FaRegCalendarAlt /> Date</span>
+                    <span className="label">
+                      <FaRegCalendarAlt /> Date
+                    </span>
                     <span className="value">{service.date}</span>
                   </p>
                 )}
                 <p>
                   <span className="label">Created</span>
-                  <span className="value">{new Date(service.createdAt).toLocaleDateString()}</span>
+                  <span className="value">
+                    {new Date(service.createdAt).toLocaleDateString()}
+                  </span>
                 </p>
                 <p>
                   <span className="label">Status</span>
                   <span className={`status-badge ${service.status}`}>
-                    {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
+                    {service.status.charAt(0).toUpperCase() +
+                      service.status.slice(1)}
                   </span>
                 </p>
               </div>
-              
+
               <div className="action-buttons">
-                <button className="view-btn" onClick={() => handleViewDetails(service)}>
+                <button
+                  className="view-btn"
+                  onClick={() => handleViewDetails(service)}
+                >
                   <FaEye /> View Details
                 </button>
               </div>
@@ -341,10 +416,7 @@ const ServicesPage: React.FC = () => {
 
       {/* Service Details Modal */}
       {selectedService && (
-        <ServiceDetailsModal 
-          service={selectedService}
-          onClose={closeModal}
-        />
+        <ServiceDetailsModal service={selectedService} onClose={closeModal} />
       )}
     </div>
   );

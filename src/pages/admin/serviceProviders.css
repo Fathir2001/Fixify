@@ -123,6 +123,7 @@
 }
 
 .search-box input {
+    color: #000000;
     width: 100%;
     padding: 0.65rem 1rem 0.65rem 2.5rem;
     border-radius: 6px;
