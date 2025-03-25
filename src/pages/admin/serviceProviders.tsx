@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaCheck, FaTimes, FaSpinner } from "react-icons/fa";
+import { FaCheck, FaTimes, FaSpinner, FaArrowLeft, FaSearch, FaUserCog } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./serviceProviders.css";
 
@@ -21,21 +22,121 @@ interface ProviderRequest {
   serviceFee: number;
 }
 
+interface ProviderDetailsModalProps {
+  provider: ProviderRequest | null;
+  onClose: () => void;
+  onStatusChange?: (providerId: string, status: "approved" | "rejected") => Promise<void>;
+}
+
+const ProviderDetailsModal: React.FC<ProviderDetailsModalProps> = ({ 
+  provider, 
+  onClose, 
+  onStatusChange 
+}) => {
+  if (!provider) return null;
+  
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="header-with-icon">
+            <FaUserCog />
+            <h2>{provider.fullName}</h2>
+          </div>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">
+          <div className="detail-row">
+            <span className="detail-label">Status:</span>
+            <span className={`status-badge ${provider.status}`}>
+              {provider.status === "pending" && <FaSpinner className="spinning" />}
+              {provider.status.charAt(0).toUpperCase() + provider.status.slice(1)}
+            </span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Email:</span>
+            <span>{provider.email}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Phone:</span>
+            <span>{provider.phoneNumber}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Service Fee:</span>
+            <span className="price-tag">LKR {provider.serviceFee}/hr</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Services Offered:</span>
+            <span>{provider.serviceType.join(", ")}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Service Area:</span>
+            <span>{provider.serviceArea}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Experience:</span>
+            <span>{provider.experience}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Availability:</span>
+            <span>{provider.availableDays.join(", ")}, {provider.timeFrom} - {provider.timeTo}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Application Date:</span>
+            <span>{new Date(provider.createdAt).toLocaleDateString()}</span>
+          </div>
+          {provider.approvedAt && (
+            <div className="detail-row">
+              <span className="detail-label">Date Approved:</span>
+              <span>{new Date(provider.approvedAt).toLocaleDateString()}</span>
+            </div>
+          )}
+          {provider.rejectedAt && (
+            <div className="detail-row">
+              <span className="detail-label">Date Rejected:</span>
+              <span>{new Date(provider.rejectedAt).toLocaleDateString()}</span>
+            </div>
+          )}
+        </div>
+        <div className="modal-footer">
+          <button className="secondary-btn" onClick={onClose}>Close</button>
+          {provider.status === "pending" && onStatusChange && (
+            <>
+              <button 
+                className="approve-btn" 
+                onClick={() => onStatusChange(provider._id, "approved")}
+              >
+                <FaCheck /> Approve Provider
+              </button>
+              <button 
+                className="reject-btn" 
+                onClick={() => onStatusChange(provider._id, "rejected")}
+              >
+                <FaTimes /> Reject Provider
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ServiceProviders: React.FC = () => {
+  const navigate = useNavigate();
   const [pendingRequests, setPendingRequests] = useState<ProviderRequest[]>([]);
-  const [approvedProviders, setApprovedProviders] = useState<ProviderRequest[]>(
-    []
-  );
-  const [rejectedProviders, setRejectedProviders] = useState<ProviderRequest[]>(
-    []
-  );
+  const [approvedProviders, setApprovedProviders] = useState<ProviderRequest[]>([]);
+  const [rejectedProviders, setRejectedProviders] = useState<ProviderRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState("pending");
+  const [filter, setFilter] = useState<"pending" | "approved" | "rejected">("pending");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProvider, setSelectedProvider] = useState<ProviderRequest | null>(null);
 
   useEffect(() => {
     const fetchProviders = async () => {
       try {
+        setLoading(true);
         const [pendingResponse, approvedResponse, rejectedResponse] =
           await Promise.all([
             axios.get("http://localhost:5000/api/service-providers/all"),
@@ -64,13 +165,14 @@ const ServiceProviders: React.FC = () => {
           }))
         );
 
-        setLoading(false);
+        setError(null);
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error
             ? err.message
             : "Failed to fetch service providers";
         setError(errorMessage);
+      } finally {
         setLoading(false);
       }
     };
@@ -104,6 +206,11 @@ const ServiceProviders: React.FC = () => {
             ...providers,
           ]);
         }
+        
+        // Close modal if the current selected provider is the one being approved
+        if (selectedProvider && selectedProvider._id === requestId) {
+          setSelectedProvider(null);
+        }
 
         alert("Service provider approved successfully!");
       } else {
@@ -127,6 +234,11 @@ const ServiceProviders: React.FC = () => {
             ...providers,
           ]);
         }
+        
+        // Close modal if the current selected provider is the one being rejected
+        if (selectedProvider && selectedProvider._id === requestId) {
+          setSelectedProvider(null);
+        }
 
         alert("Service provider rejected successfully!");
       }
@@ -140,7 +252,7 @@ const ServiceProviders: React.FC = () => {
     }
   };
 
-  const getFilteredRequests = () => {
+  const getProviders = () => {
     switch (filter) {
       case "approved":
         return approvedProviders;
@@ -152,13 +264,39 @@ const ServiceProviders: React.FC = () => {
     }
   };
 
-  const filteredRequests = getFilteredRequests();
+  const filteredProviders = getProviders().filter(provider => 
+    provider.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    provider.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    provider.serviceType.some(service => 
+      service.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
 
-  if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
+  const handleViewDetails = (provider: ProviderRequest) => {
+    setSelectedProvider(provider);
+  };
+
+  const closeModal = () => {
+    setSelectedProvider(null);
+  };
 
   return (
     <div className="provider-reqs-container">
+      <header className="providers-header">
+        <div className="header-left">
+          <button className="back-button" onClick={() => navigate("/admin/dashboard")}>
+            <FaArrowLeft />
+          </button>
+          <h1>Service Provider Management</h1>
+        </div>
+        <div className="providers-summary">
+          <div className="summary-item">
+            <span className="summary-value">{getProviders().length}</span>
+            <span className="summary-label">{filter} Providers</span>
+          </div>
+        </div>
+      </header>
+
       <div className="controls-section">
         <div className="filter-buttons">
           <button
@@ -180,88 +318,102 @@ const ServiceProviders: React.FC = () => {
             Rejected
           </button>
         </div>
+        
+        <div className="search-filter-container">
+          <div className="search-box">
+            <FaSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by name, email or service..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
-      {filteredRequests.length > 0 ? (
+      {loading ? (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading service providers...</p>
+        </div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : filteredProviders.length === 0 ? (
+        <div className="no-data-message">
+          {searchTerm ? 
+            `No results found for "${searchTerm}". Try a different search term.` : 
+            `No ${filter} service providers found.`}
+        </div>
+      ) : (
         <div className="requests-grid">
-          {filteredRequests.map((request) => (
-            <div key={request._id} className="request-card">
+          {filteredProviders.map((provider) => (
+            <div key={provider._id} className="request-card">
               <div className="request-header">
-                <h3>{request.fullName}</h3>
-                <span className={`status-badge ${request.status}`}>
-                  {request.status === "pending" && (
-                    <FaSpinner className="spinning" />
-                  )}
-                  {request.status.charAt(0).toUpperCase() +
-                    request.status.slice(1)}
+                <h3>{provider.fullName}</h3>
+                <span className={`status-badge ${provider.status}`}>
+                  {provider.status === "pending" && <FaSpinner className="spinning" />}
+                  {provider.status.charAt(0).toUpperCase() + provider.status.slice(1)}
                 </span>
               </div>
               <div className="request-details">
                 <p>
-                  <strong>Email:</strong> {request.email}
+                  <span className="label">Email:</span>
+                  <span className="value">{provider.email}</span>
                 </p>
                 <p>
-                  <strong>Phone:</strong> {request.phoneNumber}
+                  <span className="label">Services:</span>
+                  <span className="value">{provider.serviceType.join(", ")}</span>
                 </p>
                 <p>
-                  <strong>Services:</strong> {request.serviceType.join(", ")}
+                  <span className="label">Service Fee:</span>
+                  <span className="value price-tag">LKR {provider.serviceFee}/hr</span>
                 </p>
                 <p>
-                  <strong>Service Fee:</strong> LKR {request.serviceFee}/hr
+                  <span className="label">Area:</span>
+                  <span className="value">{provider.serviceArea}</span>
                 </p>
                 <p>
-                  <strong>Experience:</strong> {request.experience}
+                  <span className="label">Application Date:</span>
+                  <span className="value">{new Date(provider.createdAt).toLocaleDateString()}</span>
                 </p>
-                <p>
-                  <strong>Service Area:</strong> {request.serviceArea}
-                </p>
-                <p>
-                  <strong>Available Days:</strong>{" "}
-                  {request.availableDays.join(", ")}
-                </p>
-                <p>
-                  <strong>Hours:</strong> {request.timeFrom} - {request.timeTo}
-                </p>
-                <p>
-                  <strong>Date Applied:</strong>{" "}
-                  {new Date(request.createdAt).toLocaleDateString()}
-                </p>
-                {request.approvedAt && (
-                  <p>
-                    <strong>Date Approved:</strong>{" "}
-                    {new Date(request.approvedAt).toLocaleDateString()}
-                  </p>
-                )}
-                {request.rejectedAt && (
-                  <p>
-                    <strong>Date Rejected:</strong>{" "}
-                    {new Date(request.rejectedAt).toLocaleDateString()}
-                  </p>
+              </div>
+              <div className="card-footer">
+                <button 
+                  className="view-details-btn" 
+                  onClick={() => handleViewDetails(provider)}
+                >
+                  View Details
+                </button>
+                {provider.status === "pending" && (
+                  <div className="action-buttons">
+                    <button
+                      className="approve-btn"
+                      onClick={() => handleStatusChange(provider._id, "approved")}
+                    >
+                      <FaCheck /> Approve
+                    </button>
+                    <button
+                      className="reject-btn"
+                      onClick={() => handleStatusChange(provider._id, "rejected")}
+                    >
+                      <FaTimes /> Reject
+                    </button>
+                  </div>
                 )}
               </div>
-              {request.status === "pending" && (
-                <div className="action-buttons">
-                  <button
-                    className="approve-btn"
-                    onClick={() => handleStatusChange(request._id, "approved")}
-                  >
-                    <FaCheck /> Approve
-                  </button>
-                  <button
-                    className="reject-btn"
-                    onClick={() => handleStatusChange(request._id, "rejected")}
-                  >
-                    <FaTimes /> Reject
-                  </button>
-                </div>
-              )}
             </div>
           ))}
         </div>
-      ) : (
-        <div className="no-data-message">
-          <p>No {filter} service providers found.</p>
-        </div>
+      )}
+
+      {/* Provider Details Modal */}
+      {selectedProvider && (
+        <ProviderDetailsModal
+          provider={selectedProvider}
+          onClose={closeModal}
+          onStatusChange={selectedProvider.status === "pending" ? handleStatusChange : undefined}
+        />
       )}
     </div>
   );
