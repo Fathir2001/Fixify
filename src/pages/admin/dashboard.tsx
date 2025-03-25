@@ -61,15 +61,17 @@ const AdminDashboard: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-    const handleMenuClick = (itemId: string) => {
+  const handleMenuClick = (itemId: string) => {
     setSelectedSection(itemId);
     if (itemId === "ServiceProviders") {
       navigate("/admin/service-provider");
     } else if (itemId === "services") {
       navigate("/admin/services");
+    } else if (itemId === "customers") {
+      navigate("/admin/customers");
     }
   };
-
+  
   return (
     <div className="dashboard-container">
       <nav className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>

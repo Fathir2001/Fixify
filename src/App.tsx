@@ -18,6 +18,7 @@ import ForgotPasswordSP from './pages/serviceProvider/forgotPasswordSP';
 import ServicesPage from './pages/admin/services';
 import TrackService from './pages/serviceNeeder/trackService';
 import ServiceProviderServices from './pages/serviceProvider/services';
+import CustomersPage from './pages/admin/customers';
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
         <Route path="/admin/services" element={<ServicesPage />} />
         <Route path="/service-needer/track-service" element={<TrackService />} />
         <Route path="/service-provider/services" element={<ServiceProviderServices />} />
+        <Route path="/admin/customers" element={<CustomersPage />} />
       </Routes>
     </Router>
   );
