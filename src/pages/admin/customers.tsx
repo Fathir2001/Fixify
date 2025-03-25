@@ -29,6 +29,9 @@ interface ServiceProvider {
   phoneNumber: string;
   serviceArea: string;
   serviceType: string[];
+  availableDays: string[];
+  timeFrom: string;
+  timeTo: string;
   approvedAt: string;
   experience: string;
   serviceFee: number;
@@ -50,6 +53,9 @@ interface Customer {
   serviceType?: string[];
   experience?: string;
   serviceFee?: number;
+  availableDays?: string[];
+  timeFrom?: string;
+  timeTo?: string;
 }
 
 interface CustomerDetailsModalProps {
@@ -138,6 +144,16 @@ const CustomerDetailsModal: React.FC<CustomerDetailsModalProps> = ({
                 <span>{customer.serviceType?.join(", ")}</span>
               </div>
               <div className="detail-row">
+                <span className="detail-label">Available Days:</span>
+                <span>{customer.availableDays?.join(", ")}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Working Hours:</span>
+                <span>
+                  {customer.timeFrom} - {customer.timeTo}
+                </span>
+              </div>
+              <div className="detail-row">
                 <span className="detail-label">Experience:</span>
                 <span>{customer.experience}</span>
               </div>
@@ -191,45 +207,50 @@ const CustomersPage: React.FC = () => {
       setError(null);
       try {
         let endpoint = "";
+        let transformedData: Customer[] = [];
 
         if (activeTab === "service-needer") {
-          // Update endpoint to match your backend route
-          // Your serviceNeederRoutes.js doesn't have an /all endpoint
-          endpoint = `${API_BASE_URL}/service-needer`;
+          // Updated to use the correct backend route
+          endpoint = `${API_BASE_URL}/service-needers/all`;
+
+          const response = await axios.get(endpoint);
+
+          // Transform the service needer data
+          transformedData = response.data.map((item: ServiceNeeder) => ({
+            _id: item._id,
+            name: item.name,
+            email: item.email,
+            phone: item.phoneNumber,
+            registeredDate: item.createdAt,
+            type: "service-needer" as const,
+            status: "active", // Assuming all service needers are active
+            servicesRequested: item.servicesRequested || 0,
+          }));
         } else {
-          // Your backend has this endpoint in requestedServiceProvider.js
-          endpoint = `${API_BASE_URL}/service-provider/approved`;
+          // Fixed endpoint to match your backend route structure
+          endpoint = `${API_BASE_URL}/service-providers/approved`;
+
+          const response = await axios.get(endpoint);
+
+          // Transform the service provider data
+          transformedData = response.data.map((item: ServiceProvider) => ({
+            _id: item._id,
+            name: item.fullName,
+            email: item.email,
+            phone: item.phoneNumber,
+            location: item.serviceArea,
+            registeredDate: item.approvedAt,
+            type: "service-provider" as const,
+            status: "active", // These are approved providers
+            servicesProvided: item.servicesProvided || 0,
+            serviceType: item.serviceType,
+            availableDays: item.availableDays,
+            timeFrom: item.timeFrom,
+            timeTo: item.timeTo,
+            experience: item.experience,
+            serviceFee: item.serviceFee,
+          }));
         }
-
-        const response = await axios.get(endpoint);
-
-        // Transform the data to fit the Customer interface
-        const transformedData =
-          activeTab === "service-needer"
-            ? response.data.map((item: ServiceNeeder) => ({
-                _id: item._id,
-                name: item.name,
-                email: item.email,
-                phone: item.phoneNumber,
-                registeredDate: item.createdAt,
-                type: "service-needer",
-                status: "active", // Assuming all service needers are active
-                servicesRequested: item.servicesRequested || 0,
-              }))
-            : response.data.map((item: ServiceProvider) => ({
-                _id: item._id,
-                name: item.fullName,
-                email: item.email,
-                phone: item.phoneNumber,
-                location: item.serviceArea,
-                registeredDate: item.approvedAt,
-                type: "service-provider",
-                status: "active", // These are approved providers
-                servicesProvided: item.servicesProvided || 0,
-                serviceType: item.serviceType,
-                experience: item.experience,
-                serviceFee: item.serviceFee,
-              }));
 
         setCustomers(transformedData);
         setFilteredCustomers(transformedData);
@@ -248,6 +269,7 @@ const CustomersPage: React.FC = () => {
     fetchCustomers();
   }, [activeTab]);
 
+  
   // Effect to filter customers based on search term
   useEffect(() => {
     if (searchTerm.trim() === "") {

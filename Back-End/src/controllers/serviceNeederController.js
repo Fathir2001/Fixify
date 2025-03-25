@@ -219,9 +219,23 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const getAllServiceNeeders = async (req, res) => {
+  try {
+    const serviceNeeders = await ServiceNeeder.find({})
+      .select("-password")
+      .sort({ createdAt: -1 });
+    
+    res.status(200).json(serviceNeeders);
+  } catch (error) {
+    console.error("Error fetching service needers:", error);
+    res.status(500).json({ message: "Server error while fetching service needers" });
+  }
+};
+
 module.exports = {
   registerServiceNeeder,
   loginServiceNeeder,
   findMatchingProviders,
   resetPassword,
+  getAllServiceNeeders,
 };

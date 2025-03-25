@@ -76,10 +76,15 @@ router.post("/reset-password", async (req, res) => {
     // The pre-save middleware should handle the hashing if we set user.password directly
     user.password = newPassword;
     user.resetOTP = undefined;
-    
+
     // Use console logs for debugging
-    console.log(`Setting new password (pre-hash): ${newPassword.slice(0, 3)}... (length: ${newPassword.length})`);
-    
+    console.log(
+      `Setting new password (pre-hash): ${newPassword.slice(
+        0,
+        3
+      )}... (length: ${newPassword.length})`
+    );
+
     await user.save();
     console.log(`Password saved, hash length: ${user.password.length}`);
 
@@ -92,5 +97,21 @@ router.post("/reset-password", async (req, res) => {
 
 // Add route for token-based password reset (separate from OTP reset)
 router.post("/reset-password-token", resetPassword);
+
+// Get all service needers (admin only endpoint)
+router.get("/all", async (req, res) => {
+  try {
+    const serviceNeeders = await ServiceNeeder.find({})
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(serviceNeeders);
+  } catch (error) {
+    console.error("Error fetching service needers:", error);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching service needers" });
+  }
+});
 
 module.exports = router;
