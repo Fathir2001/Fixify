@@ -494,7 +494,16 @@ const BookService: React.FC = () => {
               />
             </div>
             <div className="form-group-3">
-              <FaCalendar />
+              <FaCalendar
+                onClick={() => {
+                  // Find the date input and programmatically click it
+                  const dateInput =
+                    document.querySelector('input[name="date"]');
+                  if (dateInput) {
+                    (dateInput as HTMLElement).click();
+                  }
+                }}
+              />
               <input
                 type="date"
                 name="date"
@@ -502,6 +511,13 @@ const BookService: React.FC = () => {
                 onChange={handleInputChange}
                 min={getTodayString()}
                 required
+                // Make the input field look more clickable with a cursor style
+                style={{ cursor: "pointer" }}
+                // Show the calendar popup when the input field itself is clicked
+                onClick={(e) => {
+                  // This ensures the browser's native date picker opens
+                  e.currentTarget.showPicker();
+                }}
               />
             </div>
             <div className="time-range-group">
