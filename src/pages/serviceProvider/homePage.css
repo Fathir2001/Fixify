@@ -617,6 +617,24 @@
     width: 95%;
     padding: 16px;
   }
+
+  .spsp-notification-wrapper {
+    position: static;
+    /* Change to static positioning on mobile */
+  }
+
+  .spsp-notification-popup {
+    width: 280px;
+    position: fixed;
+    /* Change to fixed positioning */
+    right: 10px;
+    /* Position from right edge of screen */
+    left: auto;
+    top: 60px;
+    /* Position from top */
+    z-index: 1500;
+    /* Ensure it's above other elements */
+  }
 }
 
 /* Extra Small Devices (Less than 576px) */
@@ -710,6 +728,16 @@
     padding: 1px 4px;
     font-size: 0.6rem;
   }
+
+  .spsp-notification-popup {
+    width: 250px;
+    max-height: 350px;
+    position: fixed;
+    right: 10px;
+    /* Adjust position from right for better visibility */
+    left: auto;
+    top: 60px;
+  }
 }
 
 /* Fix for the navbar on very small devices */
@@ -734,7 +762,8 @@
   }
 
   .spsp-notification-popup {
-    right: 0;
     width: 220px;
+    right: 5px;
+    left: auto;
   }
 }
