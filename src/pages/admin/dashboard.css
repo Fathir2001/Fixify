@@ -16,7 +16,7 @@
 .ad-dashboard-container {
     display: flex;
     min-height: 100vh;
-    width: 100vw;
+    width: 100%;
     max-width: 100%;
     background-color: var(--background-dark);
     color: var(--text-primary);
@@ -156,9 +156,10 @@
     margin-left: 260px;
     transition: all 0.3s ease;
     min-height: 100vh;
-    width: calc(100vw - 260px);
+    width: calc(100% - 260px);
     padding: 0;
     overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .ad-sidebar.closed+.ad-main-content {
@@ -168,7 +169,7 @@
 
 .ad-top-bar {
     background: var(--background-light);
-    padding: 1rem 2rem;
+    padding: 0.75rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -178,9 +179,8 @@
     z-index: 90;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
-    margin: 0 1rem 1rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .ad-header-left {
@@ -575,21 +575,94 @@
     border: none;
     color: var(--primary-color);
     font-size: 1.5rem;
-    padding: 0.5rem;
     cursor: pointer;
-    margin-right: 1rem;
-    transition: transform 0.3s ease;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 4px;
 }
 
 .ad-mobile-menu-toggle:hover,
 .ad-mobile-menu-toggle:focus {
-    transform: scale(1.1);
+    background-color: var(--hover-color);
     outline: none;
+}
+
+.ad-mobile-menu-toggle:active {
+    transform: scale(0.95);
 }
 
 @media (max-width: 1200px) {
     .ad-dashboard-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1043px) {
+
+    /* Hide sidebar by default below 1043px */
+    .ad-sidebar {
+        transform: translateX(-100%);
+        width: 260px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1000;
+        transition: transform 0.3s ease-in-out;
+        box-shadow: none;
+    }
+
+    .ad-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Show the mobile menu toggle at this breakpoint */
+    .ad-mobile-menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+    }
+    
+    .ad-page-title {
+        font-size: 1.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+    
+    .ad-header-right {
+        flex-shrink: 0;
+    }
+
+    .ad-header-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .ad-top-bar {
+        margin: 0;
+        border-radius: 0;
+    }
+
+    /* Fix dashboard content padding */
+    .ad-dashboard-content {
+        padding: 1rem;
+    }
+
+    /* Reset content area to full width when sidebar is hidden */
+    .ad-main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Show overlay when sidebar is open */
+    .ad-sidebar-overlay.active {
+        display: block;
     }
 }
 
@@ -608,7 +681,7 @@
         align-self: flex-start;
     }
 
-    .ad-sidebar {
+    /* .ad-sidebar {
         width: 80px;
     }
 
@@ -619,7 +692,7 @@
     .ad-main-content {
         margin-left: 80px;
         width: calc(100vw - 80px);
-    }
+    } */
 
     .ad-category-label,
     .ad-logo-text {
@@ -665,9 +738,7 @@
         display: block;
     }
 
-    .ad-sidebar {
-        position: fixed;
-    }
+
 
     .ad-main-content {
         margin-left: 0 !important;
@@ -767,7 +838,7 @@
     }
 
     .ad-top-bar {
-        padding: 0.75rem;
+        padding: 0.5rem 0.75rem;
     }
 
     .ad-dashboard-content {
@@ -821,6 +892,10 @@
 
     .ad-sidebar-toggle {
         padding: 0.3rem;
+    }
+
+    .ad-mobile-menu-toggle {
+        margin-right: 0.25rem;
     }
 }
 
@@ -934,4 +1009,10 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
 }

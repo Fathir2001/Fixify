@@ -23,7 +23,8 @@ import "./dashboard.css";
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  // Initialize with sidebar closed for mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1043);
   const [selectedSection, setSelectedSection] = useState("overview");
   const [metrics, setMetrics] = useState({
     customers: { count: 0, trend: 0 },
@@ -33,21 +34,28 @@ const AdminDashboard: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1043);
 
-  // Handle window resize
+  // Handle window resize with updated breakpoint
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth <= 768;
+      const mobile = window.innerWidth <= 1043;
       setIsMobile(mobile);
-      if (!mobile && !isSidebarOpen) {
-        setIsSidebarOpen(true);
-      }
+
+      // Auto close sidebar when resizing below 1043px
+      // Auto open sidebar when resizing above 1043px
+      setIsSidebarOpen(!mobile);
     };
+
+    // Set initial state
+    handleResize();
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [isSidebarOpen]);
+  }, []);
+
+  // Remove the redundant second resize handler
+  // The one above is sufficient
 
   // Menu structure
   const menuItems = [
@@ -135,6 +143,10 @@ const AdminDashboard: React.FC = () => {
     return num >= 1000 ? (num / 1000).toFixed(1) + "K" : num.toString();
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="ad-dashboard-container">
       {/* Overlay for mobile sidebar */}
@@ -153,7 +165,7 @@ const AdminDashboard: React.FC = () => {
             <button
               className="ad-sidebar-toggle"
               onClick={() => setIsSidebarOpen(false)}
-              style={{ position: "absolute", right: "1rem", top: "1.5rem" }}
+              aria-label="Close sidebar"
             >
               <FaTimes />
             </button>
@@ -212,11 +224,11 @@ const AdminDashboard: React.FC = () => {
       <main className="ad-main-content">
         <header className="ad-top-bar">
           <div className="ad-header-left">
-            {/* Add mobile menu toggle */}
+            {/* Always show hamburger menu on mobile */}
             {isMobile && (
               <button
                 className="ad-mobile-menu-toggle"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                onClick={toggleSidebar}
                 aria-label="Toggle menu"
               >
                 <FaBars />
@@ -248,7 +260,6 @@ const AdminDashboard: React.FC = () => {
             </button>
           </div>
         </header>
-
         <div className="ad-dashboard-content">
           <div className="ad-welcome-banner">
             <div className="ad-welcome-text">
