@@ -35,6 +35,8 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1043);
+  // Add state for logout confirmation dialog
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Handle window resize with updated breakpoint
   useEffect(() => {
@@ -53,9 +55,6 @@ const AdminDashboard: React.FC = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  // Remove the redundant second resize handler
-  // The one above is sufficient
 
   // Menu structure
   const menuItems = [
@@ -113,15 +112,26 @@ const AdminDashboard: React.FC = () => {
 
     const token = localStorage.getItem("adminToken");
     if (!token) {
-      navigate("/admin/login");
+      navigate("/admin");
     } else {
       fetchDashboardData();
     }
   }, [navigate]);
 
+  // Show logout confirmation dialog
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  // Perform actual logout
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
-    navigate("/admin/login");
+    navigate("/admin");
+  };
+
+  // Cancel logout
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
   };
 
   const handleMenuClick = (itemId: string) => {
@@ -149,6 +159,30 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="ad-dashboard-container">
+      {/* Logout confirmation modal */}
+      {showLogoutConfirm && (
+        <div className="ad-logout-confirm-overlay">
+          <div className="ad-logout-confirm-dialog">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div className="ad-logout-confirm-buttons">
+              <button 
+                className="ad-logout-cancel-btn" 
+                onClick={cancelLogout}
+              >
+                Cancel
+              </button>
+              <button 
+                className="ad-logout-confirm-btn" 
+                onClick={handleLogout}
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Overlay for mobile sidebar */}
       {isMobile && isSidebarOpen && (
         <div
@@ -252,7 +286,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <button
               className="ad-logout-btn"
-              onClick={handleLogout}
+              onClick={handleLogoutClick}
               title="Logout"
               aria-label="Logout"
             >
