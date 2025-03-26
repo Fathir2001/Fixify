@@ -203,6 +203,7 @@
   justify-content: space-between;
   margin: 2rem 0;
   padding: 0 1rem;
+  gap: 15px;
 }
 
 .progress-step {
@@ -642,4 +643,26 @@
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+@media (max-width: 768px) {
+  .booking-progress {
+    gap: 10px; /* Smaller gap on medium screens */
+  }
+  
+  .progress-step {
+    padding: 0.8rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .booking-progress {
+    gap: 8px; /* Even smaller gap on very small screens */
+  }
+  
+  .progress-step {
+    padding: 0.7rem 0.4rem;
+    font-size: 0.8rem;
+  }
 }
