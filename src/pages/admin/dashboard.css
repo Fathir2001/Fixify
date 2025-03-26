@@ -35,10 +35,33 @@
     flex-direction: column;
     height: 100vh;
     position: fixed;
-    z-index: 100;
+    z-index: 1000;
+    /* Increased z-index */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .sidebar.closed {
@@ -138,7 +161,7 @@
     overflow-x: hidden;
 }
 
-.sidebar.closed + .main-content {
+.sidebar.closed+.main-content {
     margin-left: 80px;
     width: calc(100vw - 80px);
 }
@@ -546,7 +569,6 @@
     font-weight: 500;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
@@ -567,16 +589,45 @@
     .date-display {
         align-self: flex-start;
     }
+
+    .sidebar {
+        width: 80px;
+    }
+
+    .sidebar:hover {
+        width: 260px;
+    }
+
+    .main-content {
+        margin-left: 80px;
+        width: calc(100vw - 80px);
+    }
+
+    .category-label,
+    .logo-text {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .sidebar:hover .category-label,
+    .sidebar:hover .logo-text {
+        opacity: 1;
+    }
 }
 
 @media (max-width: 768px) {
     .sidebar {
         transform: translateX(-100%);
-        border-radius: 0;
+        width: 260px;
+        /* Keep full width on mobile when open */
     }
 
     .sidebar.open {
         transform: translateX(0);
+    }
+
+    .sidebar-overlay.active {
+        display: block;
     }
 
     .main-content {
@@ -586,44 +637,198 @@
 
     .stats-grid {
         grid-template-columns: 1fr;
-    }
-
-    .user-info {
-        display: none;
+        gap: 1rem;
     }
 
     .top-bar {
         margin: 0 0 1rem 0;
         border-radius: 0;
+        padding: 1rem;
     }
-    
+
     .action-buttons-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .top-bar {
-        padding: 1rem;
-    }
-
-    .dashboard-content {
-        padding: 1rem;
-    }
-
-    .header-right {
-        gap: 1rem;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .page-title {
         font-size: 1.25rem;
     }
-    
-    .stats-grid {
-        padding: 0;
+
+    .notification-btn,
+    .logout-btn {
+        padding: 0.5rem;
+        font-size: 1.2rem;
     }
-    
+
+    .header-right {
+        gap: 0.75rem;
+    }
+
+    .user-profile {
+        padding: 0.5rem;
+    }
+
+    .user-info {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-bar {
+        padding: 0.75rem;
+    }
+
+    .dashboard-content {
+        padding: 0.75rem;
+    }
+
+    .header-right {
+        gap: 0.5rem;
+    }
+
+    .page-title {
+        font-size: 1.1rem;
+    }
+
+    .welcome-banner {
+        padding: 1rem;
+    }
+
     .welcome-text h2 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+    }
+
+    .welcome-text p {
+        font-size: 0.9rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        padding: 0.8rem;
+        font-size: 1.4rem;
+    }
+
+    .action-buttons-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .content-section {
+        padding: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .activity-item {
+        padding: 0.75rem;
+    }
+
+    .sidebar-toggle {
+        padding: 0.3rem;
+    }
+}
+
+/* Add support for very small devices */
+@media (max-width: 360px) {
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .activity-icon {
+        padding: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+}
+
+/* Add support for landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .sidebar {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar-footer {
+        padding: 0.75rem;
+    }
+
+    .menu-item {
+        padding: 0.5rem 1rem;
+    }
+
+    .activity-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+}
+
+/* Support for larger screens */
+@media (min-width: 1600px) {
+    .dashboard-content {
+        max-width: 1800px;
+        margin: 0 auto;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Add hover effect only on devices that support hover */
+@media (hover: hover) {
+    .menu-item:hover {
+        background: var(--hover-color);
+        color: var(--primary-color);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.15);
+        border-color: var(--primary-color);
+    }
+
+    .action-button:hover {
+        background: var(--hover-color);
+        border-color: var(--primary-color);
+        transform: translateY(-3px);
+    }
+}
+
+/* Add touch-friendly styles for mobile */
+@media (hover: none) {
+
+    .menu-item,
+    .stat-card,
+    .action-button {
+        transition: all 0.15s ease;
+    }
+
+    .menu-item:active {
+        background: var(--active-color);
+        color: var(--primary-color);
+    }
+
+    .action-button:active {
+        background: var(--hover-color);
+        border-color: var(--primary-color);
     }
 }

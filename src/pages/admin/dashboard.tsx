@@ -10,20 +10,19 @@ import {
   FaCalendarAlt,
   FaUserCircle,
   FaSignOutAlt,
-  FaBars,
   FaUserPlus,
   FaTachometerAlt,
-  FaRegBell,
   FaEllipsisV,
   FaExclamationCircle,
   FaCheckCircle,
+  FaTimes,
 } from "react-icons/fa";
 import axios from "axios";
 import "./dashboard.css";
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [selectedSection, setSelectedSection] = useState("overview");
   const [metrics, setMetrics] = useState({
     customers: { count: 0, trend: 0 },
@@ -33,6 +32,21 @@ const AdminDashboard: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile && !isSidebarOpen) {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isSidebarOpen]);
 
   // Menu structure
   const menuItems = [
@@ -101,12 +115,14 @@ const AdminDashboard: React.FC = () => {
     navigate("/admin/login");
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+ 
 
   const handleMenuClick = (itemId: string) => {
     setSelectedSection(itemId);
+    if (isMobile) {
+      setIsSidebarOpen(false); // Close sidebar on menu item click on mobile
+    }
+
     if (itemId === "ServiceProviders") {
       navigate("/admin/service-provider");
     } else if (itemId === "services") {
@@ -119,13 +135,30 @@ const AdminDashboard: React.FC = () => {
   const formatNumber = (num: number): string => {
     return num >= 1000 ? (num / 1000).toFixed(1) + "K" : num.toString();
   };
-  
+
   return (
     <div className="dashboard-container">
+      {/* Overlay for mobile sidebar */}
+      {isMobile && isSidebarOpen && (
+        <div
+          className="sidebar-overlay active"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       <nav className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <FaTools className="logo-icon" />
           <span className="logo-text">Fixify Admin</span>
+          {isMobile && (
+            <button
+              className="sidebar-toggle"
+              onClick={() => setIsSidebarOpen(false)}
+              style={{ position: "absolute", right: "1rem", top: "1.5rem" }}
+            >
+              <FaTimes />
+            </button>
+          )}
         </div>
 
         <div className="sidebar-menu">
@@ -140,6 +173,7 @@ const AdminDashboard: React.FC = () => {
                     selectedSection === item.id ? "active" : ""
                   }`}
                   onClick={() => handleMenuClick(item.id)}
+                  aria-label={item.label}
                 >
                   <item.icon /> <span>{item.label}</span>
                 </button>
@@ -157,6 +191,7 @@ const AdminDashboard: React.FC = () => {
                     selectedSection === item.id ? "active" : ""
                   }`}
                   onClick={() => handleMenuClick(item.id)}
+                  aria-label={item.label}
                 >
                   <item.icon /> <span>{item.label}</span>
                 </button>
@@ -178,20 +213,16 @@ const AdminDashboard: React.FC = () => {
       <main className="main-content">
         <header className="top-bar">
           <div className="header-left">
-            <button className="sidebar-toggle" onClick={toggleSidebar}>
-              <FaBars />
-            </button>
+           
             <h1 className="page-title">
-              {selectedSection === "overview" ? "Dashboard Overview" : 
-               selectedSection.charAt(0).toUpperCase() + selectedSection.slice(1)}
+              {selectedSection === "overview"
+                ? "Dashboard Overview"
+                : selectedSection.charAt(0).toUpperCase() +
+                  selectedSection.slice(1)}
             </h1>
           </div>
 
           <div className="header-right">
-            <button className="notification-btn">
-              <FaRegBell />
-              <span className="notification-badge">3</span>
-            </button>
             <div className="user-profile">
               <FaUserCircle className="avatar" />
               <div className="user-info">
@@ -199,7 +230,12 @@ const AdminDashboard: React.FC = () => {
                 <span className="user-role">System Admin</span>
               </div>
             </div>
-            <button className="logout-btn" onClick={handleLogout} title="Logout">
+            <button
+              className="logout-btn"
+              onClick={handleLogout}
+              title="Logout"
+              aria-label="Logout"
+            >
               <FaSignOutAlt />
             </button>
           </div>
@@ -212,11 +248,11 @@ const AdminDashboard: React.FC = () => {
               <p>Here's what's happening with your platform today.</p>
             </div>
             <div className="date-display">
-              {new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })}
             </div>
           </div>
@@ -229,10 +265,15 @@ const AdminDashboard: React.FC = () => {
               <div className="stat-info">
                 <h3>Total Customers</h3>
                 <p className="stat-number">
-                  {loading ? '...' : formatNumber(metrics.customers.count)}
+                  {loading ? "..." : formatNumber(metrics.customers.count)}
                 </p>
-                <span className={`stat-trend ${metrics.customers.trend >= 0 ? "positive" : "negative"}`}>
-                  {metrics.customers.trend >= 0 ? "+" : ""}{metrics.customers.trend}%
+                <span
+                  className={`stat-trend ${
+                    metrics.customers.trend >= 0 ? "positive" : "negative"
+                  }`}
+                >
+                  {metrics.customers.trend >= 0 ? "+" : ""}
+                  {metrics.customers.trend}%
                 </span>
               </div>
             </div>
@@ -243,10 +284,15 @@ const AdminDashboard: React.FC = () => {
               <div className="stat-info">
                 <h3>Active Services</h3>
                 <p className="stat-number">
-                  {loading ? '...' : formatNumber(metrics.services.count)}
+                  {loading ? "..." : formatNumber(metrics.services.count)}
                 </p>
-                <span className={`stat-trend ${metrics.services.trend >= 0 ? "positive" : "negative"}`}>
-                  {metrics.services.trend >= 0 ? "+" : ""}{metrics.services.trend}%
+                <span
+                  className={`stat-trend ${
+                    metrics.services.trend >= 0 ? "positive" : "negative"
+                  }`}
+                >
+                  {metrics.services.trend >= 0 ? "+" : ""}
+                  {metrics.services.trend}%
                 </span>
               </div>
             </div>
@@ -257,10 +303,15 @@ const AdminDashboard: React.FC = () => {
               <div className="stat-info">
                 <h3>Appointments</h3>
                 <p className="stat-number">
-                  {loading ? '...' : formatNumber(metrics.appointments.count)}
+                  {loading ? "..." : formatNumber(metrics.appointments.count)}
                 </p>
-                <span className={`stat-trend ${metrics.appointments.trend >= 0 ? "positive" : "negative"}`}>
-                  {metrics.appointments.trend >= 0 ? "+" : ""}{metrics.appointments.trend}%
+                <span
+                  className={`stat-trend ${
+                    metrics.appointments.trend >= 0 ? "positive" : "negative"
+                  }`}
+                >
+                  {metrics.appointments.trend >= 0 ? "+" : ""}
+                  {metrics.appointments.trend}%
                 </span>
               </div>
             </div>
@@ -271,10 +322,15 @@ const AdminDashboard: React.FC = () => {
               <div className="stat-info">
                 <h3>Revenue</h3>
                 <p className="stat-number">
-                  {loading ? '...' : `$${formatNumber(metrics.revenue.amount)}`}
+                  {loading ? "..." : `$${formatNumber(metrics.revenue.amount)}`}
                 </p>
-                <span className={`stat-trend ${metrics.revenue.trend >= 0 ? "positive" : "negative"}`}>
-                  {metrics.revenue.trend >= 0 ? "+" : ""}{metrics.revenue.trend}%
+                <span
+                  className={`stat-trend ${
+                    metrics.revenue.trend >= 0 ? "positive" : "negative"
+                  }`}
+                >
+                  {metrics.revenue.trend >= 0 ? "+" : ""}
+                  {metrics.revenue.trend}%
                 </span>
               </div>
             </div>
@@ -284,11 +340,11 @@ const AdminDashboard: React.FC = () => {
             <div className="content-section recent-activity">
               <div className="section-header">
                 <h2>Recent Activity</h2>
-                <button className="more-btn">
+                <button className="more-btn" aria-label="More options">
                   <FaEllipsisV />
                 </button>
               </div>
-              
+
               <div className="activity-list">
                 {loading ? (
                   <div className="loading-spinner-small"></div>
@@ -303,7 +359,9 @@ const AdminDashboard: React.FC = () => {
                         <FaCheckCircle />
                       </div>
                       <div className="activity-details">
-                        <p className="activity-text">New service provider approved</p>
+                        <p className="activity-text">
+                          New service provider approved
+                        </p>
                         <p className="activity-time">2 hours ago</p>
                       </div>
                     </div>
@@ -312,7 +370,9 @@ const AdminDashboard: React.FC = () => {
                         <FaExclamationCircle />
                       </div>
                       <div className="activity-details">
-                        <p className="activity-text">Service request pending review</p>
+                        <p className="activity-text">
+                          Service request pending review
+                        </p>
                         <p className="activity-time">4 hours ago</p>
                       </div>
                     </div>
@@ -334,17 +394,26 @@ const AdminDashboard: React.FC = () => {
               <div className="section-header">
                 <h2>Quick Actions</h2>
               </div>
-              
+
               <div className="action-buttons-grid">
-                <button className="action-button" onClick={() => navigate('/admin/service-provider')}>
+                <button
+                  className="action-button"
+                  onClick={() => navigate("/admin/service-provider")}
+                >
                   <FaUserPlus />
                   <span>Manage Providers</span>
                 </button>
-                <button className="action-button" onClick={() => navigate('/admin/customers')}>
+                <button
+                  className="action-button"
+                  onClick={() => navigate("/admin/customers")}
+                >
                   <FaUsers />
                   <span>View Customers</span>
                 </button>
-                <button className="action-button" onClick={() => navigate('/admin/services')}>
+                <button
+                  className="action-button"
+                  onClick={() => navigate("/admin/services")}
+                >
                   <FaTools />
                   <span>Review Services</span>
                 </button>
