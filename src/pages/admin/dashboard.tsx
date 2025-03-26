@@ -16,6 +16,7 @@ import {
   FaExclamationCircle,
   FaCheckCircle,
   FaTimes,
+  FaBars,
 } from "react-icons/fa";
 import axios from "axios";
 import "./dashboard.css";
@@ -115,8 +116,6 @@ const AdminDashboard: React.FC = () => {
     navigate("/admin/login");
   };
 
- 
-
   const handleMenuClick = (itemId: string) => {
     setSelectedSection(itemId);
     if (isMobile) {
@@ -213,7 +212,16 @@ const AdminDashboard: React.FC = () => {
       <main className="ad-main-content">
         <header className="ad-top-bar">
           <div className="ad-header-left">
-           
+            {/* Add mobile menu toggle */}
+            {isMobile && (
+              <button
+                className="ad-mobile-menu-toggle"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                aria-label="Toggle menu"
+              >
+                <FaBars />
+              </button>
+            )}
             <h1 className="ad-page-title">
               {selectedSection === "overview"
                 ? "Dashboard Overview"
@@ -381,7 +389,9 @@ const AdminDashboard: React.FC = () => {
                         <FaCheckCircle />
                       </div>
                       <div className="ad-activity-details">
-                        <p className="ad-activity-text">New customer registered</p>
+                        <p className="ad-activity-text">
+                          New customer registered
+                        </p>
                         <p className="ad-activity-time">Yesterday</p>
                       </div>
                     </div>
