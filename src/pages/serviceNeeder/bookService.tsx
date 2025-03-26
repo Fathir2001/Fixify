@@ -453,7 +453,7 @@ const BookService: React.FC = () => {
               {services.map((service) => (
                 <div
                   key={service.id}
-                  className="service-card"
+                  className="SN-service-card"
                   onClick={() => handleServiceSelect(service.name)}
                 >
                   <span className="service-icon">

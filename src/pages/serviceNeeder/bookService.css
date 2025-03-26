@@ -234,7 +234,7 @@
   margin-bottom: 1rem;
 }
 
-.service-card {
+.SN-service-card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -246,17 +246,17 @@
   transition: all 0.3s ease;
 }
 
-.service-card h3 {
+.SN-service-card h3 {
   margin: 0.5rem 0;
   font-size: 1.1rem;
 }
 
-.service-card p {
+.SN-service-card p {
   color: #666;
   margin: 0;
 }
 
-.service-card:hover {
+.SN-service-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
