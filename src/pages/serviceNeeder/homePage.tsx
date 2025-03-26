@@ -168,7 +168,7 @@ const ServiceNeederHomePage: React.FC = () => {
         <h2>Our Services</h2>
         <div className="services-grid">
           {services.map((service, index) => (
-            <div key={index} className="service-card">
+            <div key={index} className="SN-service-card">
               <span className="service-icon">
                 <service.icon />
               </span>
