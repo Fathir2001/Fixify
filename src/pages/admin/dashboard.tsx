@@ -137,22 +137,22 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="dashboard-container">
+    <div className="ad-dashboard-container">
       {/* Overlay for mobile sidebar */}
       {isMobile && isSidebarOpen && (
         <div
-          className="sidebar-overlay active"
+          className="ad-sidebar-overlay active"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
-      <nav className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
-        <div className="sidebar-header">
-          <FaTools className="logo-icon" />
-          <span className="logo-text">Fixify Admin</span>
+      <nav className={`ad-sidebar ${isSidebarOpen ? "open" : "closed"}`}>
+        <div className="ad-sidebar-header">
+          <FaTools className="ad-logo-icon" />
+          <span className="ad-logo-text">Fixify Admin</span>
           {isMobile && (
             <button
-              className="sidebar-toggle"
+              className="ad-sidebar-toggle"
               onClick={() => setIsSidebarOpen(false)}
               style={{ position: "absolute", right: "1rem", top: "1.5rem" }}
             >
@@ -161,15 +161,15 @@ const AdminDashboard: React.FC = () => {
           )}
         </div>
 
-        <div className="sidebar-menu">
-          <div className="menu-category">
-            <span className="category-label">Main</span>
+        <div className="ad-sidebar-menu">
+          <div className="ad-menu-category">
+            <span className="ad-category-label">Main</span>
             {menuItems
               .filter((item) => item.category === "main")
               .map((item) => (
                 <button
                   key={item.id}
-                  className={`menu-item ${
+                  className={`ad-menu-item ${
                     selectedSection === item.id ? "active" : ""
                   }`}
                   onClick={() => handleMenuClick(item.id)}
@@ -180,14 +180,14 @@ const AdminDashboard: React.FC = () => {
               ))}
           </div>
 
-          <div className="menu-category">
-            <span className="category-label">Administration</span>
+          <div className="ad-menu-category">
+            <span className="ad-category-label">Administration</span>
             {menuItems
               .filter((item) => item.category === "management")
               .map((item) => (
                 <button
                   key={item.id}
-                  className={`menu-item ${
+                  className={`ad-menu-item ${
                     selectedSection === item.id ? "active" : ""
                   }`}
                   onClick={() => handleMenuClick(item.id)}
@@ -199,22 +199,22 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="sidebar-footer">
-          <div className="user-profile-sidebar">
-            <FaUserCircle className="avatar" />
-            <div className="user-info">
-              <span className="user-name">Administrator</span>
-              <span className="user-role">System Admin</span>
+        <div className="ad-sidebar-footer">
+          <div className="ad-user-profile-sidebar">
+            <FaUserCircle className="ad-avatar" />
+            <div className="ad-user-info">
+              <span className="ad-user-name">Administrator</span>
+              <span className="ad-user-role">System Admin</span>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="main-content">
-        <header className="top-bar">
-          <div className="header-left">
+      <main className="ad-main-content">
+        <header className="ad-top-bar">
+          <div className="ad-header-left">
            
-            <h1 className="page-title">
+            <h1 className="ad-page-title">
               {selectedSection === "overview"
                 ? "Dashboard Overview"
                 : selectedSection.charAt(0).toUpperCase() +
@@ -222,16 +222,16 @@ const AdminDashboard: React.FC = () => {
             </h1>
           </div>
 
-          <div className="header-right">
-            <div className="user-profile">
-              <FaUserCircle className="avatar" />
-              <div className="user-info">
-                <span className="user-name">Administrator</span>
-                <span className="user-role">System Admin</span>
+          <div className="ad-header-right">
+            <div className="ad-user-profile">
+              <FaUserCircle className="ad-avatar" />
+              <div className="ad-user-info">
+                <span className="ad-user-name">Administrator</span>
+                <span className="ad-user-role">System Admin</span>
               </div>
             </div>
             <button
-              className="logout-btn"
+              className="ad-logout-btn"
               onClick={handleLogout}
               title="Logout"
               aria-label="Logout"
@@ -241,13 +241,13 @@ const AdminDashboard: React.FC = () => {
           </div>
         </header>
 
-        <div className="dashboard-content">
-          <div className="welcome-banner">
-            <div className="welcome-text">
+        <div className="ad-dashboard-content">
+          <div className="ad-welcome-banner">
+            <div className="ad-welcome-text">
               <h2>Welcome back, Administrator</h2>
               <p>Here's what's happening with your platform today.</p>
             </div>
-            <div className="date-display">
+            <div className="ad-date-display">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
@@ -257,18 +257,18 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon">
+          <div className="ad-stats-grid">
+            <div className="ad-stat-card">
+              <div className="ad-stat-icon">
                 <FaUsers />
               </div>
-              <div className="stat-info">
+              <div className="ad-stat-info">
                 <h3>Total Customers</h3>
-                <p className="stat-number">
+                <p className="ad-stat-number">
                   {loading ? "..." : formatNumber(metrics.customers.count)}
                 </p>
                 <span
-                  className={`stat-trend ${
+                  className={`ad-stat-trend ${
                     metrics.customers.trend >= 0 ? "positive" : "negative"
                   }`}
                 >
@@ -277,17 +277,17 @@ const AdminDashboard: React.FC = () => {
                 </span>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">
+            <div className="ad-stat-card">
+              <div className="ad-stat-icon">
                 <FaTools />
               </div>
-              <div className="stat-info">
+              <div className="ad-stat-info">
                 <h3>Active Services</h3>
-                <p className="stat-number">
+                <p className="ad-stat-number">
                   {loading ? "..." : formatNumber(metrics.services.count)}
                 </p>
                 <span
-                  className={`stat-trend ${
+                  className={`ad-stat-trend ${
                     metrics.services.trend >= 0 ? "positive" : "negative"
                   }`}
                 >
@@ -296,17 +296,17 @@ const AdminDashboard: React.FC = () => {
                 </span>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">
+            <div className="ad-stat-card">
+              <div className="ad-stat-icon">
                 <FaCalendarAlt />
               </div>
-              <div className="stat-info">
+              <div className="ad-stat-info">
                 <h3>Appointments</h3>
-                <p className="stat-number">
+                <p className="ad-stat-number">
                   {loading ? "..." : formatNumber(metrics.appointments.count)}
                 </p>
                 <span
-                  className={`stat-trend ${
+                  className={`ad-stat-trend ${
                     metrics.appointments.trend >= 0 ? "positive" : "negative"
                   }`}
                 >
@@ -315,17 +315,17 @@ const AdminDashboard: React.FC = () => {
                 </span>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon">
+            <div className="ad-stat-card">
+              <div className="ad-stat-icon">
                 <FaFileInvoiceDollar />
               </div>
-              <div className="stat-info">
+              <div className="ad-stat-info">
                 <h3>Revenue</h3>
-                <p className="stat-number">
+                <p className="ad-stat-number">
                   {loading ? "..." : `$${formatNumber(metrics.revenue.amount)}`}
                 </p>
                 <span
-                  className={`stat-trend ${
+                  className={`ad-stat-trend ${
                     metrics.revenue.trend >= 0 ? "positive" : "negative"
                   }`}
                 >
@@ -336,53 +336,53 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="dashboard-grid">
-            <div className="content-section recent-activity">
-              <div className="section-header">
+          <div className="ad-dashboard-grid">
+            <div className="ad-content-section ad-recent-activity">
+              <div className="ad-section-header">
                 <h2>Recent Activity</h2>
-                <button className="more-btn" aria-label="More options">
+                <button className="ad-more-btn" aria-label="More options">
                   <FaEllipsisV />
                 </button>
               </div>
 
-              <div className="activity-list">
+              <div className="ad-activity-list">
                 {loading ? (
-                  <div className="loading-spinner-small"></div>
+                  <div className="ad-loading-spinner-small"></div>
                 ) : error ? (
-                  <div className="error-message-small">
+                  <div className="ad-error-message-small">
                     <FaExclamationCircle /> {error}
                   </div>
                 ) : (
                   <>
-                    <div className="activity-item">
-                      <div className="activity-icon success">
+                    <div className="ad-activity-item">
+                      <div className="ad-activity-icon success">
                         <FaCheckCircle />
                       </div>
-                      <div className="activity-details">
-                        <p className="activity-text">
+                      <div className="ad-activity-details">
+                        <p className="ad-activity-text">
                           New service provider approved
                         </p>
-                        <p className="activity-time">2 hours ago</p>
+                        <p className="ad-activity-time">2 hours ago</p>
                       </div>
                     </div>
-                    <div className="activity-item">
-                      <div className="activity-icon warning">
+                    <div className="ad-activity-item">
+                      <div className="ad-activity-icon warning">
                         <FaExclamationCircle />
                       </div>
-                      <div className="activity-details">
-                        <p className="activity-text">
+                      <div className="ad-activity-details">
+                        <p className="ad-activity-text">
                           Service request pending review
                         </p>
-                        <p className="activity-time">4 hours ago</p>
+                        <p className="ad-activity-time">4 hours ago</p>
                       </div>
                     </div>
-                    <div className="activity-item">
-                      <div className="activity-icon success">
+                    <div className="ad-activity-item">
+                      <div className="ad-activity-icon success">
                         <FaCheckCircle />
                       </div>
-                      <div className="activity-details">
-                        <p className="activity-text">New customer registered</p>
-                        <p className="activity-time">Yesterday</p>
+                      <div className="ad-activity-details">
+                        <p className="ad-activity-text">New customer registered</p>
+                        <p className="ad-activity-time">Yesterday</p>
                       </div>
                     </div>
                   </>
@@ -390,34 +390,34 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="content-section quick-actions">
-              <div className="section-header">
+            <div className="ad-content-section ad-quick-actions">
+              <div className="ad-section-header">
                 <h2>Quick Actions</h2>
               </div>
 
-              <div className="action-buttons-grid">
+              <div className="ad-action-buttons-grid">
                 <button
-                  className="action-button"
+                  className="ad-action-button"
                   onClick={() => navigate("/admin/service-provider")}
                 >
                   <FaUserPlus />
                   <span>Manage Providers</span>
                 </button>
                 <button
-                  className="action-button"
+                  className="ad-action-button"
                   onClick={() => navigate("/admin/customers")}
                 >
                   <FaUsers />
                   <span>View Customers</span>
                 </button>
                 <button
-                  className="action-button"
+                  className="ad-action-button"
                   onClick={() => navigate("/admin/services")}
                 >
                   <FaTools />
                   <span>Review Services</span>
                 </button>
-                <button className="action-button">
+                <button className="ad-action-button">
                   <FaChartBar />
                   <span>Generate Reports</span>
                 </button>
