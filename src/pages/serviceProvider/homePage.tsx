@@ -371,7 +371,7 @@ const ServiceProviderHomePage: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         showNotifications &&
-        !(event.target as Element).closest(".notification-wrapper")
+        !(event.target as Element).closest(".spsp-notification-wrapper")
       ) {
         setShowNotifications(false);
       }
@@ -453,46 +453,54 @@ const ServiceProviderHomePage: React.FC = () => {
   };
 
   return (
-    <div className="home-container">
-      <nav className="navbar">
-        <h1 className="logo">Fixify</h1>
-        <div className="nav-buttons">
-          <div className="notification-wrapper">
-            <div className="notification-icon-1" onClick={toggleNotifications}>
+    <div className="spsp-home-container">
+      <nav className="spsp-navbar">
+        <h1 className="spsp-logo">Fixify</h1>
+        <div className="spsp-nav-buttons">
+          <div className="spsp-notification-wrapper">
+            <div
+              className="spsp-notification-icon-1"
+              onClick={toggleNotifications}
+            >
               <i className="fas fa-bell"></i>
               {notificationCount > 0 && (
-                <span className="notification-badge">{notificationCount}</span>
+                <span className="spsp-notification-badge">
+                  {notificationCount}
+                </span>
               )}
             </div>
             {showNotifications && (
-              <div className="notification-popup">
-                <div className="notification-header">
+              <div className="spsp-notification-popup">
+                <div className="spsp-notification-header">
                   <span>Notifications</span>
                   {notifications.some((n) => !n.read) && (
-                    <button className="mark-all-read" onClick={markAllAsRead}>
+                    <button
+                      className="spsp-mark-all-read"
+                      onClick={markAllAsRead}
+                    >
                       Mark all as read
                     </button>
                   )}
                 </div>
                 {notifications.length > 0 ? (
-                  <ul className="notification-list">
+                  <ul className="spsp-notification-list">
                     {notifications.map((notification) => (
                       <li
                         key={notification._id}
-                        className={`notification-item ${
+                        className={`spsp-notification-item ${
                           !notification.read ? "unread" : ""
                         }`}
                       >
-                        <div className="notification-content">
+                        <div className="spsp-notification-content">
                           {notification.message}
                         </div>
-                        <div className="notification-footer">
-                          <div className="notification-time">
+                        <div className="spsp-notification-footer">
+                          <div className="spsp-notification-time">
                             {new Date(notification.createdAt).toLocaleString()}
                           </div>
-                          <div className="notification-actions">
+                          <div className="spsp-notification-actions">
                             <button
-                              className="view-notification-button"
+                              className="spsp-view-notification-button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleViewNotification(notification._id);
@@ -501,7 +509,7 @@ const ServiceProviderHomePage: React.FC = () => {
                               View
                             </button>
                             <button
-                              className="reject-notification-button"
+                              className="spsp-reject-notification-button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRejectNotification(notification._id);
@@ -515,40 +523,40 @@ const ServiceProviderHomePage: React.FC = () => {
                     ))}
                   </ul>
                 ) : (
-                  <div className="no-notifications">No notifications</div>
+                  <div className="spsp-no-notifications">No notifications</div>
                 )}
               </div>
             )}
           </div>
           <button
             onClick={() => navigate("/service-provider/services")}
-            className="service-button"
+            className="spsp-service-button"
           >
             Services
           </button>
           {!isEditing && (
-            <button onClick={handleEdit} className="edit-button">
+            <button onClick={handleEdit} className="spsp-edit-button">
               Edit Profile
             </button>
           )}
-          <button onClick={handleLogout} className="logout-button">
+          <button onClick={handleLogout} className="spsp-logout-button">
             Logout
           </button>
         </div>
       </nav>
 
-      <div className="content">
-        <div className="welcome-section">
+      <div className="spsp-content">
+        <div className="spsp-welcome-section">
           <h1>Welcome, {provider?.fullName}</h1>
           <p>Manage your service provider account</p>
         </div>
 
-        <div className="info-cards">
-          <div className="card">
+        <div className="spsp-info-cards">
+          <div className="spsp-card">
             <h3>Profile Information</h3>
             {isEditing ? (
-              <div className="edit-form">
-                <div className="form-group-2">
+              <div className="spsp-edit-form">
+                <div className="spsp-form-group-2">
                   <label>Name:</label>
                   <input
                     type="text"
@@ -557,7 +565,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group-2">
+                <div className="spsp-form-group-2">
                   <label>Phone:</label>
                   <input
                     type="text"
@@ -566,7 +574,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group-2">
+                <div className="spsp-form-group-2">
                   <label>Service Area:</label>
                   <input
                     type="text"
@@ -575,7 +583,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group-2">
+                <div className="spsp-form-group-2">
                   <label>Experience:</label>
                   <input
                     type="text"
@@ -584,7 +592,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group-2">
+                <div className="spsp-form-group-2">
                   <label>Service Fee per Hour (LKR):</label>
                   <input
                     type="number"
@@ -625,18 +633,17 @@ const ServiceProviderHomePage: React.FC = () => {
             )}
           </div>
 
-          <div className="card">
+          <div className="spsp-card">
             <h3>Services</h3>
             {isEditing ? (
-              <div className="form-group-2">
+              <div className="spsp-form-group-2">
                 <label>Select Services:</label>
-                <div className="checkbox-group">
+                <div className="spsp-checkbox-group">
                   {availableServices.map((service) => (
-                    <div key={service} className="checkbox-item">
+                    <div key={service} className="spsp-checkbox-item">
                       <input
                         type="checkbox"
                         id={`service-${service}`}
-                        // Check if the service exists in editableData.serviceType array
                         checked={
                           editableData?.serviceType?.includes(service) || false
                         }
@@ -656,9 +663,9 @@ const ServiceProviderHomePage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="services-list">
+              <div className="spsp-services-list">
                 {provider?.serviceType.map((service, index) => (
-                  <span key={index} className="service-tag">
+                  <span key={index} className="spsp-service-tag">
                     {service}
                   </span>
                 ))}
@@ -666,15 +673,15 @@ const ServiceProviderHomePage: React.FC = () => {
             )}
           </div>
 
-          <div className="card">
+          <div className="spsp-card">
             <h3>Availability</h3>
             {isEditing ? (
               <>
-                <div className="form-group-2">
+                <div className="spsp-form-group-2">
                   <label>Available Days:</label>
-                  <div className="checkbox-group">
+                  <div className="spsp-checkbox-group">
                     {daysOfWeek.map((day) => (
-                      <div key={day} className="checkbox-item">
+                      <div key={day} className="spsp-checkbox-item">
                         <input
                           type="checkbox"
                           id={`day-${day}`}
@@ -693,7 +700,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                <div className="form-group-2">
+                <div className="spsp-form-group-2">
                   <label>Time From:</label>
                   <input
                     type="time"
@@ -702,7 +709,7 @@ const ServiceProviderHomePage: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group-2">
+                <div className="spsp-form-group-2">
                   <label>Time To:</label>
                   <input
                     type="time"
@@ -717,9 +724,9 @@ const ServiceProviderHomePage: React.FC = () => {
                 <p>
                   <strong>Available Days:</strong>
                 </p>
-                <div className="services-list">
+                <div className="spsp-services-list">
                   {provider?.availableDays.map((day, index) => (
-                    <span key={index} className="service-tag">
+                    <span key={index} className="spsp-service-tag">
                       {day}
                     </span>
                   ))}
@@ -734,26 +741,27 @@ const ServiceProviderHomePage: React.FC = () => {
         </div>
 
         {isEditing && (
-          <div className="edit-buttons">
-            <button onClick={handleSave} className="save-button">
+          <div className="spsp-edit-buttons">
+            <button onClick={handleSave} className="spsp-save-button">
               Save Changes
             </button>
-            <button onClick={handleCancel} className="cancel-button">
+            <button onClick={handleCancel} className="spsp-cancel-button">
               Cancel
             </button>
           </div>
         )}
       </div>
+
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
-        className="notification-modal"
-        overlayClassName="notification-modal-overlay"
+        className="spsp-notification-modal"
+        overlayClassName="spsp-notification-modal-overlay"
       >
         {selectedNotification && (
-          <div className="notification-details">
+          <div className="spsp-notification-details">
             <h2>Service Request Details</h2>
-            <div className="detail-group">
+            <div className="spsp-detail-group">
               <h3>Service Needer Information</h3>
               <p>
                 <strong>Name:</strong> {selectedNotification.serviceNeeder.name}
@@ -763,7 +771,7 @@ const ServiceProviderHomePage: React.FC = () => {
                 {selectedNotification.serviceNeeder.phoneNumber}
               </p>
             </div>
-            <div className="detail-group">
+            <div className="spsp-detail-group">
               <h3>Service Details</h3>
               <p>
                 <strong>Service Type:</strong>{" "}
@@ -787,7 +795,7 @@ const ServiceProviderHomePage: React.FC = () => {
                 {selectedNotification.serviceDetails.timeTo}
               </p>
             </div>
-            <div className="detail-group">
+            <div className="spsp-detail-group">
               <h3>Cost Details</h3>
               <p>
                 <strong>Total Hours:</strong>{" "}
@@ -802,13 +810,12 @@ const ServiceProviderHomePage: React.FC = () => {
                 {selectedNotification.serviceDetails.totalFee}
               </p>
             </div>
-            <div className="modal-button-1s">
+            <div className="spsp-modal-button-1s">
               <button
-                className="accept-modal-button-1"
+                className="spsp-accept-modal-button-1"
                 onClick={() => {
                   const requestId =
                     selectedNotification?.serviceDetails?.serviceRequestId;
-                  console.log("Service Request ID to accept:", requestId); // Debug log
 
                   if (!requestId) {
                     alert("Service request ID not found");
@@ -823,7 +830,7 @@ const ServiceProviderHomePage: React.FC = () => {
                 Accept Request
               </button>
               <button
-                className="close-modal-button-1"
+                className="spsp-close-modal-button-1"
                 onClick={() => setIsModalOpen(false)}
               >
                 Close
