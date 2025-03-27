@@ -344,11 +344,33 @@ const BookService: React.FC = () => {
 
   const generateTimeSlots = () => {
     const slots = [];
+    const now = new Date();
+    const isToday = bookingData.date === getTodayString();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
     for (let hour = 8; hour <= 20; hour++) {
-      // Add hour:00
-      slots.push(`${hour.toString().padStart(2, "0")}:00`);
-      // Add hour:30 if not 20:00
-      if (hour !== 20) {
+      // For today, only show future times
+      if (isToday && hour < currentHour) {
+        continue; // Skip past hours
+      }
+
+      // Add hour:00 if it's in the future
+      if (
+        !isToday ||
+        hour > currentHour ||
+        (hour === currentHour && currentMinute < 0)
+      ) {
+        slots.push(`${hour.toString().padStart(2, "0")}:00`);
+      }
+
+      // Add hour:30 if not 20:00 and it's in the future
+      if (
+        hour !== 20 &&
+        (!isToday ||
+          hour > currentHour ||
+          (hour === currentHour && currentMinute < 30))
+      ) {
         slots.push(`${hour.toString().padStart(2, "0")}:30`);
       }
     }

@@ -21,6 +21,8 @@ import {
 import axios from "axios";
 import "./dashboard.css";
 
+const API_BASE_URL = "http://localhost:5000/api";
+
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   // Initialize with sidebar closed for mobile
@@ -92,17 +94,27 @@ const AdminDashboard: React.FC = () => {
     const fetchDashboardData = async () => {
       setLoading(true);
       try {
-        // In a real application, this would fetch data from your API
-        // For now, we'll simulate with static data
-        setTimeout(() => {
-          setMetrics({
-            customers: { count: 1234, trend: 12.5 },
-            services: { count: 56, trend: 5.3 },
-            appointments: { count: 23, trend: -2.1 },
-            revenue: { amount: 45200, trend: 8.4 },
-          });
-          setLoading(false);
-        }, 800);
+        // Fetch actual customer counts and approved services from API endpoints
+        const [serviceNeedersResponse, serviceProvidersResponse, approvedServicesResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/service-needers/all`),
+          axios.get(`${API_BASE_URL}/service-providers/approved`),
+          axios.get(`${API_BASE_URL}/service-requests/approved`),
+        ]);
+
+        const serviceNeedersCount = serviceNeedersResponse.data.length;
+        const serviceProvidersCount = serviceProvidersResponse.data.length;
+        const totalCustomers = serviceNeedersCount + serviceProvidersCount;
+        const approvedServicesCount = approvedServicesResponse.data.length;
+
+        // Update metrics with actual data for customers and appointments (approved services)
+        // Still simulate data for services and revenue
+        setMetrics({
+          customers: { count: totalCustomers, trend: 12.5 },
+          services: { count: 56, trend: 5.3 },
+          appointments: { count: approvedServicesCount, trend: -2.1 },
+          revenue: { amount: 45200, trend: 8.4 },
+        });
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
         setError("Failed to load dashboard data. Please try again later.");
