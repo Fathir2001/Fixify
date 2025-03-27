@@ -21,6 +21,7 @@ const {
 } = require("../controllers/connectedServiceController");
 const { activateService, completeService } = require('../controllers/activeServiceController');
 const CompletedService = require("../models/CompletedService");
+const ActiveService = require("../models/ActiveService");
 
 // Create service request
 router.post("/create", authMiddleware, createServiceRequest);
