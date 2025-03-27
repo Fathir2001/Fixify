@@ -19,7 +19,8 @@ const {
   generateServiceOTP,
   verifyServiceOTP,
 } = require("../controllers/connectedServiceController");
-const ActiveService = require("../models/ActiveService");
+const { activateService, completeService } = require('../controllers/activeServiceController');
+const CompletedService = require("../models/CompletedService");
 
 // Create service request
 router.post("/create", authMiddleware, createServiceRequest);
@@ -419,10 +420,13 @@ router.get("/my-connected-services", authMiddleware, async (req, res) => {
   }
 });
 
-const { activateService } = require('../controllers/activeServiceController');
 
 // Add this route to the existing router
-router.post('/activate-service/:connectedServiceId', authMiddleware, activateService);
+router.post(
+  "/activate-service/:connectedServiceId",
+  authMiddleware,
+  activateService
+);
 
 // Get service needer's active services
 router.get("/my-active-services", authMiddleware, async (req, res) => {
@@ -481,26 +485,83 @@ router.get("/active-connected-services", authMiddleware, async (req, res) => {
     const activeServices = await ActiveService.find({
       $or: [
         { "serviceNeeder.id": req.user.id },
-        { "serviceProvider.id": req.user.id }
+        { "serviceProvider.id": req.user.id },
       ],
-      status: "active"
+      status: "active",
     }).sort({ startedAt: -1 });
 
     // Transform the data to match ServiceRequest format for frontend consistency
-    const formattedServices = activeServices.map(service => ({
+    const formattedServices = activeServices.map((service) => ({
       _id: service._id,
       serviceNeeder: service.serviceNeeder,
       serviceProvider: service.serviceProvider,
       serviceDetails: service.serviceDetails,
       status: "active", // Always active in this collection
       createdAt: service.startedAt,
-      originalServiceId: service.originalServiceId
+      originalServiceId: service.originalServiceId,
     }));
-    
+
     res.status(200).json(formattedServices);
   } catch (error) {
     console.error("Error fetching active services:", error);
     res.status(500).json({ message: "Error fetching active services" });
+  }
+});
+
+// Add manual completion route
+router.post(
+  "/complete-service/:activeServiceId",
+  authMiddleware,
+  completeService
+);
+
+// Get service needer's completed services
+router.get("/my-completed-services", authMiddleware, async (req, res) => {
+  try {
+    const completedServices = await CompletedService.find({
+      "serviceNeeder.id": req.user.id,
+    }).sort({ completedAt: -1 });
+
+    // Transform the data to match ServiceRequest format for frontend consistency
+    const formattedServices = completedServices.map((service) => ({
+      _id: service._id,
+      serviceNeeder: service.serviceNeeder,
+      serviceProvider: service.serviceProvider,
+      serviceDetails: service.serviceDetails,
+      status: "completed", // Always completed in this collection
+      createdAt: service.completedAt,
+      originalServiceId: service.originalServiceId,
+    }));
+
+    res.status(200).json(formattedServices);
+  } catch (error) {
+    console.error("Error fetching completed services:", error);
+    res.status(500).json({ message: "Error fetching completed services" });
+  }
+});
+
+// Get service provider's completed services
+router.get("/provider-completed-services", authMiddleware, async (req, res) => {
+  try {
+    const completedServices = await CompletedService.find({
+      "serviceProvider.id": req.user.id,
+    }).sort({ completedAt: -1 });
+
+    // Transform the data to match ServiceRequest format for frontend consistency
+    const formattedServices = completedServices.map((service) => ({
+      _id: service._id,
+      serviceNeeder: service.serviceNeeder,
+      serviceProvider: service.serviceProvider,
+      serviceDetails: service.serviceDetails,
+      status: "completed", // Always completed in this collection
+      createdAt: service.completedAt,
+      originalServiceId: service.originalServiceId,
+    }));
+
+    res.status(200).json(formattedServices);
+  } catch (error) {
+    console.error("Error fetching completed services:", error);
+    res.status(500).json({ message: "Error fetching completed services" });
   }
 });
 

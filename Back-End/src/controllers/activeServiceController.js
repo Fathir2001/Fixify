@@ -1,5 +1,6 @@
 const ActiveService = require("../models/ActiveService");
 const ConnectedService = require("../models/ConnectedService");
+const CompletedService = require("../models/CompletedService");
 
 // Function to activate a service when it's within service hours
 const activateService = async (req, res) => {
@@ -180,7 +181,133 @@ const checkServiceActivation = async () => {
   }
 };
 
+const checkServiceCompletion = async () => {
+  try {
+    const currentTime = new Date();
+    
+    // Find all active services
+    const activeServices = await ActiveService.find({ status: 'active' });
+    
+    for (const activeService of activeServices) {
+      // Parse service date and end time
+      const serviceDate = new Date(activeService.serviceDetails.date);
+      
+      // Parse timeTo (e.g., "5:00 PM")
+      const timeToParts = activeService.serviceDetails.timeTo.split(' ');
+      const timeToStr = timeToParts[0];
+      const timeToPeriod = timeToParts[1] || "";
+      let [toHours, toMinutes] = timeToStr.split(':').map(Number);
+      
+      // Convert to 24-hour format if PM
+      if (timeToPeriod.toUpperCase() === 'PM' && toHours < 12) toHours += 12;
+      if (timeToPeriod.toUpperCase() === 'AM' && toHours === 12) toHours = 0;
+      
+      // Set service end time
+      const serviceEndTime = new Date(serviceDate);
+      serviceEndTime.setHours(toHours, toMinutes, 0, 0);
+      
+      // If current time is at or after end time, move service to completed
+      if (currentTime >= serviceEndTime) {
+        console.log(`Service ${activeService._id} end time reached. Moving to completed services.`);
+        
+        // Create new completed service record
+        const completedService = new CompletedService({
+          serviceNeeder: activeService.serviceNeeder,
+          serviceProvider: activeService.serviceProvider,
+          serviceDetails: activeService.serviceDetails,
+          originalServiceId: activeService.originalServiceId,
+          activeServiceId: activeService._id,
+          startedAt: activeService.startedAt,
+          completedAt: new Date()
+        });
+        
+        await completedService.save();
+        
+        // Delete service from ActiveService collection
+        await ActiveService.findByIdAndDelete(activeService._id);
+        
+        console.log(`Service ${activeService._id} moved to completed services`);
+        
+        // Optionally notify via socket
+        // if (app && app.get('io')) {
+        //   const io = app.get('io');
+        //   io.emit('serviceCompleted', {
+        //     serviceId: completedService._id,
+        //     serviceNeederId: activeService.serviceNeeder.id,
+        //     serviceProviderId: activeService.serviceProvider.id,
+        //     serviceType: activeService.serviceDetails.serviceType
+        //   });
+        // }
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error in automatic service completion check:', error);
+  }
+};
+
+// Add a manual complete endpoint
+const completeService = async (req, res) => {
+  try {
+    const { activeServiceId } = req.params;
+    
+    // Find the active service
+    const activeService = await ActiveService.findById(activeServiceId);
+    if (!activeService) {
+      return res.status(404).json({ message: "Active service not found" });
+    }
+    
+    // Check if user is authorized (either service provider or service needer)
+    const isAuthorized = 
+      activeService.serviceProvider.id.toString() === req.user.id ||
+      activeService.serviceNeeder.id.toString() === req.user.id;
+      
+    if (!isAuthorized) {
+      return res.status(403).json({ message: "Not authorized to complete this service" });
+    }
+    
+    // Create new completed service record
+    const completedService = new CompletedService({
+      serviceNeeder: activeService.serviceNeeder,
+      serviceProvider: activeService.serviceProvider,
+      serviceDetails: activeService.serviceDetails,
+      originalServiceId: activeService.originalServiceId,
+      activeServiceId: activeService._id,
+      startedAt: activeService.startedAt,
+      completedAt: new Date()
+    });
+    
+    await completedService.save();
+    
+    // Delete from ActiveService collection
+    await ActiveService.findByIdAndDelete(activeServiceId);
+    
+    // Notify via socket
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('serviceCompleted', {
+        serviceId: completedService._id,
+        serviceNeederId: activeService.serviceNeeder.id,
+        serviceProviderId: activeService.serviceProvider.id,
+        serviceType: activeService.serviceDetails.serviceType
+      });
+    }
+    
+    res.status(200).json({ 
+      message: "Service completed successfully",
+      completedService
+    });
+    
+  } catch (error) {
+    console.error('Error completing service:', error);
+    res.status(500).json({ message: 'Error completing service', error: error.message });
+  }
+};
+
+
 module.exports = {
   activateService,
   checkServiceActivation,
+  checkServiceCompletion,
+  completeService
 };

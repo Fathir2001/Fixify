@@ -56,6 +56,9 @@ const TrackService: React.FC = () => {
     []
   );
   const [activeServices, setActiveServices] = useState<ServiceRequest[]>([]);
+  const [completedServices, setCompletedServices] = useState<ServiceRequest[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -340,6 +343,16 @@ const TrackService: React.FC = () => {
         }
       );
 
+      // Fetch completed services
+      const completedResponse = await fetch(
+        "http://localhost:5000/api/service-requests/my-completed-services",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (!requestsResponse.ok) {
         throw new Error("Failed to fetch your service requests");
       }
@@ -370,6 +383,12 @@ const TrackService: React.FC = () => {
         console.log("Active services retrieved:", activeData);
       }
 
+      let completedData: ServiceRequest[] = [];
+      if (completedResponse.ok) {
+        completedData = await completedResponse.json();
+        console.log("Completed services retrieved:", completedData);
+      }
+
       console.log("Service requests retrieved:", requestsData);
       console.log("Rejected services retrieved:", rejectedData);
 
@@ -377,6 +396,7 @@ const TrackService: React.FC = () => {
       setRejectedServices(rejectedData);
       setConnectedServices(connectedData);
       setActiveServices(activeData);
+      setCompletedServices(completedData);
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -672,6 +692,7 @@ const TrackService: React.FC = () => {
     ...rejectedServices,
     ...connectedServices,
     ...activeServices,
+    ...completedServices,
   ];
 
   const filteredRequests = allServices.filter((req) => {
