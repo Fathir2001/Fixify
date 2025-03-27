@@ -363,6 +363,15 @@
   color: white;
 }
 
+.status-active {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-icon.active {
+  color: #ffffff;
+}
+
 .status-icon.connected {
   color: #ffffff;
 }

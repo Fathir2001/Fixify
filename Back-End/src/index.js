@@ -12,6 +12,10 @@ const authMiddleware = require("./middleware/auth");
 const { createTransport } = require("nodemailer");
 const adminServiceRoutes = require("./routes/adminServiceRoutes");
 const ConnectedService = require('./models/ConnectedService');
+const { checkServiceActivation } = require('./controllers/activeServiceController');
+
+// Set up periodic check for service activation (every minute)
+setInterval(checkServiceActivation, 60000);
 
 // Load environment variables
 dotenv.config();

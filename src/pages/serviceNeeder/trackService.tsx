@@ -55,6 +55,7 @@ const TrackService: React.FC = () => {
   const [connectedServices, setConnectedServices] = useState<ServiceRequest[]>(
     []
   );
+  const [activeServices, setActiveServices] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -329,10 +330,21 @@ const TrackService: React.FC = () => {
         }
       );
 
+      // Fetch active services
+      const activeResponse = await fetch(
+        "http://localhost:5000/api/service-requests/my-active-services",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (!requestsResponse.ok) {
         throw new Error("Failed to fetch your service requests");
       }
 
+      // Get the data from each response
       const requestsData = await requestsResponse.json();
 
       let rejectedData: ServiceRequest[] = [];
@@ -352,12 +364,19 @@ const TrackService: React.FC = () => {
         console.log("Connected services retrieved:", connectedData);
       }
 
+      let activeData: ServiceRequest[] = [];
+      if (activeResponse.ok) {
+        activeData = await activeResponse.json();
+        console.log("Active services retrieved:", activeData);
+      }
+
       console.log("Service requests retrieved:", requestsData);
       console.log("Rejected services retrieved:", rejectedData);
 
       setServiceRequests(requestsData);
       setRejectedServices(rejectedData);
       setConnectedServices(connectedData);
+      setActiveServices(activeData);
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -511,7 +530,9 @@ const TrackService: React.FC = () => {
       case "ongoing":
         return "status-ongoing";
       case "connected":
-        return "status-connected"; 
+        return "status-connected";
+      case "active":
+        return "status-active";
       case "completed":
         return "status-completed";
       case "cancelled":
@@ -534,7 +555,9 @@ const TrackService: React.FC = () => {
       case "ongoing":
         return <FaSpinner className="status-icon ongoing" />;
       case "connected":
-        return <FaCheckCircle className="status-icon connected" />; // Added connected status
+        return <FaCheckCircle className="status-icon connected" />;
+      case "active":
+        return <FaTools className="status-icon active" />;
       case "completed":
         return <FaCheckCircle className="status-icon completed" />;
       case "cancelled":
@@ -648,14 +671,17 @@ const TrackService: React.FC = () => {
     ...serviceRequests,
     ...rejectedServices,
     ...connectedServices,
+    ...activeServices,
   ];
 
   const filteredRequests = allServices.filter((req) => {
     const expired = isServiceExpired(req);
 
     if (activeTab === "all") return true;
-    if (activeTab === "active")
-      return ["pending", "ongoing"].includes(req.status) && !expired;
+    if (activeTab === "active") {
+      // Only show services from ActiveService collection with "active" status
+      return req.status === "active" && !expired;
+    }
     if (activeTab === "accepted") return req.status === "accepted" && !expired;
     if (activeTab === "connected") return req.status === "connected";
     if (activeTab === "completed") return req.status === "completed";

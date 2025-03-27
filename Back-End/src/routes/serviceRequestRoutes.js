@@ -19,6 +19,8 @@ const {
   generateServiceOTP,
   verifyServiceOTP,
 } = require("../controllers/connectedServiceController");
+const ActiveService = require("../models/ActiveService");
+
 // Create service request
 router.post("/create", authMiddleware, createServiceRequest);
 
@@ -414,6 +416,91 @@ router.get("/my-connected-services", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error fetching connected services:", error);
     res.status(500).json({ message: "Error fetching connected services" });
+  }
+});
+
+const { activateService } = require('../controllers/activeServiceController');
+
+// Add this route to the existing router
+router.post('/activate-service/:connectedServiceId', authMiddleware, activateService);
+
+// Get service needer's active services
+router.get("/my-active-services", authMiddleware, async (req, res) => {
+  try {
+    const activeServices = await ActiveService.find({
+      "serviceNeeder.id": req.user.id,
+      status: "active",
+    }).sort({ startedAt: -1 });
+
+    // Transform the data to match ServiceRequest format for frontend consistency
+    const formattedServices = activeServices.map((service) => ({
+      _id: service._id,
+      serviceNeeder: service.serviceNeeder,
+      serviceProvider: service.serviceProvider,
+      serviceDetails: service.serviceDetails,
+      status: service.status,
+      createdAt: service.startedAt,
+      originalServiceId: service.originalServiceId,
+    }));
+
+    res.status(200).json(formattedServices);
+  } catch (error) {
+    console.error("Error fetching active services:", error);
+    res.status(500).json({ message: "Error fetching active services" });
+  }
+});
+
+// Get service provider's active services
+router.get("/provider-active-services", authMiddleware, async (req, res) => {
+  try {
+    const activeServices = await ActiveService.find({
+      "serviceProvider.id": req.user.id,
+      status: "active",
+    }).sort({ startedAt: -1 });
+
+    const formattedServices = activeServices.map((service) => ({
+      _id: service._id,
+      serviceNeeder: service.serviceNeeder,
+      serviceProvider: service.serviceProvider,
+      serviceDetails: service.serviceDetails,
+      status: service.status,
+      createdAt: service.startedAt,
+      originalServiceId: service.originalServiceId,
+    }));
+
+    res.status(200).json(formattedServices);
+  } catch (error) {
+    console.error("Error fetching active services:", error);
+    res.status(500).json({ message: "Error fetching active services" });
+  }
+});
+
+router.get("/active-connected-services", authMiddleware, async (req, res) => {
+  try {
+    // This now specifically queries the ActiveService collection
+    const activeServices = await ActiveService.find({
+      $or: [
+        { "serviceNeeder.id": req.user.id },
+        { "serviceProvider.id": req.user.id }
+      ],
+      status: "active"
+    }).sort({ startedAt: -1 });
+
+    // Transform the data to match ServiceRequest format for frontend consistency
+    const formattedServices = activeServices.map(service => ({
+      _id: service._id,
+      serviceNeeder: service.serviceNeeder,
+      serviceProvider: service.serviceProvider,
+      serviceDetails: service.serviceDetails,
+      status: "active", // Always active in this collection
+      createdAt: service.startedAt,
+      originalServiceId: service.originalServiceId
+    }));
+    
+    res.status(200).json(formattedServices);
+  } catch (error) {
+    console.error("Error fetching active services:", error);
+    res.status(500).json({ message: "Error fetching active services" });
   }
 });
 
