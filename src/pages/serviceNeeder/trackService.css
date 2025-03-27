@@ -358,6 +358,40 @@
   z-index: 1001;
 }
 
+.status-connected {
+  background-color: #3498db;
+  color: white;
+}
+
+.status-icon.connected {
+  color: #ffffff;
+}
+
+.ongoing-service-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #0056b3;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: rgba(0, 86, 179, 0.1);
+}
+
+.ongoing-service-indicator .spinner-icon {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .notifications-dropdown {
   position: absolute;
   top: 100%;

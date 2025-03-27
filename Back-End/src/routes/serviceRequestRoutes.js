@@ -369,20 +369,20 @@ router.get(
   async (req, res) => {
     try {
       const { requestId } = req.params;
-      
+
       // Find the accepted service that references this request ID
       const acceptedService = await ServiceAccepted.findOne({
-        originalRequestId: requestId
+        originalRequestId: requestId,
       });
-      
+
       if (!acceptedService) {
-        return res.status(404).json({ 
-          message: "No accepted service found for this request ID" 
+        return res.status(404).json({
+          message: "No accepted service found for this request ID",
         });
       }
-      
-      res.status(200).json({ 
-        acceptedServiceId: acceptedService._id.toString() 
+
+      res.status(200).json({
+        acceptedServiceId: acceptedService._id.toString(),
       });
     } catch (error) {
       console.error("Error getting accepted service ID:", error);
@@ -390,5 +390,31 @@ router.get(
     }
   }
 );
+
+// Get service needer's connected services
+router.get("/my-connected-services", authMiddleware, async (req, res) => {
+  try {
+    const connectedServices = await ConnectedService.find({
+      "serviceNeeder.id": req.user.id,
+      status: "connected",
+    }).sort({ connectedAt: -1 });
+
+    // Transform the data to match ServiceRequest format for frontend consistency
+    const formattedServices = connectedServices.map((service) => ({
+      _id: service._id,
+      serviceNeeder: service.serviceNeeder,
+      serviceProvider: service.serviceProvider,
+      serviceDetails: service.serviceDetails,
+      status: service.status,
+      createdAt: service.connectedAt,
+      originalServiceId: service.originalServiceId,
+    }));
+
+    res.status(200).json(formattedServices);
+  } catch (error) {
+    console.error("Error fetching connected services:", error);
+    res.status(500).json({ message: "Error fetching connected services" });
+  }
+});
 
 module.exports = router;

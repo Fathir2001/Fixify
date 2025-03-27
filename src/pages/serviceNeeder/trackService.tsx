@@ -52,6 +52,9 @@ const TrackService: React.FC = () => {
   const [rejectedServices, setRejectedServices] = useState<ServiceRequest[]>(
     []
   );
+  const [connectedServices, setConnectedServices] = useState<ServiceRequest[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -316,6 +319,16 @@ const TrackService: React.FC = () => {
         }
       );
 
+      // Fetch connected services
+      const connectedResponse = await fetch(
+        "http://localhost:5000/api/service-requests/my-connected-services",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (!requestsResponse.ok) {
         throw new Error("Failed to fetch your service requests");
       }
@@ -333,11 +346,18 @@ const TrackService: React.FC = () => {
         }));
       }
 
+      let connectedData: ServiceRequest[] = [];
+      if (connectedResponse.ok) {
+        connectedData = await connectedResponse.json();
+        console.log("Connected services retrieved:", connectedData);
+      }
+
       console.log("Service requests retrieved:", requestsData);
       console.log("Rejected services retrieved:", rejectedData);
 
       setServiceRequests(requestsData);
       setRejectedServices(rejectedData);
+      setConnectedServices(connectedData);
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -490,6 +510,8 @@ const TrackService: React.FC = () => {
         return "status-accepted";
       case "ongoing":
         return "status-ongoing";
+      case "connected":
+        return "status-connected"; 
       case "completed":
         return "status-completed";
       case "cancelled":
@@ -511,6 +533,8 @@ const TrackService: React.FC = () => {
         return <FaCheckCircle className="status-icon accepted" />;
       case "ongoing":
         return <FaSpinner className="status-icon ongoing" />;
+      case "connected":
+        return <FaCheckCircle className="status-icon connected" />; // Added connected status
       case "completed":
         return <FaCheckCircle className="status-icon completed" />;
       case "cancelled":
@@ -563,6 +587,11 @@ const TrackService: React.FC = () => {
   const canStartService = (
     request: ServiceRequest
   ): { canStart: boolean; message?: string } => {
+    // Don't allow starting service that is already ongoing or completed
+    if (request.status === "ongoing" || request.status === "completed") {
+      return { canStart: false };
+    }
+
     // Only check for accepted services
     if (request.status !== "accepted") {
       return { canStart: false };
@@ -615,7 +644,11 @@ const TrackService: React.FC = () => {
   };
 
   // Combine both regular requests and rejected services
-  const allServices = [...serviceRequests, ...rejectedServices];
+  const allServices = [
+    ...serviceRequests,
+    ...rejectedServices,
+    ...connectedServices,
+  ];
 
   const filteredRequests = allServices.filter((req) => {
     const expired = isServiceExpired(req);
@@ -624,6 +657,7 @@ const TrackService: React.FC = () => {
     if (activeTab === "active")
       return ["pending", "ongoing"].includes(req.status) && !expired;
     if (activeTab === "accepted") return req.status === "accepted" && !expired;
+    if (activeTab === "connected") return req.status === "connected";
     if (activeTab === "completed") return req.status === "completed";
     if (activeTab === "cancelled")
       return (
@@ -675,6 +709,12 @@ const TrackService: React.FC = () => {
             onClick={() => setActiveTab("accepted")}
           >
             Accepted
+          </button>
+          <button
+            className={activeTab === "connected" ? "active" : ""}
+            onClick={() => setActiveTab("connected")}
+          >
+            Connected
           </button>
           <button
             className={activeTab === "completed" ? "active" : ""}
@@ -763,6 +803,11 @@ const TrackService: React.FC = () => {
                             )}
                           </button>
                         )}
+                      {request.status === "ongoing" && (
+                        <div className="ongoing-service-indicator">
+                          <FaSpinner className="spinner-icon" /> In Progress
+                        </div>
+                      )}
                     </div>
                   </div>
 
