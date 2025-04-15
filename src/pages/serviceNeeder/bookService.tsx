@@ -387,11 +387,11 @@ const BookService: React.FC = () => {
 
   return (
     <div>
-      <nav className="navbar-2">
-        <div className="nav-left">
-          <div className="notification-wrapper">
+      <nav className="SN-BS-navbar">
+        <div className="SN-BS-nav-left">
+          <div className="SN-BS-notification-wrapper">
             <FaBell
-              className="notification-icon"
+              className="SN-BS-notification-icon"
               onClick={() => {
                 setShowNotificationsList(!showNotificationsList);
                 if (!showNotificationsList && unreadCount > 0) {
@@ -400,30 +400,30 @@ const BookService: React.FC = () => {
               }}
             />
             {unreadCount > 0 && (
-              <span className="notification-badge">{unreadCount}</span>
+              <span className="SN-BS-notification-badge">{unreadCount}</span>
             )}
             {showNotificationsList && (
-              <div className="notifications-dropdown">
-                <div className="notifications-header">
+              <div className="SN-BS-notifications-dropdown">
+                <div className="SN-BS-notifications-header">
                   <h3>Notifications</h3>
                 </div>
-                <div className="notifications-list">
+                <div className="SN-BS-notifications-list">
                   {snNotifications && snNotifications.length > 0 ? (
                     snNotifications.map((notification) => (
                       <div
                         key={notification._id}
-                        className={`notification-item ${
-                          !notification.read ? "unread" : ""
+                        className={`SN-BS-notification-item ${
+                          !notification.read ? "SN-BS-unread" : ""
                         }`}
                       >
-                        <p className="notification-message">
+                        <p className="SN-BS-notification-message">
                           {notification.message}
                         </p>
-                        <p className="notification-time">
+                        <p className="SN-BS-notification-time">
                           {new Date(notification.createdAt).toLocaleString()}
                         </p>
                         {notification.status === "accepted" && (
-                          <div className="provider-contact">
+                          <div className="SN-BS-provider-contact">
                             <p>Contact Provider:</p>
                             <p>{notification.serviceProvider.name}</p>
                             <p>{notification.serviceProvider.phoneNumber}</p>
@@ -432,53 +432,59 @@ const BookService: React.FC = () => {
                       </div>
                     ))
                   ) : (
-                    <p className="no-notifications">No notifications</p>
+                    <p className="SN-BS-no-notifications">No notifications</p>
                   )}
                 </div>
               </div>
             )}
           </div>
         </div>
-        <div className="nav-center">
+        <div className="SN-BS-nav-center">
           <h1>Fixify</h1>
         </div>
-        <div className="nav-right">
+        <div className="SN-BS-nav-right">
           <button
-            className="track-service-btn"
+            className="SN-BS-track-service-btn"
             onClick={() => navigate("/service-needer/track-service")}
           >
             Track Service
           </button>
-          <button className="logout-btn" onClick={handleLogoutClick}>
+          <button className="SN-BS-logout-btn" onClick={handleLogoutClick}>
             Logout
           </button>
         </div>
       </nav>
 
-      <div className="book-service">
-        <div className="booking-progress">
-          <div className={`progress-step ${step >= 1 ? "active" : ""}`}>
+      <div className="SN-BS-book-service">
+        <div className="SN-BS-booking-progress">
+          <div
+            className={`SN-BS-progress-step ${step >= 1 ? "SN-BS-active" : ""}`}
+          >
             1. Select Service
           </div>
-          <div className={`progress-step ${step >= 2 ? "active" : ""}`}>
+          <div
+            className={`SN-BS-progress-step ${step >= 2 ? "SN-BS-active" : ""}`}
+          >
             2. Schedule
           </div>
-          <div className={`progress-step ${step >= 3 ? "active" : ""}`}>
+          <div
+            className={`SN-BS-progress-step ${step >= 3 ? "SN-BS-active" : ""}`}
+          >
             3. Confirm
           </div>
         </div>
 
         {step === 1 && (
-          <div className="service-selection">
+          <div className="SN-BS-service-selection">
             <h2>Select a Service</h2>
-            <div className="services-grid">
+            <div className="SN-BS-services-grid">
               {services.map((service) => (
                 <div
                   key={service.id}
-                  className="SN-service-card"
+                  className="SN-BS-service-card"
                   onClick={() => handleServiceSelect(service.name)}
                 >
-                  <span className="service-icon">
+                  <span className="SN-BS-service-icon">
                     <service.icon />
                   </span>
                   <h3>{service.name}</h3>
@@ -490,10 +496,10 @@ const BookService: React.FC = () => {
         )}
 
         {step === 2 && (
-          <form className="booking-form" onSubmit={handleSubmit}>
+          <form className="SN-BS-booking-form" onSubmit={handleSubmit}>
             <h2>Schedule Your Service</h2>
-            {error && <div className="error-message">{error}</div>}
-            <div className="form-group-3">
+            {error && <div className="SN-BS-error-message">{error}</div>}
+            <div className="SN-BS-form-group">
               <FaMapMarkerAlt />
               <input
                 type="text"
@@ -504,7 +510,7 @@ const BookService: React.FC = () => {
                 required
               />
             </div>
-            <div className="form-group-3">
+            <div className="SN-BS-form-group">
               <FaMapMarkerAlt />
               <input
                 type="text"
@@ -515,7 +521,7 @@ const BookService: React.FC = () => {
                 required
               />
             </div>
-            <div className="form-group-3">
+            <div className="SN-BS-form-group">
               <FaCalendar
                 onClick={() => {
                   // Find the date input and programmatically click it
@@ -542,8 +548,8 @@ const BookService: React.FC = () => {
                 }}
               />
             </div>
-            <div className="time-range-group">
-              <div className="form-group-3">
+            <div className="SN-BS-time-range-group">
+              <div className="SN-BS-form-group">
                 <FaClock />
                 <select
                   name="timeFrom"
@@ -559,7 +565,7 @@ const BookService: React.FC = () => {
                   ))}
                 </select>
               </div>
-              <div className="form-group-3">
+              <div className="SN-BS-form-group">
                 <FaClock />
                 <select
                   name="timeTo"
@@ -582,18 +588,18 @@ const BookService: React.FC = () => {
                 </select>
               </div>
             </div>
-            <button type="submit" className="next-button">
+            <button type="submit" className="SN-BS-next-button">
               Find Service Providers
             </button>
           </form>
         )}
 
         {step === 3 && (
-          <div className="booking-confirmation">
+          <div className="SN-BS-booking-confirmation">
             <h2>Available Service Providers</h2>
-            <div className="booking-summary">
+            <div className="SN-BS-booking-summary">
               <h3>Booking Details</h3>
-              <div className="summary-details">
+              <div className="SN-BS-summary-details">
                 <p>
                   <strong>Service:</strong> {selectedService}
                 </p>
@@ -614,12 +620,12 @@ const BookService: React.FC = () => {
               </div>
             </div>
 
-            <div className="providers-list">
+            <div className="SN-BS-providers-list">
               {matchedProviders.length > 0 ? (
                 matchedProviders.map((provider) => (
-                  <div key={provider._id} className="provider-card">
+                  <div key={provider._id} className="SN-BS-provider-card">
                     <h3>{provider.fullName}</h3>
-                    <div className="provider-details">
+                    <div className="SN-BS-provider-details">
                       <p>
                         <strong>Experience:</strong> {provider.experience}
                       </p>
@@ -629,7 +635,7 @@ const BookService: React.FC = () => {
                       </p>
                     </div>
                     <button
-                      className="select-provider-button"
+                      className="SN-BS-select-provider-button"
                       onClick={() =>
                         handleBookingConfirm(provider._id, provider.serviceFee)
                       }
@@ -640,11 +646,14 @@ const BookService: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <div className="no-providers">
+                <div className="SN-BS-no-providers">
                   <p>
                     No service providers available for the selected criteria.
                   </p>
-                  <button className="back-button" onClick={() => setStep(2)}>
+                  <button
+                    className="SN-BS-back-button"
+                    onClick={() => setStep(2)}
+                  >
                     Modify Search
                   </button>
                 </div>
@@ -657,8 +666,8 @@ const BookService: React.FC = () => {
         <Modal
           isOpen={showModal}
           onRequestClose={() => setShowModal(false)}
-          className="modal-content"
-          overlayClassName="modal-overlay"
+          className="SN-BS-modal-content"
+          overlayClassName="SN-BS-modal-overlay"
         >
           <h2>
             {bookingResponse.success
@@ -667,12 +676,14 @@ const BookService: React.FC = () => {
           </h2>
           <div
             className={
-              bookingResponse.success ? "success-message" : "error-message"
+              bookingResponse.success
+                ? "SN-BS-success-message"
+                : "SN-BS-error-message"
             }
           >
             <p>{bookingResponse.message}</p>
             {bookingResponse.success && (
-              <div className="countdown-timer">
+              <div className="SN-BS-countdown-timer">
                 Closing in {countdown} seconds
               </div>
             )}
@@ -683,17 +694,20 @@ const BookService: React.FC = () => {
         <Modal
           isOpen={showLogoutModal}
           onRequestClose={() => setShowLogoutModal(false)}
-          className="modal-content"
-          overlayClassName="modal-overlay"
+          className="SN-BS-modal-content"
+          overlayClassName="SN-BS-modal-overlay"
         >
           <h2>Confirm Logout</h2>
           <p>Are you sure you want to log out from your account?</p>
-          <div className="modal-buttons">
-            <button className="confirm-button" onClick={handleLogoutConfirm}>
+          <div className="SN-BS-modal-buttons">
+            <button
+              className="SN-BS-confirm-button"
+              onClick={handleLogoutConfirm}
+            >
               Yes, Logout
             </button>
             <button
-              className="cancel-button"
+              className="SN-BS-cancel-button"
               onClick={() => setShowLogoutModal(false)}
             >
               Cancel

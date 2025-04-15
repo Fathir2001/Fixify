@@ -1,4 +1,5 @@
-.navbar-2 {
+/* Book Service Page Styles with SN-BS prefix */
+.SN-BS-navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -10,17 +11,17 @@
   z-index: 1000;
 }
 
-.nav-left {
+.SN-BS-nav-left {
   position: relative;
 }
 
-.notification-icon {
+.SN-BS-notification-icon {
   font-size: 1.5rem;
   color: #333;
   cursor: pointer;
 }
 
-.notification-badge {
+.SN-BS-notification-badge {
   position: absolute;
   top: -8px;
   right: -8px;
@@ -32,35 +33,58 @@
   font-weight: bold;
 }
 
-.nav-center h1 {
+.SN-BS-nav-center h1 {
   margin: 0;
   color: #333;
   font-size: 1.5rem;
 }
 
-.nav-right {
+.SN-BS-nav-right {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.profile-btn, .logout-btn {
+.SN-BS-track-service-btn {
   padding: 8px 16px;
   border-radius: 4px;
   border: none;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
+  background-color: #4CAF50;
+  color: white;
+  margin-right: 10px;
   transition: background-color 0.3s ease;
 }
 
-.notification-wrapper {
+.SN-BS-track-service-btn:hover {
+  background-color: #45a049;
+}
+
+.SN-BS-logout-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #f44336;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.SN-BS-logout-btn:hover {
+  background-color: #da190b;
+}
+
+.SN-BS-notification-wrapper {
   position: relative;
   cursor: pointer;
   z-index: 1001;
 }
 
-.notifications-dropdown {
+.SN-BS-notifications-dropdown {
   position: absolute;
   top: 100%;
   left: 0;
@@ -74,50 +98,49 @@
   margin-top: 10px;
 }
 
-.notifications-header {
+.SN-BS-notifications-header {
   padding: 12px 16px;
   border-bottom: 1px solid #eee;
 }
 
-.notifications-header h3 {
+.SN-BS-notifications-header h3 {
   margin: 0;
   font-size: 16px;
   color: #333;
 }
 
-.notifications-list {
+.SN-BS-notifications-list {
   padding: 0;
 }
 
-.notification-item {
+.SN-BS-notification-item {
   padding: 15px;
   border-bottom: 1px solid #eee;
   transition: background-color 0.2s;
 }
 
-.notification-item:hover {
+.SN-BS-notification-item:hover {
   background-color: #f8f9fa;
 }
 
-.notification-item.unread {
+.SN-BS-notification-item.SN-BS-unread {
   background-color: #f0f7ff;
 }
 
-.notification-message {
+.SN-BS-notification-message {
   margin: 0 0 8px 0;
   font-size: 14px;
   color: #333;
   font-weight: bold;
 }
 
-
-.notification-time {
+.SN-BS-notification-time {
   margin: 0;
   font-size: 12px;
   color: #666;
 }
 
-.provider-contact {
+.SN-BS-provider-contact {
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid #eee;
@@ -126,46 +149,25 @@
   font-weight: 400;
 }
 
-.provider-contact p {
+.SN-BS-provider-contact p {
   margin: 3px 0;
 }
 
-.no-notifications {
+.SN-BS-no-notifications {
   padding: 16px;
   text-align: center;
   color: #666;
 }
 
-.notification-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: #dc3545;
-  color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 12px;
-  min-width: 18px;
-  text-align: center;
-}
-
-.logout-btn {
-  background-color: #f44336;
-  color: white;
-}
-
-.logout-btn:hover {
-  background-color: #da190b;
-}
-
-.modal-buttons {
+.SN-BS-modal-buttons {
   display: flex;
   justify-content: center;
   gap: 1rem;
   margin-top: 1.5rem;
 }
 
-.confirm-button, .cancel-button {
+.SN-BS-confirm-button,
+.SN-BS-cancel-button {
   padding: 0.8rem 1.5rem;
   border-radius: 4px;
   border: none;
@@ -174,31 +176,31 @@
   transition: background-color 0.3s ease;
 }
 
-.confirm-button {
+.SN-BS-confirm-button {
   background-color: #f44336;
   color: white;
 }
 
-.confirm-button:hover {
+.SN-BS-confirm-button:hover {
   background-color: #da190b;
 }
 
-.cancel-button {
+.SN-BS-cancel-button {
   background-color: #e0e0e0;
   color: #333;
 }
 
-.cancel-button:hover {
+.SN-BS-cancel-button:hover {
   background-color: #d5d5d5;
 }
 
-.book-service {
+.SN-BS-book-service {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-.booking-progress {
+.SN-BS-booking-progress {
   display: flex;
   justify-content: space-between;
   margin: 2rem 0;
@@ -206,7 +208,7 @@
   gap: 15px;
 }
 
-.progress-step {
+.SN-BS-progress-step {
   position: relative;
   padding: 1rem;
   border-radius: 4px;
@@ -214,19 +216,23 @@
   color: #666;
 }
 
-.progress-step.active {
+.SN-BS-progress-step.SN-BS-active {
   background: #000000;
   color: white;
 }
 
-.services-grid {
+.SN-BS-service-selection {
+  margin: 2rem 0;
+}
+
+.SN-BS-services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
   margin: 2rem 0;
 }
 
-.service-icon {
+.SN-BS-service-icon {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -235,53 +241,58 @@
   margin-bottom: 1rem;
 }
 
-.SN-service-card {
+.SN-BS-service-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   padding: 1.5rem;
-  border: 1px solid #ddd;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
+  background: linear-gradient(145deg, rgba(26, 26, 26, 0.9), rgba(0, 0, 0, 0.95));
+  border-radius: 20px;
+  transition: all 0.4s ease;
+  border: 1px solid var(--accent-color);
+  position: relative;
+  overflow: hidden;
 }
 
-.SN-service-card h3 {
+.SN-BS-service-card h3 {
   margin: 0.5rem 0;
   font-size: 1.1rem;
 }
 
-.SN-service-card p {
+.SN-BS-service-card p {
   color: #666;
   margin: 0;
 }
 
-.SN-service-card:hover {
+.SN-BS-service-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.booking-form {
+.SN-BS-booking-form {
   max-width: 600px;
   margin: 0 auto;
 }
 
-.form-group-3 {
+.SN-BS-form-group {
   display: flex;
   align-items: center;
   margin-bottom: 1.5rem;
   gap: 1rem;
 }
 
-.form-group-3 input {
+.SN-BS-form-group input {
   flex: 1;
   padding: 0.8rem;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
-.form-group-3 select {
+.SN-BS-form-group select {
   flex: 1;
   padding: 0.8rem;
   border: 1px solid #ddd;
@@ -297,29 +308,28 @@
   background-size: 1em;
 }
 
-.form-group-3 select:focus {
+.SN-BS-form-group select:focus {
   outline: none;
   border-color: #FFD700;
 }
 
-.form-group-3 select option {
+.SN-BS-form-group select option {
   padding: 0.5rem;
 }
 
-.time-range-group {
+.SN-BS-time-range-group {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-.form-group-3 svg {
+.SN-BS-form-group svg {
   font-size: 1.2rem;
   margin-right: 10px;
 }
 
-.next-button,
-.confirm-button {
+.SN-BS-next-button {
   width: 100%;
   padding: 1rem;
   background: #FFD700;
@@ -330,13 +340,13 @@
   font-size: 1.1rem;
 }
 
-.booking-confirmation {
+.SN-BS-booking-confirmation {
   max-width: 600px;
   margin: 0 auto;
   text-align: center;
 }
 
-.error-message {
+.SN-BS-error-message {
   background-color: #ffe6e6;
   color: #d63031;
   padding: 12px;
@@ -346,7 +356,7 @@
   border: 1px solid #ff9999;
 }
 
-.booking-summary {
+.SN-BS-booking-summary {
   background: #f8f9fa;
   padding: 1.5rem;
   border-radius: 8px;
@@ -354,119 +364,92 @@
   color: #333;
 }
 
-.booking-summary h3 {
+.SN-BS-booking-summary h3 {
   color: #000000;
   margin-bottom: 1rem;
   font-size: 1.2rem;
 }
 
-.summary-details {
+.SN-BS-summary-details {
   margin-top: 1rem;
   color: #444;
 }
 
-.summary-details p {
+.SN-BS-summary-details p {
   margin: 0.5rem 0;
   line-height: 1.5;
 }
 
-.summary-details strong {
+.SN-BS-summary-details strong {
   color: #000000;
   font-weight: 600;
   margin-right: 0.5rem;
 }
 
-.providers-list {
+.SN-BS-providers-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
 }
 
-.provider-card {
+.SN-BS-provider-card {
   background: white;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1.5rem;
   transition: all 0.3s ease;
   color: #333;
-  /* Add text color */
 }
 
-.provider-card h3 {
+.SN-BS-provider-card h3 {
   color: #000000;
   margin-bottom: 1rem;
   font-size: 1.2rem;
 }
 
-.provider-details {
+.SN-BS-provider-details {
   margin: 1rem 0;
   color: #444;
-  /* Add text color for details */
 }
 
-.provider-details p {
+.SN-BS-provider-details p {
   margin: 0.5rem 0;
   line-height: 1.4;
 }
 
-.provider-details strong {
+.SN-BS-provider-details strong {
   color: #000000;
   font-weight: 600;
 }
 
-.rating {
+.SN-BS-rating {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.5rem;
   color: #333;
-  /* Add text color for rating text */
 }
 
-.star-filled {
+.SN-BS-star-filled {
   color: #FFD700;
 }
 
-.star-empty {
+.SN-BS-star-empty {
   color: #ddd;
 }
 
-.new-provider {
+.SN-BS-new-provider {
   color: #666;
   font-style: italic;
 }
 
-.provider-card:hover {
+.SN-BS-provider-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.provider-details {
-  margin: 1rem 0;
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.star-filled {
-  color: #FFD700;
-}
-
-.star-empty {
-  color: #ddd;
-}
-
-.new-provider {
-  color: #666;
-  font-style: italic;
-}
-
-.select-provider-button {
+.SN-BS-select-provider-button {
   width: 100%;
   padding: 0.8rem;
   background: #FFD700;
@@ -478,11 +461,11 @@
   transition: background-color 0.3s ease;
 }
 
-.select-provider-button:hover {
+.SN-BS-select-provider-button:hover {
   background: #F4C430;
 }
 
-.no-providers {
+.SN-BS-no-providers {
   text-align: center;
   padding: 2rem;
   background: #f8f9fa;
@@ -490,7 +473,7 @@
   color: #000;
 }
 
-.back-button {
+.SN-BS-back-button {
   margin-top: 1rem;
   padding: 0.8rem 1.5rem;
   background: #666;
@@ -501,11 +484,11 @@
   transition: background-color 0.3s ease;
 }
 
-.back-button:hover {
+.SN-BS-back-button:hover {
   background: #555;
 }
 
-.modal-overlay {
+.SN-BS-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -518,7 +501,7 @@
   z-index: 1000;
 }
 
-.modal-content {
+.SN-BS-modal-content {
   background-color: white;
   padding: 2rem;
   border-radius: 8px;
@@ -526,20 +509,22 @@
   width: 90%;
   text-align: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  animation: SN-BS-fadeIn 0.3s ease-in-out;
 }
 
-.modal-content h2 {
+.SN-BS-modal-content h2 {
   margin-bottom: 1rem;
   color: #333;
 }
 
-.modal-content p {
+.SN-BS-modal-content p {
   margin-bottom: 1.5rem;
   color: #666;
   line-height: 1.5;
 }
 
-.modal-close-button {
+.SN-BS-modal-close-button {
   padding: 0.8rem 2rem;
   background: #FFD700;
   color: black;
@@ -550,19 +535,29 @@
   transition: background-color 0.3s ease;
 }
 
-.modal-close-button:hover {
+.SN-BS-modal-close-button:hover {
   background: #F4C430;
 }
 
-.loading-spinner {
-  animation: spin 1s linear infinite;
+.SN-BS-loading-spinner {
+  animation: SN-BS-spin 1s linear infinite;
   font-size: 3rem;
   color: #FFD700;
   margin: 2rem auto;
   display: block;
 }
 
-@keyframes fadeIn {
+@keyframes SN-BS-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes SN-BS-fadeIn {
   from {
     opacity: 0;
     transform: translateY(-20px);
@@ -574,7 +569,13 @@
   }
 }
 
-.countdown-timer {
+.SN-BS-success-message {
+  color: #28a745;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.SN-BS-countdown-timer {
   margin-top: 1rem;
   font-size: 0.9rem;
   color: #666;
@@ -584,84 +585,25 @@
   display: inline-block;
 }
 
-.modal-content {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  position: relative;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.modal-content h2 {
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.modal-content p {
-  margin-bottom: 1.5rem;
-  color: #666;
-  line-height: 1.5;
-}
-
-.success-message,
-.error-message {
-  text-align: center;
-  margin: 1rem 0;
-}
-
-.success-message {
-  color: #28a745;
-}
-
-.error-message {
-  color: #dc3545;
-}
-
-
-.track-service-btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  background-color: #4CAF50;
-  color: white;
-  margin-right: 10px;
-  transition: background-color 0.3s ease;
-}
-
-.track-service-btn:hover {
-  background-color: #45a049;
-}
-
-.nav-right {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
 @media (max-width: 768px) {
-  .booking-progress {
-    gap: 10px; /* Smaller gap on medium screens */
+  .SN-BS-booking-progress {
+    gap: 10px;
+    /* Smaller gap on medium screens */
   }
-  
-  .progress-step {
+
+  .SN-BS-progress-step {
     padding: 0.8rem 0.5rem;
     font-size: 0.9rem;
   }
 }
 
 @media (max-width: 576px) {
-  .booking-progress {
-    gap: 8px; /* Even smaller gap on very small screens */
+  .SN-BS-booking-progress {
+    gap: 8px;
+    /* Even smaller gap on very small screens */
   }
-  
-  .progress-step {
+
+  .SN-BS-progress-step {
     padding: 0.7rem 0.4rem;
     font-size: 0.8rem;
   }
