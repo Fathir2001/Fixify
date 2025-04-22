@@ -5,9 +5,10 @@ const {
   findMatchingProviders,
   resetPassword,
 } = require("../controllers/serviceNeederController");
-const authMiddleware = require("../middleware/auth");
+const authMiddleware = require("../middleware/auth"); // Make sure this is correct
 const { sendOTP } = require("../utils/mailer");
 const ServiceNeeder = require("../models/ServiceNeeder");
+const ApprovedServiceProvider = require("../models/ApprovedServiceProvider"); // Add this import
 const bcrypt = require("bcryptjs");
 const router = express.Router();
 
@@ -111,6 +112,25 @@ router.get("/all", async (req, res) => {
     res
       .status(500)
       .json({ message: "Server error while fetching service needers" });
+  }
+});
+
+
+/// Get all available service locations
+router.get('/available-locations', authMiddleware, async (req, res) => {
+  try {
+    // Find all unique service areas from approved service providers
+    const providers = await ApprovedServiceProvider.find({}, 'serviceArea');
+
+    // Extract serviceArea values and ensure they're not null/undefined
+    const locations = providers
+      .map(provider => provider.serviceArea)
+      .filter(area => area); // Filter out null/undefined values
+
+    res.json({ locations });
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    res.status(500).json({ message: 'Failed to fetch available locations' });
   }
 });
 

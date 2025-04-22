@@ -258,6 +258,101 @@
   overflow: hidden;
 }
 
+/* Updated location dropdown styling */
+.SN-BS-location-dropdown {
+  position: absolute;
+  width: 100%; /* Make it full width of the parent */
+  max-height: 250px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  top: 100%; /* Position it directly below the input */
+  left: 0; /* Align to the left edge of the form group */
+  margin-top: 5px; /* Small gap between input and dropdown */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d1d1 #f5f5f5;
+}
+
+.SN-BS-location-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.SN-BS-location-dropdown::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.SN-BS-location-dropdown::-webkit-scrollbar-thumb {
+  background-color: #d1d1d1;
+  border-radius: 4px;
+  border: 2px solid #f5f5f5;
+}
+
+.SN-BS-location-option {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+  font-size: 14px;
+}
+
+.SN-BS-location-option:last-child {
+  border-bottom: none;
+}
+
+.SN-BS-location-option:hover {
+  background-color: #f8f9fa;
+  padding-left: 20px;
+}
+
+.SN-BS-location-option.SN-BS-highlighted {
+  background-color: #f0f7ff;
+  color: #0066cc;
+}
+
+/* Improve the input field styling to match */
+.SN-BS-form-group input[name="location"] {
+  flex: 1;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.SN-BS-form-group input[name="location"]:focus {
+  outline: none;
+  border-color: #FFD700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+}
+
+/* Add a custom dropdown indicator */
+.SN-BS-location-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.SN-BS-location-input-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #666;
+  pointer-events: none;
+}
+
+.SN-BS-form-group input[name="location"]:focus + .SN-BS-location-input-wrapper::after {
+  border-top-color: #FFD700;
+}
+
 .SN-BS-service-card h3 {
   margin: 0.5rem 0;
   font-size: 1.1rem;

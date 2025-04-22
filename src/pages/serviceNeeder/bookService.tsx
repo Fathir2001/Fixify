@@ -128,6 +128,8 @@ const BookService: React.FC = () => {
     message: "",
   });
   const [countdown, setCountdown] = useState(8);
+  const [availableLocations, setAvailableLocations] = useState<string[]>([]);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 
   const fetchSNNotifications = async () => {
     try {
@@ -202,6 +204,11 @@ const BookService: React.FC = () => {
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [showNotificationsList]);
+
+
+  useEffect(() => {
+    fetchAvailableLocations();
+  }, []);
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -404,6 +411,42 @@ const BookService: React.FC = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const fetchAvailableLocations = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(
+        "http://localhost:5000/api/service-needers/available-locations",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Location data received:", data); // Debug log to see structure
+
+        // Check if data.locations exists and is an array
+        if (data && data.locations && Array.isArray(data.locations)) {
+          // Remove duplicates and sort alphabetically
+          const uniqueLocations = [...new Set(data.locations)].sort();
+          setAvailableLocations(uniqueLocations);
+        } else {
+          // Handle case where data structure is unexpected
+          console.error("Unexpected response format for locations:", data);
+          setAvailableLocations([]);
+        }
+      } else {
+        console.error("Failed to fetch locations:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  };
+
   return (
     <div>
       <nav className="SN-BS-navbar">
@@ -519,14 +562,42 @@ const BookService: React.FC = () => {
             {error && <div className="SN-BS-error-message">{error}</div>}
             <div className="SN-BS-form-group">
               <FaMapMarkerAlt />
-              <input
-                type="text"
-                name="location"
-                placeholder="Service Location"
-                value={bookingData.location}
-                onChange={handleInputChange}
-                required
-              />
+              <div className="SN-BS-location-input-wrapper">
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="Service Location"
+                  value={bookingData.location}
+                  onChange={handleInputChange}
+                  onClick={() => setShowLocationDropdown(true)}
+                  onFocus={() => setShowLocationDropdown(true)}
+                  onBlur={() => {
+                    setTimeout(() => setShowLocationDropdown(false), 200);
+                  }}
+                  required
+                />
+                {/* Dropdown attached inside the wrapper for proper positioning */}
+                {showLocationDropdown && availableLocations.length > 0 && (
+                  <div className="SN-BS-location-dropdown">
+                    {availableLocations
+                      .filter(location =>
+                        location.toLowerCase().includes(bookingData.location.toLowerCase()))
+                      .map((location, index) => (
+                        <div
+                          key={index}
+                          className={`SN-BS-location-option ${bookingData.location === location ? 'SN-BS-highlighted' : ''
+                            }`}
+                          onMouseDown={() => {
+                            setBookingData((prev) => ({ ...prev, location }));
+                            setShowLocationDropdown(false);
+                          }}
+                        >
+                          {location}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="SN-BS-form-group">
               <FaMapMarkerAlt />
