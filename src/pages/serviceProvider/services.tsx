@@ -360,11 +360,7 @@ const ServiceProviderServices: React.FC = () => {
 
               <div className="sp-service-footer">
                 <p>Accepted on: {formatDate(service.acceptedAt)}</p>
-                {service.status === "ongoing" && (
-                  <button className="sp-complete-button">
-                    Mark as Complete
-                  </button>
-                )}
+                
               </div>
             </div>
           ))}
