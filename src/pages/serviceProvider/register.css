@@ -22,6 +22,40 @@ body::before {
   z-index: -1;
 }
 
+
+.revenue-notice-top {
+  margin: 0 0 2rem;
+  background-color: rgba(255, 215, 0, 0.15);
+  border: 1px solid #FFD700;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.revenue-notice-top .revenue-notice-text {
+  font-size: 1rem;
+  text-align: center;
+}
+
+.revenue-notice {
+  margin: 0.5rem 0 1.5rem;
+  padding: 0.8rem;
+  background-color: rgba(255, 215, 0, 0.1);
+  border-left: 3px solid #FFD700;
+  border-radius: 4px;
+}
+
+.revenue-notice-text {
+  color: #FFD700;
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.revenue-notice-text strong {
+  color: #FFD700;
+  font-weight: bold;
+}
+
 .login-button-container {
   position: absolute;
   top: 1rem;

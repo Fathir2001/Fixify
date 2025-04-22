@@ -147,6 +147,12 @@ const ServiceProviderRegister: React.FC = () => {
           <h2>Service Provider Registration</h2>
         </div>
 
+        <div className="revenue-notice revenue-notice-top">
+          <p className="revenue-notice-text">
+            <strong>Important:</strong> You need to pay 15% of your revenue which are earned in this platform.
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-group">
             <FaUserCircle className="input-icon" />
@@ -333,7 +339,6 @@ const ServiceProviderRegister: React.FC = () => {
               onWheel={(e) => e.currentTarget.blur()} // Prevents mouse wheel from changing the value
             />
           </div>
-
           <button type="submit" className="register-button">
             Register as Service Provider
           </button>
