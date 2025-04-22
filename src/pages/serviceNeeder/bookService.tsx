@@ -134,6 +134,8 @@ const BookService: React.FC = () => {
   const [countdown, setCountdown] = useState(8);
   const [availableLocations, setAvailableLocations] = useState<string[]>([]);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
+  const [previousStep, setPreviousStep] = useState(1);
 
   const handleCustomTimeChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'timeFrom' | 'timeTo') => {
     setBookingData({
@@ -238,9 +240,16 @@ const BookService: React.FC = () => {
   };
 
   const handleServiceSelect = (serviceName: string) => {
+    setPreviousStep(step);
+    setShowTransition(true);
     setSelectedService(serviceName);
     setBookingData((prev) => ({ ...prev, serviceType: serviceName }));
-    setStep(2);
+
+    // Delay setting step to allow for animation
+    setTimeout(() => {
+      setStep(2);
+      setShowTransition(false);
+    }, 700);
   };
 
   const handleInputChange = (
@@ -265,6 +274,9 @@ const BookService: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); // Clear any previous errors
+
+    setPreviousStep(step);
+    setShowTransition(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -302,8 +314,11 @@ const BookService: React.FC = () => {
         throw new Error("Invalid response format from server");
       }
 
-      setMatchedProviders(data.providers);
-      setStep(3);
+      setTimeout(() => {
+        setMatchedProviders(data.providers);
+        setStep(3);
+        setShowTransition(false);
+      }, 700);
     } catch (error) {
       console.error("Error finding providers:", error);
       setError(
@@ -536,12 +551,12 @@ const BookService: React.FC = () => {
       <div className="SN-BS-book-service">
         <div className="SN-BS-booking-progress">
           <div
-            className={`SN-BS-progress-step ${step >= 1 ? "SN-BS-active" : ""}`}
+            className={`SN-BS-progress-step ${step >= 1 ? "SN-BS-active" : ""} ${step > 1 ? "SN-BS-completed" : ""}`}
           >
             1. Select Service
           </div>
           <div
-            className={`SN-BS-progress-step ${step >= 2 ? "SN-BS-active" : ""}`}
+            className={`SN-BS-progress-step ${step >= 2 ? "SN-BS-active" : ""} ${step > 2 ? "SN-BS-completed" : ""}`}
           >
             2. Schedule
           </div>
@@ -551,6 +566,11 @@ const BookService: React.FC = () => {
             3. Confirm
           </div>
         </div>
+
+        {/* Add transition overlay */}
+        {showTransition && (
+          <div className="SN-BS-step-transition"></div>
+        )}
 
         {step === 1 && (
           <div className="SN-BS-service-selection">
@@ -656,7 +676,14 @@ const BookService: React.FC = () => {
             </div>
             <div className="SN-BS-time-range-group">
               <div className="SN-BS-form-group">
-                <FaClock />
+                <FaClock
+                  onClick={() => {
+                    const timeFromInput = document.querySelector('input[name="timeFrom"]');
+                    if (timeFromInput) {
+                      (timeFromInput as HTMLElement).click();
+                    }
+                  }}
+                />
                 <input
                   type="time"
                   name="timeFrom"
@@ -666,10 +693,20 @@ const BookService: React.FC = () => {
                   max="20:00"
                   required
                   style={{ cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.currentTarget.showPicker();
+                  }}
                 />
               </div>
               <div className="SN-BS-form-group">
-                <FaClock />
+                <FaClock
+                  onClick={() => {
+                    const timeToInput = document.querySelector('input[name="timeTo"]');
+                    if (timeToInput) {
+                      (timeToInput as HTMLElement).click();
+                    }
+                  }}
+                />
                 <input
                   type="time"
                   name="timeTo"
@@ -679,6 +716,9 @@ const BookService: React.FC = () => {
                   max="20:00"
                   required
                   style={{ cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.currentTarget.showPicker();
+                  }}
                 />
               </div>
             </div>
@@ -746,7 +786,14 @@ const BookService: React.FC = () => {
                   </p>
                   <button
                     className="SN-BS-back-button"
-                    onClick={() => setStep(2)}
+                    onClick={() => {
+                      setPreviousStep(step);
+                      setShowTransition(true);
+                      setTimeout(() => {
+                        setStep(2);
+                        setShowTransition(false);
+                      }, 700);
+                    }}
                   >
                     Modify Search
                   </button>
