@@ -196,7 +196,7 @@ const BookService: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest(".notification-wrapper") && showNotificationsList) {
+      if (!target.closest(".SN-BS-notification-wrapper") && showNotificationsList) {
         setShowNotificationsList(false);
       }
     };

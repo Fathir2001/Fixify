@@ -669,6 +669,7 @@
 }
 
 .otp-digit {
+  color: #333;
   width: 50px;
   height: 60px;
   margin: 0 5px;
