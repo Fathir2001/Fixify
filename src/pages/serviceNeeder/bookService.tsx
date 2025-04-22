@@ -51,6 +51,10 @@ const BookService: React.FC = () => {
   const [matchedProviders, setMatchedProviders] = useState<ServiceProvider[]>(
     []
   );
+  const [showTimeModal, setShowTimeModal] = useState({
+    timeFrom: false,
+    timeTo: false
+  });
   const [snNotifications, setSNNotifications] = useState<SNNotification[]>([]);
   const [showNotificationsList, setShowNotificationsList] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -130,6 +134,19 @@ const BookService: React.FC = () => {
   const [countdown, setCountdown] = useState(8);
   const [availableLocations, setAvailableLocations] = useState<string[]>([]);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+
+  const handleCustomTimeChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'timeFrom' | 'timeTo') => {
+    setBookingData({
+      ...bookingData,
+      [field]: e.target.value
+    });
+  };
+
+  const validateTime = (time: string): boolean => {
+    // Simple time validation using regex (HH:MM format, 24-hour)
+    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    return timeRegex.test(time);
+  };
 
   const fetchSNNotifications = async () => {
     try {
@@ -640,41 +657,29 @@ const BookService: React.FC = () => {
             <div className="SN-BS-time-range-group">
               <div className="SN-BS-form-group">
                 <FaClock />
-                <select
+                <input
+                  type="time"
                   name="timeFrom"
                   value={bookingData.timeFrom}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleCustomTimeChange(e, 'timeFrom')}
+                  min="08:00"
+                  max="20:00"
                   required
-                >
-                  <option value="">Select start time</option>
-                  {generateTimeSlots().map((time) => (
-                    <option key={`from-${time}`} value={time}>
-                      {time}
-                    </option>
-                  ))}
-                </select>
+                  style={{ cursor: "pointer" }}
+                />
               </div>
               <div className="SN-BS-form-group">
                 <FaClock />
-                <select
+                <input
+                  type="time"
                   name="timeTo"
                   value={bookingData.timeTo}
-                  onChange={(e) =>
-                    handleInputChange(
-                      e as unknown as React.ChangeEvent<HTMLInputElement>
-                    )
-                  }
+                  onChange={(e) => handleCustomTimeChange(e, 'timeTo')}
+                  min={bookingData.timeFrom || "08:00"}
+                  max="20:00"
                   required
-                >
-                  <option value="">Select end time</option>
-                  {generateTimeSlots()
-                    .filter((time) => time > bookingData.timeFrom)
-                    .map((time) => (
-                      <option key={`to-${time}`} value={time}>
-                        {time}
-                      </option>
-                    ))}
-                </select>
+                  style={{ cursor: "pointer" }}
+                />
               </div>
             </div>
             <button type="submit" className="SN-BS-next-button">
