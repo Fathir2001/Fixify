@@ -222,10 +222,18 @@ const BookService: React.FC = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setBookingData({
-      ...bookingData,
-      [e.target.name]: e.target.value,
-    });
+    // Special handling for location field to normalize case
+    if (e.target.name === "location") {
+      setBookingData({
+        ...bookingData,
+        [e.target.name]: e.target.value.trim(), // Store as entered but trim whitespace
+      });
+    } else {
+      setBookingData({
+        ...bookingData,
+        [e.target.name]: e.target.value,
+      });
+    }
   };
 
   const [error, setError] = useState<string>("");
@@ -240,6 +248,11 @@ const BookService: React.FC = () => {
         return;
       }
 
+      const normalizedBookingData = {
+        ...bookingData,
+        location: bookingData.location.toLowerCase(), // Convert to lowercase for consistent matching
+      };
+
       console.log("Sending booking data:", bookingData); // Debug log
 
       const response = await fetch(
@@ -250,7 +263,7 @@ const BookService: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(bookingData),
+          body: JSON.stringify(normalizedBookingData),
         }
       );
 
@@ -291,6 +304,12 @@ const BookService: React.FC = () => {
         (timeTo.getTime() - timeFrom.getTime()) / (1000 * 60 * 60);
       const totalFee = totalHours * providerFee;
 
+      // Normalize the location case
+      const normalizedBookingData = {
+        ...bookingData,
+        location: bookingData.location.toLowerCase(),
+      };
+
       const response = await fetch(
         "http://localhost:5000/api/service-requests/create",
         {
@@ -300,7 +319,7 @@ const BookService: React.FC = () => {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({
-            ...bookingData,
+            ...normalizedBookingData,
             providerId,
             totalHours,
             totalFee,
@@ -412,9 +431,8 @@ const BookService: React.FC = () => {
                     snNotifications.map((notification) => (
                       <div
                         key={notification._id}
-                        className={`SN-BS-notification-item ${
-                          !notification.read ? "SN-BS-unread" : ""
-                        }`}
+                        className={`SN-BS-notification-item ${!notification.read ? "SN-BS-unread" : ""
+                          }`}
                       >
                         <p className="SN-BS-notification-message">
                           {notification.message}
