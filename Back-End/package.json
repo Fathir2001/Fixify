@@ -1,8 +1,11 @@
 {
   "name": "back-end",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend API for Fixify service platform",
   "main": "index.js",
+  "engines": {
+    "node": ">=16.20.1"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
@@ -26,3 +29,5 @@
     "react-icons": "^5.4.0"
   }
 }
+
+

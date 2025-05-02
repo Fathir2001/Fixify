@@ -31,14 +31,27 @@ const server = http.createServer(app);
 // Configure Socket.io
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173"],  // Allow both origins
+    origin: [
+      "http://localhost:3000", 
+      "http://localhost:5173",
+      "https://fixify-frontend.onrender.com", // Add your deployed frontend URL here
+    ],
     methods: ["GET", "POST"],
     credentials: true
   },
 });
 
 // Configure CORS
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000", 
+    "http://localhost:5173",
+    "https://fixify-frontend.onrender.com", // Add your deployed frontend URL here
+    // Allow your production domain when you have it
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true
+}));
 
 // Middleware
 app.use(express.json());
