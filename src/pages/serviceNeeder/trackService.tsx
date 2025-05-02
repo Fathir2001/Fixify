@@ -4,10 +4,7 @@ import "./trackService.css";
 import Modal from "react-modal";
 Modal.setAppElement("#root");
 import {
-  FaCalendarCheck,
   FaTools,
-  FaMapMarkerAlt,
-  FaClock,
   FaUser,
   FaPhone,
   FaArrowLeft,
@@ -75,12 +72,12 @@ const TrackService: React.FC = () => {
   } | null>(null);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [generatedOTP, setGeneratedOTP] = useState<string | null>(null);
-  const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
-  const [otpServiceId, setOtpServiceId] = useState<string | null>(null);
+  const [_otpExpiry, setOtpExpiry] = useState<Date | null>(null);
+  const [_tpServiceId, setOtpServiceId] = useState<string | null>(null);
   const [otpCountdown, setOtpCountdown] = useState<number>(0);
   const [otpGenerating, setOtpGenerating] = useState(false);
 
-  const debugRequestId = (requestId: string) => {
+  const _debugRequestId = (requestId: string) => {
     console.log("Debug requestId:", requestId);
     console.log("Length:", requestId.length);
     console.log("Is ObjectId format:", /^[0-9a-fA-F]{24}$/.test(requestId));
@@ -156,7 +153,7 @@ const TrackService: React.FC = () => {
   }, [navigate]);
 
   // Add a debug function in your component
-  const testServiceById = async (serviceId: string) => {
+  const _testServiceById = async (serviceId: string) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) return;

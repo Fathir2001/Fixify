@@ -51,7 +51,7 @@ const BookService: React.FC = () => {
   const [matchedProviders, setMatchedProviders] = useState<ServiceProvider[]>(
     []
   );
-  const [showTimeModal, setShowTimeModal] = useState({
+  const [_showTimeModal, _setShowTimeModal] = useState({
     timeFrom: false,
     timeTo: false
   });
@@ -135,7 +135,7 @@ const BookService: React.FC = () => {
   const [availableLocations, setAvailableLocations] = useState<string[]>([]);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
-  const [previousStep, setPreviousStep] = useState(1);
+  const [_previousStep, setPreviousStep] = useState(1);
 
   const handleCustomTimeChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'timeFrom' | 'timeTo') => {
     setBookingData({
@@ -465,7 +465,7 @@ const BookService: React.FC = () => {
         if (data && data.locations && Array.isArray(data.locations)) {
           // Remove duplicates and sort alphabetically
           const uniqueLocations = [...new Set(data.locations)].sort();
-          setAvailableLocations(uniqueLocations);
+          setAvailableLocations(uniqueLocations as string[]);
         } else {
           // Handle case where data structure is unexpected
           console.error("Unexpected response format for locations:", data);
