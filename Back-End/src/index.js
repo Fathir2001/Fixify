@@ -28,6 +28,15 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+// Middleware to log incoming requests
+console.log("Environment variables check:", {
+  PORT: process.env.PORT || "(using default 5000)",
+  MONGODB_URI_SET: process.env.MONGODB_URI ? "✓" : "✗",
+  JWT_SECRET_SET: process.env.JWT_SECRET ? "✓" : "✗",
+  EMAIL_USER_SET: process.env.EMAIL_USER ? "✓" : "✗",
+  EMAIL_PASS_SET: process.env.EMAIL_PASS ? "✓" : "✗"
+});
+
 // Configure Socket.io
 const io = socketIo(server, {
   cors: {
@@ -64,6 +73,16 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to Fixify API" });
 });
 
+// Add this near your other routes
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    time: new Date().toISOString(),
+    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    env: process.env.NODE_ENV || "development"
+  });
+});
+
 // API Routes
 app.use("/api/service-providers", requestedServiceProviderRoutes);
 app.use("/api/admin", adminRoutes);
@@ -89,20 +108,34 @@ io.on("connection", (socket) => {
   socket.on("verifyOTP", (data) => {
     console.log("OTP verification for service:", data.serviceId);
   });
+
+  socket.on("error", (error) => {
+    console.error("Socket.IO error:", error);
+  });
+});
+
+// Add general error handler for io
+io.engine.on("connection_error", (err) => {
+  console.error("Socket.IO connection error:", err);
 });
 
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    // Don't let the server crash on MongoDB connection failure
+    // The application can still start, just with limited functionality
+  });
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("Unhandled error:", err);
   res.status(500).json({
     message: "Internal Server Error",
-    error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    error: process.env.NODE_ENV === "production" ? "An unexpected error occurred" : err.message,
   });
 });
 
@@ -131,7 +164,12 @@ const verifyEmailConfig = async () => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, async () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  await verifyEmailConfig();
+  
+  // Run email verification separately so it doesn't block startup
+  verifyEmailConfig().catch(err => {
+    console.error("Failed to verify email configuration:", err);
+    // App continues running even if email verification fails
+  });
 });
