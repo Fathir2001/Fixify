@@ -139,9 +139,9 @@ const ServiceProviders: React.FC = () => {
         setLoading(true);
         const [pendingResponse, approvedResponse, rejectedResponse] =
           await Promise.all([
-            axios.get("http://localhost:5000/api/service-providers/all"),
-            axios.get("http://localhost:5000/api/service-providers/approved"),
-            axios.get("http://localhost:5000/api/service-providers/rejected"),
+            axios.get("https://fixme-production.up.railway.app/api/service-providers/all"),
+            axios.get("https://fixme-production.up.railway.app/api/service-providers/approved"),
+            axios.get("https://fixme-production.up.railway.app/api/service-providers/rejected"),
           ]);
 
         setPendingRequests(
@@ -187,7 +187,7 @@ const ServiceProviders: React.FC = () => {
     try {
       if (newStatus === "approved") {
         await axios.put(
-          `http://localhost:5000/api/service-providers/approve/${requestId}`
+          `https://fixme-production.up.railway.app/api/service-providers/approve/${requestId}`
         );
 
         const approvedProvider = pendingRequests.find(
@@ -215,7 +215,7 @@ const ServiceProviders: React.FC = () => {
         alert("Service provider approved successfully!");
       } else {
         await axios.put(
-          `http://localhost:5000/api/service-providers/reject/${requestId}`
+          `https://fixme-production.up.railway.app/api/service-providers/reject/${requestId}`
         );
 
         const rejectedProvider = pendingRequests.find(

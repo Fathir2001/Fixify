@@ -17,7 +17,7 @@ const ForgotPassword: React.FC = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        "http://localhost:5000/api/service-needers/forgot-password",
+        "https://fixme-production.up.railway.app/api/service-needers/forgot-password",
         {
           method: "POST",
           headers: {
@@ -52,7 +52,7 @@ const ForgotPassword: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/service-needers/reset-password",
+        "https://fixme-production.up.railway.app/api/service-needers/reset-password",
         {
           method: "POST",
           headers: {

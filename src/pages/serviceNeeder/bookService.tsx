@@ -158,7 +158,7 @@ const BookService: React.FC = () => {
       console.log("Fetching notifications..."); // Debug log
 
       const response = await fetch(
-        "http://localhost:5000/api/service-requests/sn-notifications",
+        "https://fixme-production.up.railway.app/api/service-requests/sn-notifications",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -184,7 +184,7 @@ const BookService: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       await fetch(
-        "http://localhost:5000/api/service-requests/sn-notifications/mark-read",
+        "https://fixme-production.up.railway.app/api/service-requests/sn-notifications/mark-read",
         {
           method: "PATCH",
           headers: {
@@ -292,7 +292,7 @@ const BookService: React.FC = () => {
       console.log("Sending booking data:", bookingData); // Debug log
 
       const response = await fetch(
-        "http://localhost:5000/api/service-needers/find-providers",
+        "https://fixme-production.up.railway.app/api/service-needers/find-providers",
         {
           method: "POST",
           headers: {
@@ -350,7 +350,7 @@ const BookService: React.FC = () => {
       };
 
       const response = await fetch(
-        "http://localhost:5000/api/service-requests/create",
+        "https://fixme-production.up.railway.app/api/service-requests/create",
         {
           method: "POST",
           headers: {
@@ -449,7 +449,7 @@ const BookService: React.FC = () => {
       if (!token) return;
 
       const response = await fetch(
-        "http://localhost:5000/api/service-needers/available-locations",
+        "https://fixme-production.up.railway.app/api/service-needers/available-locations",
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -63,7 +63,7 @@ interface CustomerDetailsModalProps {
   onClose: () => void;
 }
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://fixme-production.up.railway.app/api";
 
 // Customer Details Modal Component
 const CustomerDetailsModal: React.FC<CustomerDetailsModalProps> = ({

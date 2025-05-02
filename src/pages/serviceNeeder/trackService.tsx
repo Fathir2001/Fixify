@@ -97,7 +97,7 @@ const TrackService: React.FC = () => {
         }
 
         const response = await fetch(
-          "http://localhost:5000/api/service-requests/my-requests",
+          "https://fixme-production.up.railway.app/api/service-requests/my-requests",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -122,7 +122,7 @@ const TrackService: React.FC = () => {
 
         // Also fetch rejected services
         const rejectedResponse = await fetch(
-          "http://localhost:5000/api/service-requests/my-rejected-services",
+          "https://fixme-production.up.railway.app/api/service-requests/my-rejected-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -163,7 +163,7 @@ const TrackService: React.FC = () => {
 
       console.log("Testing service with ID:", serviceId);
       const response = await fetch(
-        `http://localhost:5000/api/service-requests/test-service/${serviceId}`,
+        `https://fixme-production.up.railway.app/api/service-requests/test-service/${serviceId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -195,7 +195,7 @@ const TrackService: React.FC = () => {
 
       // Make a request to get accepted service ID for this request
       const response = await fetch(
-        `http://localhost:5000/api/service-requests/accepted-service-id/${requestId}`,
+        `https://fixme-production.up.railway.app/api/service-requests/accepted-service-id/${requestId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -253,7 +253,7 @@ const TrackService: React.FC = () => {
       const payload = JSON.parse(atob(tokenParts[1]));
       const userId = payload.id;
 
-      const socket = io("http://localhost:5000");
+      const socket = io("https://fixme-production.up.railway.app");
 
       socket.on("connect", () => {
         console.log("Connected to WebSocket for service start notifications");
@@ -305,7 +305,7 @@ const TrackService: React.FC = () => {
 
       // Fetch regular service requests
       const requestsResponse = await fetch(
-        "http://localhost:5000/api/service-requests/my-requests",
+        "https://fixme-production.up.railway.app/api/service-requests/my-requests",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -315,7 +315,7 @@ const TrackService: React.FC = () => {
 
       // Fetch rejected services
       const rejectedResponse = await fetch(
-        "http://localhost:5000/api/service-requests/my-rejected-services",
+        "https://fixme-production.up.railway.app/api/service-requests/my-rejected-services",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -325,7 +325,7 @@ const TrackService: React.FC = () => {
 
       // Fetch connected services
       const connectedResponse = await fetch(
-        "http://localhost:5000/api/service-requests/my-connected-services",
+        "https://fixme-production.up.railway.app/api/service-requests/my-connected-services",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -335,7 +335,7 @@ const TrackService: React.FC = () => {
 
       // Fetch active services
       const activeResponse = await fetch(
-        "http://localhost:5000/api/service-requests/my-active-services",
+        "https://fixme-production.up.railway.app/api/service-requests/my-active-services",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -345,7 +345,7 @@ const TrackService: React.FC = () => {
 
       // Fetch completed services
       const completedResponse = await fetch(
-        "http://localhost:5000/api/service-requests/my-completed-services",
+        "https://fixme-production.up.railway.app/api/service-requests/my-completed-services",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -468,7 +468,7 @@ const TrackService: React.FC = () => {
       console.log("Requesting OTP for service:", requestId);
 
       const response = await fetch(
-        `http://localhost:5000/api/service-requests/start-service/${requestId}/generate-otp`,
+        `https://fixme-production.up.railway.app/api/service-requests/start-service/${requestId}/generate-otp`,
         {
           method: "POST",
           headers: {

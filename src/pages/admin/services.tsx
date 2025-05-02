@@ -53,7 +53,7 @@ interface ServiceDetailsModalProps {
   onClose: () => void;
 }
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://fixme-production.up.railway.app/api";
 
 // Service Details Modal Component
 const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({

@@ -94,7 +94,7 @@ const ServiceProviderHomePage: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/service-requests/notifications/${notificationId}/details`,
+        `https://fixme-production.up.railway.app/api/service-requests/notifications/${notificationId}/details`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -137,7 +137,7 @@ const ServiceProviderHomePage: React.FC = () => {
       console.log("Fetching notifications...");
 
       const response = await fetch(
-        "http://localhost:5000/api/service-requests/notifications",
+        "https://fixme-production.up.railway.app/api/service-requests/notifications",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -169,7 +169,7 @@ const ServiceProviderHomePage: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:5000/api/service-requests/notifications/mark-read",
+        "https://fixme-production.up.railway.app/api/service-requests/notifications/mark-read",
         {
           method: "PATCH",
           headers: {
@@ -207,7 +207,7 @@ const ServiceProviderHomePage: React.FC = () => {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/service-requests/reject-service/${serviceRequestId}`,
+        `https://fixme-production.up.railway.app/api/service-requests/reject-service/${serviceRequestId}`,
         {
           method: "POST",
           headers: {
@@ -255,7 +255,7 @@ const ServiceProviderHomePage: React.FC = () => {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/service-requests/${serviceRequestId}/accept`,
+        `https://fixme-production.up.railway.app/api/service-requests/${serviceRequestId}/accept`,
         {
           method: "POST",
           headers: {
@@ -294,7 +294,7 @@ const ServiceProviderHomePage: React.FC = () => {
   useEffect(() => {
     if (!provider?._id) return;
 
-    const socket = io("http://localhost:5000");
+    const socket = io("https://fixme-production.up.railway.app");
     const providerId = provider._id;
 
     console.log("Provider ID for socket:", providerId); // Add this log
@@ -341,7 +341,7 @@ const ServiceProviderHomePage: React.FC = () => {
     const fetchProviderData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/service-providers/profile",
+          "https://fixme-production.up.railway.app/api/service-providers/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -419,7 +419,7 @@ const ServiceProviderHomePage: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:5000/api/service-providers/profile/update",
+        "https://fixme-production.up.railway.app/api/service-providers/profile/update",
         {
           method: "PUT",
           headers: {

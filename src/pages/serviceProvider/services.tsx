@@ -57,7 +57,7 @@ const ServiceProviderServices: React.FC = () => {
     const fetchAcceptedServices = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/service-requests/provider-accepted-services",
+          "https://fixme-production.up.railway.app/api/service-requests/provider-accepted-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -101,7 +101,7 @@ const ServiceProviderServices: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:5000/api/service-requests/start-service/verify-otp",
+        "https://fixme-production.up.railway.app/api/service-requests/start-service/verify-otp",
         {
           method: "POST",
           headers: {
@@ -153,7 +153,7 @@ const ServiceProviderServices: React.FC = () => {
       const payload = JSON.parse(atob(tokenParts[1]));
       const userId = payload.id;
 
-      const socket = io("http://localhost:5000");
+      const socket = io("https://fixme-production.up.railway.app");
 
       socket.on("serviceOtpGenerated", (data) => {
         // Check if this event is for current provider

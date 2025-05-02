@@ -98,7 +98,7 @@ const ServiceProviderRegister: React.FC = () => {
       };
 
       const response = await fetch(
-        "http://localhost:5000/api/service-providers/register",
+        "https://fixme-production.up.railway.app/api/service-providers/register",
         {
           method: "POST",
           headers: {
