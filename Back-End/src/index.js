@@ -43,7 +43,8 @@ const io = socketIo(server, {
     origin: [
       "http://localhost:3000", 
       "http://localhost:5173",
-      "https://fixify-frontend.onrender.com", // Add your deployed frontend URL here
+      "https://fixify-frontend.onrender.com",
+      "https://jolly-macaron-6caae5.netlify.app" // Add your Netlify domain here
     ],
     methods: ["GET", "POST"],
     credentials: true
@@ -55,8 +56,8 @@ app.use(cors({
   origin: [
     "http://localhost:3000", 
     "http://localhost:5173",
-    "https://fixify-frontend.onrender.com", // Add your deployed frontend URL here
-    // Allow your production domain when you have it
+    "https://fixify-frontend.onrender.com",
+    "https://jolly-macaron-6caae5.netlify.app" // Add your Netlify domain here
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
